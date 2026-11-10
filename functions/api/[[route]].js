@@ -1,4 +1,5 @@
-// 도란도란 동물의숲 server (Cloudflare Pages Functions): own sign-in (login id + password), profile, check-record sync.
+// 도란도란 동물의숲 server (Cloudflare Pages Functions): own sign-in (login id + password), profile, check-record sync,
+// trade posts (구해요 / 팔아요 / 나눔) with comments.
 // Needs one D1 database bound to this Pages project as DB. Tables are made on the first request.
 // No e-mail and no outside sign-in: a forgotten password is reset by the admin (the first account made).
 
@@ -20,6 +21,14 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id)`,
   `CREATE TABLE IF NOT EXISTS sync (user_id TEXT PRIMARY KEY, rev INTEGER NOT NULL, code TEXT NOT NULL, updated INTEGER NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS hits (k TEXT PRIMARY KEY, n INTEGER NOT NULL, until INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS posts (
+     id TEXT PRIMARY KEY, user_id TEXT NOT NULL, type TEXT NOT NULL, items TEXT NOT NULL, pay TEXT NOT NULL,
+     body TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'open', cmts INTEGER NOT NULL DEFAULT 0,
+     created INTEGER NOT NULL, updated INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS posts_status ON posts(status, updated)`,
+  `CREATE INDEX IF NOT EXISTS posts_user ON posts(user_id, updated)`,
+  `CREATE TABLE IF NOT EXISTS comments (id TEXT PRIMARY KEY, post_id TEXT NOT NULL, user_id TEXT NOT NULL, body TEXT NOT NULL, created INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS comments_post ON comments(post_id, created)`,
 ];
 let schemaReady = null;
 function setup(db){
@@ -84,6 +93,49 @@ async function overLimit(db, k, max, windowMs){
       RETURNING n`).bind(k, now + windowMs, now).first();
   return r.n > max;
 }
+/* ---------- trade posts ---------- */
+const TYPES = ["want", "sell", "free"];
+const SERVICES = ["turnip", "shop", "catalog", "help"];   // 무 섬 입장, 상점 구경, 만지작(카탈로그 등록), 그 밖의 부탁
+// No cash trades: bank words, pay apps, gift cards, and "number + 원".
+const CASH = /(계좌|입금|송금|현금|현거래|현질|(?<![가-힣])토스(?![터트])|카카오\s*페이|카페이|네이버\s*페이|페이코|문상|문화\s*상품권|컬[쳐처]\s*랜드|해피\s*머니|기프티콘|기프트\s*카드|상품권|페이팔|paypal|venmo|₩|krw|\d[\d,.\s]*(만|천)?\s*원(?!하|해|할|함|했|합|래|룸|피스|목|석|숭이|두|형|예|반|통|뿔|탁|더|소|심|시|승|\s*포인트)|만\s*원(?!하|해|할|함|했|합))/i;
+// Post text keeps line breaks (at most one empty line in a row); everything else like cleanText.
+const cleanBody = (s, max) => String(s ?? "").normalize("NFC").replace(/\r\n?/g, "\n").replace(/[\u0000-\u0009\u000b-\u001f\u007f\u200b-\u200f\u2028-\u202e\u2066-\u2069]/g, "").split("\n").map(l => l.replace(/\s+/g, " ").trim()).join("\n").replace(/\n{3,}/g, "\n\n").trim().slice(0, max);
+const hasCash = (...t) => t.some(x => x && CASH.test(String(x)));
+const intIn = (v, lo, hi) => { const n = Math.floor(Number(v)); return Number.isFinite(n) && n >= lo && n <= hi ? n : null; };
+function cleanItems(arr){
+  if(!Array.isArray(arr) || !arr.length || arr.length > 20) return null;
+  const out = [], seen = new Set();
+  for(const x of arr){
+    if(!x || typeof x !== "object") return null;
+    let o;
+    if(x.k === "i"){ const id = intIn(x.id, 0, 9999999); if(id === null) return null; o = { k: "i", id, n: intIn(x.n, 1, 999) || 1 }; const c = intIn(x.c, 0, 63); if(c !== null) o.c = c; }
+    else if(x.k === "v"){ const id = String(x.id || ""); if(!/^[A-Za-z0-9_.-]{1,32}$/.test(id)) return null; o = { k: "v", id, m: x.m === "photo" ? "photo" : "move" }; }
+    else if(x.k === "s"){ if(!SERVICES.includes(x.id)) return null; o = { k: "s", id: x.id }; }
+    else return null;
+    const key = o.k + ":" + o.id + ":" + (o.c ?? "") + ":" + (o.m || "");
+    if(seen.has(key)) continue; seen.add(key); out.push(o);
+  }
+  return out;
+}
+function cleanPay(p, type){
+  if(type === "free") return { free: true };
+  p = p && typeof p === "object" ? p : {};
+  const o = {}, mile = intIn(p.mile, 1, 999), bells = intIn(p.bells, 1, 999999999), swap = cleanText(p.swap).slice(0, 100);
+  if(mile) o.mile = mile; if(bells) o.bells = bells; if(swap) o.swap = swap; if(p.nego) o.nego = true;
+  return Object.keys(o).length ? o : null;
+}
+const author = r => ({ id: r.user_id, name: r.a_name || "", island: r.a_island || "", fruit: r.a_fruit || "" });
+const postOut = r => ({ id: r.id, type: r.type, items: JSON.parse(r.items), pay: JSON.parse(r.pay), body: r.body, status: r.status, cmts: r.cmts, created: r.created, updated: r.updated, author: author(r) });
+const POST_SQL = `SELECT p.*, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM posts p JOIN users u ON u.id = p.user_id WHERE u.banned = 0`;
+async function postInput(b){
+  const type = TYPES.includes(b.type) ? b.type : null; if(!type) return { err: "type" };
+  const items = cleanItems(b.items); if(!items) return { err: "items" };
+  const pay = cleanPay(b.pay, type); if(!pay) return { err: "pay" };
+  const body = cleanBody(b.body, 500);
+  if(hasCash(body, pay.swap)) return { err: "cash" };
+  return { type, items, pay, body };
+}
+
 const pub = u => ({ id: u.id, login: u.login, name: u.name, island: u.island, fruit: u.fruit, admin: u.role === "admin", mustChange: !!u.must_change, created: u.created });
 
 async function currentUser(req, env, url){
@@ -119,6 +171,22 @@ export async function onRequest(ctx){
     const db = env.DB;
     if(m === "GET" && path === "me"){ const u = await currentUser(req, env, url); return json({ user: u ? pub(u) : null }); }
     if(m === "GET" && path === "sync") return getSync(req, env, url);
+    if(m === "GET" && path === "posts"){
+      const mine = url.searchParams.get("mine") === "1", before = intIn(url.searchParams.get("before"), 1, 9e15);
+      let r;
+      if(mine){
+        const u = await currentUser(req, env, url); if(!u) return fail("signin", 401);
+        r = await db.prepare(POST_SQL + ` AND p.user_id = ? AND p.updated < ? ORDER BY p.updated DESC LIMIT 100`).bind(u.id, before || 9e15).all();
+      } else r = await db.prepare(POST_SQL + ` AND p.status = 'open' AND p.updated < ? ORDER BY p.updated DESC LIMIT 200`).bind(before || 9e15).all();
+      return json({ posts: r.results.map(postOut), more: r.results.length >= (mine ? 100 : 200) });
+    }
+    let pm;
+    if(m === "GET" && (pm = /^posts\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+      const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(pm[1]).first();
+      if(!r) return fail("no_post", 404);
+      const c = await db.prepare(`SELECT c.id, c.body, c.created, c.user_id, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM comments c JOIN users u ON u.id = c.user_id WHERE c.post_id = ? AND u.banned = 0 ORDER BY c.created LIMIT 300`).bind(pm[1]).all();
+      return json({ post: postOut(r), comments: c.results.map(x => ({ id: x.id, body: x.body, created: x.created, author: author(x) })) });
+    }
     if(m !== "GET" && !sameSite(req, url)) return fail("origin", 403);
     const ip = req.headers.get("CF-Connecting-IP") || "local";
 
@@ -189,6 +257,9 @@ export async function onRequest(ctx){
       if(u.role === "admin" && (await db.prepare(`SELECT COUNT(*) AS n FROM users`).first()).n > 1) return fail("admin_last", 409);
       await db.batch([
         db.prepare(`DELETE FROM sync WHERE user_id = ?`).bind(u.id),
+        db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.user_id = ?))`).bind(u.id),
+        db.prepare(`DELETE FROM comments WHERE user_id = ? OR post_id IN (SELECT id FROM posts WHERE user_id = ?)`).bind(u.id, u.id),
+        db.prepare(`DELETE FROM posts WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM sessions WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM users WHERE id = ?`).bind(u.id),
       ]);
@@ -203,6 +274,61 @@ export async function onRequest(ctx){
         : await db.prepare(`UPDATE sync SET rev = rev + 1, code = ?, updated = ? WHERE user_id = ? AND rev = ?`).bind(code, now, u.id, base).run();
       if(!r.meta.changes){ const cur = await db.prepare(`SELECT rev, code, updated FROM sync WHERE user_id = ?`).bind(u.id).first(); return fail("conflict", 409, cur || { rev: 0 }); }
       return json({ rev: base + 1, updated: now });
+    }
+
+    if(m === "POST" && path === "posts"){
+      const v = await postInput(await body(req)); if(v.err) return fail(v.err);
+      if(await overLimit(db, "po:" + u.id, 30, DAY)) return fail("slow_down", 429);
+      const id = rand(9), now = Date.now();
+      await db.prepare(`INSERT INTO posts (id, user_id, type, items, pay, body, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(id, u.id, v.type, JSON.stringify(v.items), JSON.stringify(v.pay), v.body, now, now).run();
+      return json({ post: postOut({ id, user_id: u.id, ...v, items: JSON.stringify(v.items), pay: JSON.stringify(v.pay), status: "open", cmts: 0, created: now, updated: now, a_name: u.name, a_island: u.island, a_fruit: u.fruit }) });
+    }
+    if((pm = /^posts\/([A-Za-z0-9_-]{6,24})(\/comments)?$/.exec(path))){
+      const p = await db.prepare(`SELECT * FROM posts WHERE id = ?`).bind(pm[1]).first();
+      if(!p) return fail("no_post", 404);
+      const own = p.user_id === u.id, admin = u.role === "admin", now = Date.now();
+      if(pm[2]){
+        if(m !== "POST") return fail("not_found", 404);
+        const b = await body(req), text = cleanBody(b.body, 300);
+        if(!text) return fail("empty");
+        if(hasCash(text)) return fail("cash");
+        if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
+        const id = rand(9);
+        await db.batch([
+          db.prepare(`INSERT INTO comments (id, post_id, user_id, body, created) VALUES (?, ?, ?, ?, ?)`).bind(id, p.id, u.id, text, now),
+          db.prepare(`UPDATE posts SET cmts = cmts + 1 WHERE id = ?`).bind(p.id),
+        ]);
+        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit } } });
+      }
+      if(m === "DELETE"){
+        if(!own && !admin) return fail("not_yours", 403);
+        await db.batch([db.prepare(`DELETE FROM comments WHERE post_id = ?`).bind(p.id), db.prepare(`DELETE FROM posts WHERE id = ?`).bind(p.id)]);
+        return json({ ok: true });
+      }
+      if(m === "POST"){
+        if(!own) return fail("not_yours", 403);
+        const b = await body(req);
+        if(b.status && !b.items){
+          if(!["open", "done"].includes(b.status)) return fail("status");
+          await db.prepare(`UPDATE posts SET status = ?, updated = ? WHERE id = ?`).bind(b.status, now, p.id).run();
+        } else {
+          const v = await postInput(b); if(v.err) return fail(v.err);
+          await db.prepare(`UPDATE posts SET type = ?, items = ?, pay = ?, body = ?, updated = ? WHERE id = ?`).bind(v.type, JSON.stringify(v.items), JSON.stringify(v.pay), v.body, now, p.id).run();
+        }
+        const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(p.id).first();
+        return json({ post: postOut(r) });
+      }
+    }
+    if(m === "DELETE" && (pm = /^comments\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+      const c = await db.prepare(`SELECT * FROM comments WHERE id = ?`).bind(pm[1]).first();
+      if(!c) return fail("no_comment", 404);
+      if(c.user_id !== u.id && u.role !== "admin"){
+        const p = await db.prepare(`SELECT user_id FROM posts WHERE id = ?`).bind(c.post_id).first();
+        if(!p || p.user_id !== u.id) return fail("not_yours", 403);   // the post's author may tidy comments on their own post
+      }
+      await db.batch([db.prepare(`DELETE FROM comments WHERE id = ?`).bind(c.id), db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.post_id)]);
+      return json({ ok: true });
     }
 
     if(path.startsWith("admin/")){

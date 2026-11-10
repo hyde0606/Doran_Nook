@@ -370,6 +370,81 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .urow .wt{flex:1 1 auto} .urow .pill{flex:none; min-height:38px; padding:0 12px} .urow .fr{width:44px; height:44px; background:var(--paper)} .urow .fr .pic{--t:34px}
 .urow .me{flex:none; font-size:13px; color:var(--muted); padding:0 8px}
 .ures:empty{display:none}
+/* 거래 */
+.tr-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap:14px; align-items:start}
+.tr-bar{grid-column:1/-1; display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13.5px; min-width:0}
+.tr-bar > .pill:first-child{margin-left:auto}
+.tr-bar .pill .fi{width:15px; height:15px}
+.tr-card{border:0; text-align:left; background:var(--card); color:var(--ink); border-radius:20px; padding:12px 14px 12px; display:grid; gap:10px; box-shadow:0 5px 0 var(--grass-shadow); min-width:0; width:100%; font:inherit; content-visibility:auto; contain-intrinsic-size:auto 220px}
+.tr-card:active{transform:scale(.985)}
+.tr-card.tr-closed{opacity:.75}
+.tr-h{display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0}
+.tr-tag{font-family:var(--f-display); font-size:13.5px; line-height:1.2; border-radius:8px; padding:3px 9px; white-space:nowrap}
+.tr-tag.tr-want{background:var(--plum-soft); color:var(--plum)}
+.tr-tag.tr-sell{background:color-mix(in srgb, var(--sun) 40%, transparent); color:var(--ink)}
+.tr-tag.tr-free{background:var(--sprout); color:var(--leaf)}
+.tr-tag.tr-fin{background:var(--chip); color:var(--muted)}
+.tr-h .tr-tm{margin-left:auto; font-size:12.5px; color:var(--muted); white-space:nowrap}
+.tr-items{display:grid; gap:8px; min-width:0}
+.tr-it{display:flex; align-items:center; gap:10px; min-width:0}
+.tr-it .pic{flex:none}
+.tr-it .tx{display:grid; min-width:0}
+.tr-it b{font-family:var(--f-display); font-weight:400; font-size:15.5px; line-height:1.25; overflow-wrap:anywhere}
+.tr-it i{font-style:normal; font-size:12.5px; color:var(--muted); overflow-wrap:anywhere}
+.tr-more{font-size:13px; color:var(--muted); padding-left:50px}
+.tr-pay{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; font-size:14px; min-width:0; background:var(--chip); border-radius:12px; padding:7px 10px}
+.tr-pay em{font-style:normal; font-family:var(--f-display); color:var(--h-ink); font-size:13.5px; flex:none}
+.tr-pp{display:inline-flex; align-items:center; gap:5px; min-width:0; overflow-wrap:anywhere}
+.tr-pp .pic,.tr-pp .fi{flex:none}
+.tr-pp .fi{width:20px; height:20px; color:var(--h-ink)}
+.tr-pay.tr-big{font-size:15.5px; background:transparent; padding:0}
+.tr-by{display:flex; align-items:center; gap:6px; min-width:0; font-size:13.5px; color:var(--muted); flex-wrap:wrap}
+.tr-by b{font-family:var(--f-display); font-weight:400; color:var(--ink); font-size:14.5px}
+.tr-by .fr,.cmt .fr{width:24px; height:24px; display:grid; place-items:center; flex:none}
+.tr-by .fr .pic,.cmt .fr .pic{--t:24px}
+.tr-by .tr-cm{margin-left:auto; display:inline-flex; align-items:center; gap:4px}
+.tr-by .tr-cm .fi{width:16px; height:16px}
+.tr-paybox{display:grid; gap:8px; background:var(--chip); border-radius:14px; padding:10px 12px}
+.tr-row .tr-go{flex:none; font-size:12.5px; color:var(--muted); padding-right:4px}
+.tr-row .tx b,.tr-frow .tx b{overflow-wrap:anywhere}
+.tr-auth .fr{width:44px; height:44px; border-radius:50%; background:var(--paper2); display:grid; place-items:center; flex:none}
+.tr-auth .fr .pic{--t:34px}
+.tr-auth .wt{display:grid; min-width:0}
+.tr-auth .wt b{font-family:var(--f-display); font-weight:400; font-size:16px}
+.tr-auth .wt span{font-size:13px; color:var(--muted)}
+.tr-cmh{margin-top:4px}
+.tr-seg{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px}
+.tr-seg button{border:0; border-radius:12px; padding:11px 4px; background:var(--paper2); color:var(--ink); font-family:var(--f-display); font-size:16px; white-space:nowrap}
+.tr-seg button.tr-want[aria-checked="true"]{background:var(--plum); color:#fff}
+.tr-seg button.tr-sell[aria-checked="true"]{background:var(--sun); color:#4a3a1c}
+.tr-seg button.tr-free[aria-checked="true"]{background:var(--leaf); color:var(--leaf-ink)}
+.fld > span .tr-fh{font-family:var(--f-display); font-weight:400; font-size:15px; color:var(--h-ink)}
+.tr-payrow{display:flex; align-items:center; gap:8px; background:var(--paper2); border-radius:12px; padding:6px 10px; min-width:0}
+.tr-payrow .pic,.tr-payrow .fi{flex:none}
+.tr-payrow .fi{width:22px; height:22px; margin:0 6px; color:var(--h-ink)}
+.tr-payrow .tr-lb{flex:none; font-size:14.5px}
+.fld .tr-payrow input{flex:1 1 auto; width:auto; min-width:0; background:var(--paper); padding:9px 10px; text-align:right}
+.fld .tr-payrow.tr-swp input{text-align:left}
+.fld .toggle{background:var(--paper2); color:var(--ink)}
+.fld .toggle input{width:20px; height:20px; flex:none; padding:0; accent-color:var(--leaf)}
+.tr-payrow .tr-u{flex:none; font-size:14px; color:var(--muted)}
+.tr-frow{align-items:flex-start; padding:8px}
+.tr-frow > .pic{margin-top:2px}
+.tr-frow .tx{display:grid; gap:6px}
+.tr-fo{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.tr-fo select{border:0; background:var(--paper); color:var(--ink); border-radius:10px; padding:7px 8px; font:inherit; font-size:14px; max-width:100%; min-width:0}
+.tr-qty{display:inline-flex; align-items:center; gap:2px; background:var(--paper); border-radius:10px; padding:2px}
+.tr-qty .tr-qb{width:30px; height:30px; border:0; border-radius:8px; background:transparent; color:var(--ink); display:grid; place-items:center; padding:0}
+.tr-qty .tr-qb svg{width:14px; height:14px}
+.fld .tr-qty input{width:46px; padding:5px 2px; text-align:center; background:transparent; font-size:15px}
+.tr-qty > span{font-size:13px; color:var(--muted); padding-right:6px}
+.tr-frow .tr-rm{flex:none; width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--muted); display:grid; place-items:center; padding:0}
+.tr-frow .tr-rm svg{width:13px; height:13px}
+.pic.tr-svc{display:grid; place-items:center; background:var(--paper); border-radius:10px; color:var(--h-ink)}
+.pic.tr-svc svg{width:55%; height:55%}
+.tr-box .acts2 .pill{flex:1 1 auto}
+.tr-box .acts2 .pill .fi{width:16px; height:16px}
+#tp-res .shd{margin:12px 0 6px}
 .tempbox{display:grid; gap:8px; background:var(--plum-soft); border-radius:12px; padding:12px}
 .tempbox p{margin:0; line-height:1.5}
 .tempbox input{border:0; background:var(--paper); color:var(--ink); border-radius:10px; padding:10px 12px; font-size:18px; letter-spacing:.06em}
@@ -464,15 +539,23 @@ body{display:flex; flex-direction:column}
 .page{flex:1 1 auto; min-height:0; height:auto}
 .tabbar{flex:none; position:relative; z-index:7; background-color:var(--soil); background-image:var(--soil-tex); padding:6px max(10px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-right, 0px)); box-shadow:0 -3px 0 rgba(0,0,0,.18)}
 .tabbar .in{max-width:640px; margin:0 auto; display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:4px}
+html.srv .tabbar .in{max-width:700px; grid-template-columns:repeat(7, minmax(0,1fr))}
+html:not(.srv) .tabbar [data-tab="trade"]{display:none}
+@media (max-width:340px){
+  html.srv .tabbar{padding-left:max(4px, env(safe-area-inset-left, 0px)); padding-right:max(4px, env(safe-area-inset-right, 0px))}
+  html.srv .tabbar .in{gap:2px}
+  html.srv .tabbar button{font-size:10px; letter-spacing:-.04em}
+}
 .tabbar button{border:0; background:transparent; color:var(--cream); opacity:.7; height:52px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:var(--f-display); font-size:clamp(11px, 3.1vw, 13.5px); line-height:1; white-space:nowrap; letter-spacing:-.01em; padding:0; min-width:0; transition:background .15s}
 .tabbar button svg{width:24px; height:24px}
-.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp) no-repeat; background-size:168px 28px; transition:transform .12s}
+.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp) no-repeat; background-size:196px 28px; transition:transform .12s}
 .tabbar [data-tab="item"] .tic{background-position:0px 0}
 .tabbar [data-tab="museum"] .tic{background-position:-28px 0}
 .tabbar [data-tab="villager"] .tic{background-position:-56px 0}
 .tabbar [data-tab="dream"] .tic{background-position:-84px 0}
 .tabbar [data-tab="todo"] .tic{background-position:-112px 0}
 .tabbar [data-tab="island"] .tic{background-position:-140px 0}
+.tabbar [data-tab="trade"] .tic{background-position:-168px 0}
 .tabbar button[aria-current="page"] .tic{transform:scale(1.1)}
 .ia .sbx, .imrow > .sbx{border-radius:9px}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .ia .sbx, :root:not([data-theme="light"]) .imrow > .sbx{background:rgba(246,234,208,.9)} }
@@ -1258,6 +1341,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
   <button type="button" data-tab="museum"><i class="tic" aria-hidden="true"></i>박물관</button>
   <button type="button" data-tab="villager"><i class="tic" aria-hidden="true"></i>주민</button>
   <button type="button" data-tab="dream"><i class="tic" aria-hidden="true"></i>꿈번지</button>
+  <button type="button" data-tab="trade"><i class="tic" aria-hidden="true"></i>거래</button>
   <button type="button" data-tab="todo"><i class="tic" aria-hidden="true"></i>할 일</button>
   <button type="button" data-tab="island"><i class="tic" aria-hidden="true"></i>섬 꾸미기</button>
 </div></nav>
@@ -1440,12 +1524,13 @@ let saveT = 0;
 function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try{ lsSet(KEY, JSON.stringify(serial())); }catch(e){} }, 250); }
 function serial(){ const m = {}; vmask.forEach((v,k) => { if(v) m[k]=v; }); const wm = {}; like.forEach((v,k) => { if(BY_ID.get(k).vs.length) wm[k]=v; }); return {v:1, o:[...own].sort((a,b)=>a-b), m, w:[...like.keys()].sort((a,b)=>a-b), wm, r:[...res], vl:[...vlike]}; }
 
+if(window.DN_SERVER) document.documentElement.classList.add("srv");   // own server: the 거래 tab shows
 /* ---------- View state (kept per device) ---------- */
 const ui = { tab:"item", cat:0, fo:"all", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1, liked:false, view:"list", sort:"base", limit:0,
   mmon:"all", msort:"base", vpers:-1, vgen:-1, vbm:false, vsort:"name", q:"" };
 // Each bottom tab remembers its own category, status tab and 좋아요 switch.
-const TABS = ["item", "museum", "villager", "dream", "todo", "island"];
-const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:"new"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
+const TABS = ["item", "museum", "villager", "dream", "trade", "todo", "island"];
+const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:"new"}, trade:{cat:-1, fo:"all"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
 const mem = {}; TABS.forEach(t => mem[t] = {...TAB_DEF[t], liked:false});
 const SORTS = {base:"기본 순서", name:"이름 순", buyD:"구매가 높은 순", buyA:"구매가 낮은 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
 const MSORTS = {base:"기본 순서", name:"이름 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
@@ -1456,6 +1541,7 @@ const TAB_FO = {
   museum: [["all","전체"], ["none","미기증"], ["done","기증 완료","기증"]],
   villager: [["all","전체"], ["res","우리 섬"], ["nophoto","사진 없음"], ["photo","사진 있음"]],
   dream: [["new","최신순","최신"], ["hot","인기순","인기"], ["view","많이 본 순","조회"]],
+  trade: [["all","전체"], ["want","구해요"], ["sell","팔아요"], ["free","나눔"]],
   todo: [["day","매일"], ["week","매주"], ["season","시즌"], ["turnip","무트코인"]],
   island: [["land","땅"], ["water","물"], ["path","길"], ["deco","나무·꽃"], ["build","건물"]]
 };
@@ -1468,7 +1554,7 @@ try{ const v = JSON.parse(localStorage.getItem(UIKEY) || "null"); if(v){
   if(mem.item.cat >= 0 && tabOfCat(mem.item.cat) === "museum"){ mem.museum.cat = mem.item.cat; mem.item.cat = 0; }
   if(!(mem.item.cat >= -3 && mem.item.cat < CATS.length)) mem.item.cat = 0;
   if(!(mem.museum.cat === -1 || mem.museum.cat === -3 || MUSEUM_CATS.includes(mem.museum.cat))) mem.museum.cat = -1;
-  if(TABS.includes(v.tab)) ui.tab = v.tab;
+  if(TABS.includes(v.tab) && (v.tab !== "trade" || window.DN_SERVER)) ui.tab = v.tab;
   // only the three "what to show" switches survive a reload; 3.0 신규, DIY, 리폼, 얻는 법, every sort and the museum and villager filters start fresh
   ui.buyable=!!v.buyable; ui.showNS=v.showNS!==false; ui.showNC=v.showNC!==false;
 } }catch(e){}
@@ -1617,6 +1703,7 @@ function render(){
   $("welcome").classList.toggle("tabhide", ui.tab !== "item");
   if(ui.tab === "villager") return renderVillagers();
   if(ui.tab === "dream") return renderDreams();
+  if(ui.tab === "trade") return renderTrades();
   if(ui.tab === "todo") return renderTodo();
   if(ui.tab === "island") return renderIsland();
   const list = sortList(listFor(ui.cat).filter(matchesFilters));
@@ -1638,7 +1725,7 @@ function setTabs(counts){
   const el = $("tabs");
   if(el.dataset.tab !== ui.tab){
     el.dataset.tab = ui.tab;
-    el.setAttribute("aria-label", ui.tab === "island" ? "도구" : ui.tab === "dream" ? "정렬" : ui.tab === "villager" ? "주민 상태" : "보유 상태");
+    el.setAttribute("aria-label", ui.tab === "island" ? "도구" : ui.tab === "dream" ? "정렬" : ui.tab === "trade" ? "글 종류" : ui.tab === "villager" ? "주민 상태" : "보유 상태");
     el.innerHTML = TAB_FO[ui.tab].map(([v, l, short]) => `<button type="button" role="tab" data-fo="${v}">${short ? `<span class="mob">${short}</span><span class="desk">${l}</span>` : l}${counts ? `<span class="tn num"></span>` : ""}${ui.tab === "dream" && v !== "new" ? `<span class="cd num" aria-hidden="true"></span>` : ""}</button>`).join("");
   }
   el.querySelectorAll("button").forEach(b => { const f = b.dataset.fo; b.setAttribute("aria-selected", ui.fo === f); const tn = b.querySelector(".tn"); if(tn && counts) tn.textContent = fmt(counts[f] || 0); });
@@ -1669,10 +1756,10 @@ function setPick(name, kind, kindCls, cnt){
 }
 function renderHead(){
   $("btn-like").setAttribute("aria-pressed", ui.liked);
-  $("btn-like").title = $("btn-like").ariaLabel = ui.tab === "villager" ? "좋아하는 주민만 보기" : ui.tab === "dream" ? "좋아요한 꿈번지만 보기" : "좋아요만 보기";
+  $("btn-like").title = $("btn-like").ariaLabel = ui.tab === "villager" ? "좋아하는 주민만 보기" : ui.tab === "dream" ? "좋아요한 꿈번지만 보기" : ui.tab === "trade" ? "좋아요한 아이템·주민이 들어간 글만 보기" : "좋아요만 보기";
   const fl = $("btn-filt"), dreamMode = ui.tab === "dream", todo = ui.tab === "todo", island = ui.tab === "island";
   const pk = $("btn-pick"); pk.querySelector(".ps use").setAttribute("href", island ? "#i-menu" : "#i-search"); pk.title = pk.ariaLabel = island ? "섬 메뉴" : "카테고리 고르기와 검색";
-  const [flb, fic, ft] = island ? ["저장·공유", "share", "섬 지도 저장과 공유"] : dreamMode ? ["등록", "plus", "꿈번지 등록"] : !todo ? ["필터·정렬", "sliders", "필터와 정렬"]
+  const [flb, fic, ft] = island ? ["저장·공유", "share", "섬 지도 저장과 공유"] : dreamMode ? ["등록", "plus", "꿈번지 등록"] : ui.tab === "trade" ? ["글쓰기", "plus", "거래 글 쓰기"] : !todo ? ["필터·정렬", "sliders", "필터와 정렬"]
     : ui.fo === "season" ? ["설정", "sliders", "시즌 설정"] : ui.fo === "turnip" ? ["지난 기록", "cal", "무트코인 지난 기록"] : ["고치기", "sliders", "할 일 고치기"];
   fl.querySelector(".lb").textContent = flb; fl.querySelector("use").setAttribute("href", "#i-" + fic); fl.title = fl.ariaLabel = ft;
   $("btn-like").classList.toggle("tabhide", todo || island);
@@ -1680,6 +1767,7 @@ function renderHead(){
   if(todo) return renderTodoHead();
   if(ui.tab === "villager") return renderVillagerHead();
   if(ui.tab === "dream") return renderDreamHead();
+  if(ui.tab === "trade") return renderTradeHead();
   const all = listFor(ui.cat); const o = ownedIn(all); const isCat = catIsCatalog(ui.cat);
   const museum = ui.tab === "museum";
   const kl = ui.cat < 0 ? "" : museum ? "박물관" : isCat ? "카탈로그" : "카탈로그 아님";
@@ -1698,14 +1786,14 @@ function groupStats(){
   const g = it => CATS[it.lc][1];
   if(ui.tab === "museum") return [part("생물", TAB_ITEMS.museum.filter(it => g(it) === "bio")), part("화석", BY_CAT[22]), part("미술품", BY_CAT[23])].join("");
   if(ui.tab === "villager") return villagerStats();
-  if(ui.tab === "dream" || ui.tab === "todo" || ui.tab === "island") return "";
+  if(ui.tab === "dream" || ui.tab === "trade" || ui.tab === "todo" || ui.tab === "island") return "";
   const L = TAB_ITEMS.item;
   return [part("카탈로그", L.filter(it => it.st <= 2)), part("레시피", L.filter(it => g(it) === "rcp")), part("리액션·리폼", L.filter(it => g(it) === "more"))].join("");
 }
 function renderTotals(){
   let n = 0, all = 0;
   if(ui.tab === "villager"){ all = VIL.length; n = VIL.filter(hasPhoto).length; }
-  else if(ui.tab === "dream" || ui.tab === "todo" || ui.tab === "island"){ all = 0; }
+  else if(ui.tab === "dream" || ui.tab === "trade" || ui.tab === "todo" || ui.tab === "island"){ all = 0; }
   else { const L = TAB_ITEMS[ui.tab]; all = L.length; n = ownedIn(L); }
   const pct = all ? n/all*100 : 0;
   $("p-total").textContent = all ? `${fmt(n)} / ${fmt(all)}` : "";
@@ -1728,6 +1816,7 @@ function toggleOwn(id){ if(own.has(id)){ own.delete(id); vmask.delete(id); } els
 $("grid").addEventListener("click", e => {
   if(lpFired){ lpFired = false; return; }
   const dc = e.target.closest("[data-dream]"); if(dc){ openDream(dc.dataset.dream); return; }
+  const tc = e.target.closest("[data-trade]"); if(tc){ openTrade(tc.dataset.trade); return; }
   const b = e.target.closest("[data-act]"); if(!b) return;
   const card = b.closest(".card");
   if(card.dataset.v){
@@ -1927,6 +2016,7 @@ function openDetail(it, startSel){
       ${acqHTML(it, info)}
       ${cr ? seasonHTML(cr) : ""}
       ${more.length ? `<details class="more-info" id="d-more"${open ? " open" : ""}><summary>자세한 정보</summary><div class="qlist">${more.map(tile).join("")}</div></details>` : ""}
+      ${tradeBox("i", it)}
       <div class="dnames"><div class="dlab">이름</div>${names.map(([c,l,v]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span>${v ? `<b lang="${c}">${esc(v)}</b><button class="cp" type="button" data-copy="${esc(v)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button>` : `<b class="miss">공식 한국어 이름을 아직 못 구했어요</b>`}</div>`).join("")}</div>
     </div>`;
     const det = body.querySelector("#d-more"); det && det.addEventListener("toggle", () => { try{ localStorage.setItem(KEY + ":more", det.open ? "1" : "0"); }catch(e){} });
@@ -2004,11 +2094,11 @@ function catsHTML(){
 // One sheet for both: type to search this tab, or leave the box empty and pick a category.
 function openFind(){
   const T = ui.tab;
-  const what = T === "villager" ? "주민 이름" : T === "dream" ? "제목, 섬 이름, 대표 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
-  const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? "꿈번지를 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
+  const what = T === "villager" ? "주민 이름" : T === "dream" ? "제목, 섬 이름, 대표 이름" : T === "trade" ? "아이템, 주민, 이름, 섬 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
+  const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? "꿈번지를 찾아요" : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
   const s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
-    <div class="bd-in" id="f-cats">${T === "dream" ? `<p class="sub">찾을 말을 넣어 주세요. ㅂㄲ처럼 초성만 넣어도 돼요.</p>` : catsHTML()}</div>
+    <div class="bd-in" id="f-cats">${T === "dream" || T === "trade" ? `<p class="sub">찾을 말을 넣어 주세요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.</p>` : catsHTML()}</div>
     <div class="res" id="s-res" hidden></div>`, () => { renderTotals(); render(); });
   const inp = s.el.querySelector("#s-q"), out = s.el.querySelector("#s-res"), cats = s.el.querySelector("#f-cats");
   const LIM = 80;
@@ -2024,6 +2114,7 @@ function openFind(){
     let list, html, wrap, hint;
     if(T === "villager"){ list = searchIn(VIL, v => [v.ko, v.en, v.ja], q); html = vilCardHTML; wrap = "grid list vgrid"; hint = "누르면 사진 받은 걸로 체크돼요. ⋯를 누르면 자세히 보여요."; }
     else if(T === "dream"){ list = searchIn(DS.list, x => [x.title, x.island, x.owner, x.text], q); html = x => dreamCardHTML(x); wrap = "dgrid"; hint = "누르면 자세히 보여요."; }
+    else if(T === "trade"){ list = searchIn(tradeAll(), tradeNames, q); html = x => tradeCardHTML(x); wrap = "tgrid"; hint = "누르면 자세히 보여요."; }
     else { list = searchList(q); html = cardHTML; wrap = "grid list"; hint = (T === "museum" ? "누르면 기증한 걸로 체크돼요." : "누르면 바로 체크돼요.") + " ⋯를 누르면 자세히 보여요."; }
     out.innerHTML = list.length ? `<p class="sub">${hint}</p><div class="${wrap} sgrid">${list.slice(0, LIM).map(x => html(x)).join("")}</div>` + (list.length > LIM ? `<p class="sub">${fmt(list.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(q)}"에 맞는 것이 없어요.</p>`;
   };
@@ -2032,6 +2123,7 @@ function openFind(){
   const redo = (el, h) => { const w = document.createElement("div"); w.innerHTML = h; el.replaceWith(w.firstChild); };
   s.el.addEventListener("click", e => {
     const d = e.target.closest("[data-dream]"); if(d){ sheetOver = true; openDream(d.dataset.dream); return; }
+    const tr = e.target.closest("[data-trade]"); if(tr){ sheetOver = true; openTrade(tr.dataset.trade); return; }
     const ab = e.target.closest("[data-act]"), card = ab && ab.closest(".sgrid .card");
     if(card){
       const a = ab.dataset.act;
@@ -2133,7 +2225,7 @@ function openFilters(){
     else if(e.target.closest("#f-reset")){ ui.sort="base"; ui.buyable=false; ui.showNS=true; ui.showNC=true; ui.new3=false; ui.diy=false; ui.remake=false; ui.src=-1; sync(); }
   });
 }
-$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? openDreamForm() : ui.tab === "villager" ? openVilFilters() : openFilters());
+$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? openDreamForm() : ui.tab === "trade" ? openTradeForm() : ui.tab === "villager" ? openVilFilters() : openFilters());
 document.addEventListener("change", e => { if(e.target.id === "f-src"){ ui.src = +e.target.value; ui.limit = 0; saveView(); render(); renderHead(); } });
 
 $("btn-like").addEventListener("click", () => {
@@ -2141,12 +2233,13 @@ $("btn-like").addEventListener("click", () => {
   if(!ui.liked) return;
   if(ui.tab === "villager" && !vlike.size) toast("아직 좋아하는 주민이 없어요. ♡를 눌러 모아 보세요");
   else if((ui.tab === "item" || ui.tab === "museum") && !listFor(-3).length) toast("아직 좋아요한 것이 없어요. ♡를 눌러 모아 보세요");
+  else if(ui.tab === "trade" && !like.size && !vlike.size) toast("아직 좋아요한 아이템이나 주민이 없어요. ♡를 눌러 모아 보세요");
 });
 
 /* ---------- Bottom tabs ---------- */
 function renderTabbar(){ $("tabbar").querySelectorAll("button").forEach(b => b.dataset.tab === ui.tab ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")); }
 function switchTab(t){
-  if(!TABS.includes(t)) return;
+  if(!TABS.includes(t) || (t === "trade" && !window.DN_SERVER)) return;
   if(t === ui.tab){ $("page").scrollTo({top:0, behavior: REDUCED ? "auto" : "smooth"}); return; }
   saveView();
   ui.tab = t; Object.assign(ui, {cat:mem[t].cat, fo:mem[t].fo, liked:mem[t].liked, limit:0});
@@ -2260,6 +2353,7 @@ function openVillager(v){
         ${inside.length ? `<div class="qgrid">${inside.map(([k, it]) => `<button type="button" class="qf qb${own.has(it.id) ? " on" : ""}" data-open-item="${it.id}">${framePic(it, 0, 44)}<div><span>${k}</span><b>${esc(it.ko)}</b></div></button>`).join("")}</div>` : ""}
         ${furn.length ? `<div class="fgrid">${furn.map(it => `<button type="button" data-open-item="${it.id}" class="${own.has(it.id) ? "on" : ""}" title="${esc(it.ko)}">${framePic(it, 0, 52)}<span>${esc(it.ko)}</span></button>`).join("")}</div>` : ""}</div>` : ""}
       ${rel.length ? `<div class="acq"><div class="shd">${ico("box")}<b>관련 아이템</b><span class="sub" style="margin-left:auto">누르면 체크돼요</span></div>${rel.map(([k, it, n]) => `<button class="irow" type="button" data-own-item="${it.id}" aria-pressed="${own.has(it.id)}">${framePic(it, n, 46)}<span class="tx"><span>${k}</span><b>${esc(it.ko)}${n && it.vs[n] ? ` <small>${esc(it.vs[n])}</small>` : ""}</b></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`).join("")}</div>` : ""}
+      ${tradeBox("v", v)}
       <div class="dnames"><div class="dlab">이름</div>${[["ko", "한국어", v.ko], ["en", "English", v.en], ["ja", "日本語", v.ja]].filter(r => r[2]).map(([c, l, val]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span><b lang="${c}">${esc(val)}</b><button class="cp" type="button" data-copy="${esc(val)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button></div>`).join("")}</div>`;
   }
   draw();
@@ -3235,6 +3329,358 @@ const AUTH_ERR = {
 };
 const authErr = e => e && e.message === "locked" ? `비밀번호가 여러 번 틀려서 ${(e.data && e.data.wait) || 10}분 동안 잠겼어요. 잠시 뒤에 다시 해 주세요.` : AUTH_ERR[e && e.message] || "잠시 문제가 생겼어요. 다시 해 주세요.";
 const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? "방금" : m < 60 ? `${m}분 전` : m < 1440 ? `${Math.round(m / 60)}시간 전` : `${Math.round(m / 1440)}일 전`; };
+/* ---------- 거래 ----------
+   Posts live on the site's own server (functions/api: GET posts, posts/:id; POST posts, posts/:id, posts/:id/comments; DELETE …).
+   Anyone can look; writing needs sign-in. Items are {k:"i", id, n, c?} (c = colour number), {k:"v", id} villagers moving,
+   {k:"s", id} help on the island (무 팔기, 상점, 만지작, 그 밖의 부탁). Pay = {mile, bells, swap, nego} or {free:true}. */
+const CASH_RE = /(계좌|입금|송금|현금|현거래|현질|(?<![가-힣])토스(?![터트])|카카오\s*페이|카페이|네이버\s*페이|페이코|문상|문화\s*상품권|컬[쳐처]\s*랜드|해피\s*머니|기프티콘|기프트\s*카드|상품권|페이팔|paypal|venmo|₩|krw|\d[\d,.\s]*(만|천)?\s*원(?!하|해|할|함|했|합|래|룸|피스|목|석|숭이|두|형|예|반|통|뿔|탁|더|소|심|시|승|\s*포인트)|만\s*원(?!하|해|할|함|했|합))/i;   // the same words the server refuses
+const TRADE_MINE = 1;   // mem.trade.cat: -1 = everyone's open posts, 1 = only mine (open and finished)
+const TRADE_T = {want:["구해요"], sell:["팔아요"], free:["나눔"]};
+const PAY_HEAD = {want:"드릴 것", sell:"받고 싶은 것", free:"나눔"};
+const SERVICE = {turnip:["무 팔러 가기", "섬에 들어가서 무를 팔아요"], shop:["상점 구경", "섬 가게에 가서 물건을 사요"], catalog:["만지작", "만져 보고 카탈로그에 등록해요"], help:["그 밖의 부탁", "글에 적어 주세요"]};
+const SERVICE_PIC = {turnip:7734, shop:"bag", catalog:"hand", help:"chat"};
+const tradable = it => CATS[it.lc][1] !== "more";   // 리액션, 건축물·리폼 can't change hands
+const TRADE_ITEMS = ITEMS.filter(tradable);
+const kSearch = (L, names, q) => { const m = KS.matcher(q), hits = []; L.forEach(x => { let best = -1; names(x).forEach(n => { if(!n) return; const r = m(KS.norm(n), "", {}); if(r >= 0 && (best < 0 || r < best)) best = r; }); if(best >= 0) hits.push([best, x, names(x)[0] || ""]); }); return hits.sort((a, b) => a[0] - b[0] || a[2].length - b[2].length).map(h => h[1]); };   // shorter names first when equally good
+const itemPic = (id, t) => { const it = BY_ID.get(id); return it ? framePic(it, 0, t) : ""; };
+function tEntry(x, t){
+  if(x.k === "i"){
+    const it = BY_ID.get(x.id); if(!it) return {pic:`<span class="pic ph" style="--t:${t}px">?</span>`, name:"없어진 아이템", sub:""};
+    const nf = frameCount(it), c = Number.isInteger(x.c) && x.c >= 0 && x.c < it.vs.length ? x.c : -1;
+    return {pic: framePic(it, nf > 1 && c >= 0 && c < nf ? c : 0, t), name: it.ko, sub: [c >= 0 ? it.vs[c] : it.vs.length ? "색 상관없음" : "", `${fmt(x.n || 1)}개`].filter(Boolean).join(" · "), it};
+  }
+  if(x.k === "v"){ const v = VBY.get(x.id); return v ? {pic: vilPic(v, t), name: v.ko, sub: "주민 이사", v} : {pic:`<span class="pic ph" style="--t:${t}px">?</span>`, name:"없어진 주민", sub:""}; }
+  const sv = SERVICE[x.id] || ["부탁", ""], pc = SERVICE_PIC[x.id];
+  return {pic: typeof pc === "number" ? itemPic(pc, t) : `<span class="pic ph tr-svc" style="--t:${t}px"><svg aria-hidden="true"><use href="#i-${pc || "chat"}"/></svg></span>`, name: sv[0], sub: sv[1]};
+}
+const tradeTitle = p => { const e = tEntry(p.items[0] || {k:"s", id:"help"}, 10); return p.items.length > 1 ? `${e.name} 외 ${p.items.length - 1}개` : e.name; };
+const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, p.author.island, p.body, p.pay.swap];
+const tradeLiked = p => p.items.some(x => x.k === "i" ? like.has(x.id) : x.k === "v" ? vlike.has(x.id) : false);
+function payParts(pay){
+  const a = [];
+  if(pay.mile) a.push(`<span class="tr-pp">${itemPic(5851, 26)}<span>마일 여행권 <b class="num">${fmt(pay.mile)}</b>장</span></span>`);
+  if(pay.bells) a.push(`<span class="tr-pp">${itemPic(7731, 26)}<span><b class="num">${fmt(pay.bells)}</b>벨</span></span>`);
+  if(pay.swap) a.push(`<span class="tr-pp">${ico("refresh")}<span>맞교환: ${esc(pay.swap)}</span></span>`);
+  if(pay.nego) a.push(`<span class="tr-pp">${ico("chat")}<span>다른 제안도 받아요</span></span>`);
+  return a.join("");
+}
+const payHTML = p => p.type === "free" ? `<span class="tr-pp">${ico("leaf")}<span>대가 없이 나눠요</span></span>` : payParts(p.pay || {});
+function tradeCardHTML(p){
+  const ents = p.items.map(x => tEntry(x, 40)), more = ents.length - 3;
+  return `<button class="tr-card${p.status === "done" ? " tr-closed" : ""}" type="button" data-trade="${esc(p.id)}">
+    <span class="tr-h"><span class="tr-tag tr-${p.type}">${TRADE_T[p.type][0]}</span>${p.status === "done" ? `<span class="tr-tag tr-fin">거래 완료</span>` : ""}<span class="tr-tm">${ago(p.created)}</span></span>
+    <span class="tr-items">${ents.slice(0, 3).map(e => `<span class="tr-it">${e.pic}<span class="tx"><b>${esc(e.name)}</b>${e.sub ? `<i>${esc(e.sub)}</i>` : ""}</span></span>`).join("")}${more > 0 ? `<span class="tr-more">외 ${more}개 더</span>` : ""}</span>
+    <span class="tr-pay">${p.type === "free" ? "" : `<em>${PAY_HEAD[p.type]}</em>`}${payHTML(p)}</span>
+    <span class="tr-by"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span class="tr-isl">${esc(islandText(p.author.island))}</span><span class="tr-cm">${ico("chat")}<span class="num">${fmt(p.cmts || 0)}</span></span></span>
+  </button>`;
+}
+const TRADE_ERR = {
+  items: "거래할 아이템이나 주민을 하나 이상 골라 주세요.",
+  pay: "주고받을 것을 하나 이상 넣어 주세요. (마일 여행권, 벨, 맞교환, 다른 제안 중에서)",
+  cash: "현금이나 상품권 거래로 보이는 말이 있어서 올릴 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.",
+  type: "글 종류를 골라 주세요.", empty: "댓글 내용을 적어 주세요.",
+  slow_down: "오늘은 너무 많이 썼어요. 내일 다시 해 주세요.",
+  not_yours: "내가 쓴 글만 고칠 수 있어요.", no_post: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.",
+  range: "마일 여행권은 1~999장, 벨은 1~999,999,999벨까지 넣을 수 있어요.",
+};
+const tradeErr = e => TRADE_ERR[e && e.message] || authErr(e);
+const cashWord = (...t) => { for(const x of t){ const m = x && String(x).match(CASH_RE); if(m) return m[0].trim(); } return ""; };
+
+const TS = (() => {
+  let list = [], mine = [], ready = false, at = 0, err = "", busy = null;
+  const subs = new Set(), emit = () => subs.forEach(f => { try{ f(); }catch(e){} });
+  function load(force){
+    if(!AUTH.on) return Promise.resolve();
+    if(busy) return busy;
+    if(!force && ready && Date.now() - at < 30000) return Promise.resolve();
+    busy = (async () => {
+      try{ list = (await AUTH.api("posts")).posts; at = Date.now(); err = ""; }catch(e){ err = e.message || "network"; }
+      if(AUTH.me){ try{ mine = (await AUTH.api("posts?mine=1")).posts; }catch(e){} } else mine = [];
+      ready = true; busy = null; emit();
+    })();
+    return busy;
+  }
+  function put(p){
+    const up = L => { const i = L.findIndex(x => x.id === p.id); if(i >= 0) L[i] = p; else L.unshift(p); };
+    if(p.status === "open") up(list); else list = list.filter(x => x.id !== p.id);
+    if(AUTH.me && p.author.id === AUTH.me.id) up(mine);
+    emit();
+  }
+  function drop(id){ list = list.filter(x => x.id !== id); mine = mine.filter(x => x.id !== id); emit(); }
+  AUTH.sub(() => { if(ready) load(true); });
+  document.addEventListener("visibilitychange", () => { if(!document.hidden && ui.tab === "trade") load(); });
+  return {load, put, drop, find: id => list.find(x => x.id === id) || mine.find(x => x.id === id),
+    get list(){ return list; }, get mine(){ return mine; }, get ready(){ return ready; }, get at(){ return at; }, get err(){ return err; },
+    sub: f => { subs.add(f); return () => subs.delete(f); }};
+})();
+TS.sub(() => { if(ui.tab === "trade" && !$("layer").firstChild) render(); });
+function tradeAll(){ const m = new Map(); TS.list.forEach(p => m.set(p.id, p)); TS.mine.forEach(p => m.set(p.id, p)); return [...m.values()]; }
+function tradeShown(){
+  let L = (ui.cat === TRADE_MINE ? TS.mine : TS.list).filter(p => ui.fo === "all" || p.type === ui.fo);
+  if(ui.liked) L = L.filter(tradeLiked);
+  return L.sort((a, b) => (a.status === "done") - (b.status === "done") || b.created - a.created);
+}
+const signinBtns = `<div class="acts2"><button class="pill leaf" type="button" data-signin="in">로그인</button><button class="pill sun" type="button" data-signin="up">처음이에요 (가입하기)</button></div>`;
+function renderTrades(){
+  TS.load();
+  const grid = $("grid"); grid.className = "tr-grid";
+  cycReset(); $("more").hidden = true;
+  let hello = true; try{ hello = !localStorage.getItem(KEY + ":tradehello"); }catch(e){}
+  const intro = hello ? `<div class="plank" style="grid-column:1/-1; margin:0"><p>친구들과 아이템·주민을 주고받는 곳이에요. 글은 누구나 볼 수 있고, 글쓰기와 댓글은 로그인하고 해요. 현금·상품권 거래는 할 수 없어요.</p><button class="x" type="button" id="trade-hello-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button></div>` : "";
+  const L = tradeShown();
+  let body;
+  if(!TS.ready) body = `<div class="empty"><b>거래 글을 불러오는 중이에요</b>잠시만 기다려 주세요.</div>`;
+  else if(TS.err && !TS.list.length) body = `<div class="empty"><b>거래 글을 불러오지 못했어요</b>인터넷 연결을 확인하고 위쪽 새로 보기를 눌러 주세요.</div>`;
+  else if(ui.cat === TRADE_MINE && !AUTH.me) body = `<div class="empty"><b>로그인하면 내 글이 보여요</b>내가 쓴 거래 글을 여기서 모아 봐요.${signinBtns}</div>`;
+  else if(!L.length) body = ui.liked ? `<div class="empty"><b>좋아요한 것이 들어간 글이 없어요</b>아이템이나 주민의 ♡를 누르면, 그게 들어간 글만 모아 볼 수 있어요.</div>`
+    : `<div class="empty"><b>${ui.cat === TRADE_MINE ? `아직 쓴 ${ui.fo === "all" ? "" : TRADE_T[ui.fo][0] + " "}글이 없어요` : `아직 ${ui.fo === "all" ? "거래" : TRADE_T[ui.fo][0]} 글이 없어요`}</b>위쪽 글쓰기 버튼으로 첫 글을 올려 보세요.</div>`;
+  else body = L.map(tradeCardHTML).join("");
+  const mineOn = ui.cat === TRADE_MINE;
+  const bar = TS.ready ? `<div class="tr-bar"><button class="pill sm ${mineOn ? "leaf" : "ghost"}" type="button" id="tr-mine" aria-pressed="${mineOn}">${ico(mineOn ? "check" : "face")}내 글만</button><button class="pill ghost sm" type="button" id="tr-re">${ico("refresh")}새로 보기</button></div>` : "";
+  grid.innerHTML = intro + bar + body;
+  const on = (sel, f) => grid.querySelectorAll(sel).forEach(b => b.addEventListener("click", f));
+  on("#trade-hello-x", () => { try{ localStorage.setItem(KEY + ":tradehello", "1"); }catch(e){} render(); });
+  on("#tr-re", e => { e.currentTarget.disabled = true; TS.load(true); });
+  on("#tr-mine", () => { ui.cat = ui.cat === TRADE_MINE ? -1 : TRADE_MINE; saveView(); render(); });
+  on("[data-signin]", e => openSignin(e.currentTarget.dataset.signin));
+  renderHead();
+}
+function renderTradeHead(){
+  setPick("거래", "", "", TS.ready ? `${fmt(TS.list.length)}개` : "");
+  setBadge(0); setTabs(null);
+}
+// The "거래" box on an item or villager sheet.
+function tradeBox(k, x){
+  if(!AUTH.on || (k === "i" && !tradable(x))) return "";
+  const a = `data-tk="${k}" data-tid="${esc(k === "i" ? x.id : x.f)}"`;
+  return `<div class="acq tr-box"><div class="shd">${itemPic(7731, 28)}<b>거래</b></div>
+    <div class="acts2"><button class="pill leaf" type="button" data-tw="want" ${a}>구해요 글 쓰기</button><button class="pill sun" type="button" data-tw="sell" ${a}>팔아요 글 쓰기</button><button class="pill ghost" type="button" data-tw="find" ${a}>${ico("search")}거래 글 보기</button></div></div>`;
+}
+$("layer").addEventListener("click", e => {
+  const t = e.target.closest("[data-tw]"); if(!t) return;
+  const x = t.dataset.tk === "v" ? {k:"v", id:t.dataset.tid} : t.dataset.tk === "s" ? {k:"s", id:t.dataset.tid} : {k:"i", id:+t.dataset.tid, n:1};
+  if(t.dataset.tw === "find") return openTradeFind(x);
+  sheetOver = true; openTradeForm(null, {type:t.dataset.tw, items:[x]});
+});
+function openTradeFind(x){
+  const e = tEntry(x, 44), who = x.k === "v" ? "주민" : "아이템";
+  sheetOver = true;
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>${esc(e.name)} 거래</h3><p class="sub">이 ${who}이 들어간 거래 글이에요</p></div>${XBTN}</div><div class="tr-grid" id="tfd"><div class="empty"><b>불러오는 중이에요</b>잠시만 기다려 주세요.</div></div>`);
+  const box = s.el.querySelector("#tfd"), a = `data-tk="${x.k}" data-tid="${esc(x.id)}"`;
+  const paint = () => {
+    if(!box.isConnected) return;
+    const L = TS.list.filter(p => p.items.some(y => y.k === x.k && String(y.id) === String(x.id)));
+    box.innerHTML = L.length ? L.map(tradeCardHTML).join("") : `<div class="empty"><b>아직 이 ${who}이 들어간 글이 없어요</b>먼저 글을 올려 보세요.<div class="acts2" style="justify-content:center; margin-top:12px"><button class="pill leaf" type="button" data-tw="want" ${a}>구해요 글 쓰기</button><button class="pill sun" type="button" data-tw="sell" ${a}>팔아요 글 쓰기</button></div></div>`;
+  };
+  TS.load().then(paint);
+  s.ov._reveal = paint;
+  s.el.addEventListener("click", ev => { const c = ev.target.closest("[data-trade]"); if(c){ sheetOver = true; openTrade(c.dataset.trade); } });
+}
+
+function openTrade(id){
+  let p = TS.find(id); if(!p) return;
+  let cmts = null, loadErr = false;
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="tr-t"></h3><p class="sub" id="tr-s"></p></div>${XBTN}</div><div class="bd-in" id="tr-body"></div>`, () => { stop(); if(ui.tab === "trade") render(); });
+  const body = s.el.querySelector("#tr-body"), me = () => AUTH.me;
+  const mine = () => !!me() && me().id === p.author.id;
+  const canDel = c => !!me() && (me().admin || me().id === c.author.id || mine());
+  function cmtsHTML(){
+    if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
+    if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
+    return cmts.map(c => `<div class="cmt"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === p.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+  }
+  function head(){
+    s.el.querySelector("#tr-t").textContent = tradeTitle(p);
+    s.el.querySelector("#tr-s").textContent = `${TRADE_T[p.type][0]} · ${ago(p.created)}${p.status === "done" ? " · 거래 완료" : ""}`;
+  }
+  function row(x){
+    const e = tEntry(x, 48), tag = e.it || e.v ? "button" : "div";
+    return `<${tag} class="srow tr-row"${tag === "button" ? ` type="button" data-ti="${x.k}:${esc(x.id)}:${Number.isInteger(x.c) ? x.c : ""}"` : ""}>${e.pic}<span class="tx"><b>${esc(e.name)}</b>${e.sub ? `<span>${esc(e.sub)}</span>` : ""}</span>${tag === "button" ? `<span class="tr-go">자세히</span>` : ""}</${tag}>`;
+  }
+  function draw(){
+    head();
+    const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
+    body.innerHTML = `
+      <div class="res">${p.items.map(row).join("")}</div>
+      <div class="tr-paybox"><div class="shd">${p.type === "free" ? ico("leaf") : itemPic(7731, 26)}<b>${PAY_HEAD[p.type]}</b></div><div class="tr-pay tr-big">${payHTML(p)}</div></div>
+      ${p.body ? `<div class="dtext">${esc(p.body)}</div>` : ""}
+      <div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div>
+      ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">고치기</button><button class="pill danger" type="button" id="tr-del">지우기</button></div>`
+        : me() && me().admin ? `<div class="acts2"><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
+      <div id="tr-msg"></div>
+      <div class="shd tr-cmh">${ico("chat")}<b id="tr-cn">댓글 ${fmt(p.cmts || 0)}</b></div>
+      <div class="cmts" id="tr-cl">${cmtsHTML()}</div>
+      ${me() ? `<label class="fld"><span>댓글 달기<i id="trc-cnt">0/300</i></span><textarea id="trc-text" maxlength="300" placeholder="${mine() ? "답을 남겨 주세요" : "거래하고 싶으면 댓글을 남겨 주세요"}"></textarea></label>
+        <div id="trc-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="trc-send">댓글 달기</button></div>`
+        : `<p class="note">댓글은 로그인하고 달 수 있어요.</p>${signinBtns}`}`;
+    const t2 = body.querySelector("#trc-text"); if(t2 && keep){ t2.value = keep; body.querySelector("#trc-cnt").textContent = `${keep.length}/300`; }
+  }
+  function drawCmts(){ const cl = body.querySelector("#tr-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#tr-cn"); if(cn) cn.textContent = `댓글 ${fmt(p.cmts || 0)}`; }
+  const stop = AUTH.sub(draw);
+  draw();
+  AUTH.api("posts/" + encodeURIComponent(id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); draw(); })
+    .catch(e => { if(e.message === "no_post"){ TS.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
+  const msg = sel => body.querySelector(sel);
+  s.el.addEventListener("input", e => {
+    if(e.target.id !== "trc-text") return;
+    body.querySelector("#trc-cnt").textContent = `${e.target.value.length}/300`;
+    const w = cashWord(e.target.value); msg("#trc-msg").innerHTML = w ? `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요.</p>` : "";
+  });
+  s.el.addEventListener("click", async e => {
+    const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
+    if(t.dataset.signin) return openSignin(t.dataset.signin);
+    if(t.dataset.ti){ const [k, xid, c] = t.dataset.ti.split(":"); sheetOver = true;
+      if(k === "i"){ const it = BY_ID.get(+xid); if(it) openDetail(it, c !== "" && frameCount(it) > 1 ? +c : undefined); }
+      else { const v = VBY.get(xid); if(v) openVillager(v); }
+      return; }
+    if(t.id === "tr-done") return busyRun(t, msg("#tr-msg"), async () => {
+      const j = await AUTH.api("posts/" + p.id, {method: "POST", body: JSON.stringify({status: p.status === "done" ? "open" : "done"})});
+      p = j.post; TS.put(p); draw(); toast(p.status === "done" ? "거래 완료로 바꿨어요. '내 글만'에서 볼 수 있어요" : "다시 거래 중으로 바꿨어요");
+    }, tradeErr);
+    if(t.id === "tr-edit"){ s.close(); return openTradeForm(p); }
+    if(t.id === "tr-del"){
+      msg("#tr-msg").innerHTML = `<div class="confirm"><p>이 글을 지울까요? 댓글도 함께 지워져요.</p><div class="acts2"><button class="pill danger" type="button" id="tr-yes">네, 지울게요</button><button class="pill ghost" type="button" id="tr-no">그만두기</button></div></div>`;
+      return;
+    }
+    if(t.id === "tr-no"){ msg("#tr-msg").innerHTML = ""; return; }
+    if(t.id === "tr-yes"){ t.disabled = true;
+      try{ await AUTH.api("posts/" + p.id, {method: "DELETE"}); TS.drop(p.id); s.close(); toast("글을 지웠어요"); }
+      catch(err){ t.disabled = false; msg("#tr-msg").innerHTML = `<p class="err">${tradeErr(err)}</p>`; }
+      return; }
+    if(t.id === "trc-send"){
+      const ta = body.querySelector("#trc-text"), text = ta.value.trim(), out = msg("#trc-msg");
+      if(!text){ out.innerHTML = `<p class="err">${TRADE_ERR.empty}</p>`; return; }
+      const w = cashWord(text); if(w){ out.innerHTML = `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요.</p>`; return; }
+      return busyRun(t, out, async () => {
+        const j = await AUTH.api("posts/" + p.id + "/comments", {method: "POST", body: JSON.stringify({body: text})});
+        (cmts = cmts || []).push(j.comment); p = {...p, cmts: (p.cmts || 0) + 1}; TS.put(p);
+        ta.value = ""; body.querySelector("#trc-cnt").textContent = "0/300"; drawCmts(); toast("댓글을 달았어요");
+      }, tradeErr);
+    }
+    if(t.dataset.delc){
+      const c = (cmts || []).find(y => y.id === t.dataset.delc); if(!c) return;
+      if(!t.dataset.armed){ t.dataset.armed = "1"; t.textContent = "한 번 더 누르면 지워요"; return; }
+      t.disabled = true;
+      try{ await AUTH.api("comments/" + c.id, {method: "DELETE"}); cmts = cmts.filter(y => y.id !== c.id); p = {...p, cmts: Math.max(0, (p.cmts || 0) - 1)}; TS.put(p); drawCmts(); toast("댓글을 지웠어요"); }
+      catch(err){ t.disabled = false; toast(tradeErr(err)); }
+    }
+  });
+}
+
+function openTradeForm(p, preset){
+  if(!AUTH.on) return;
+  if(!AUTH.me){ toast("거래 글은 로그인하고 쓸 수 있어요"); openSignin("in"); return; }
+  const edit = !!p;
+  const st = edit ? {type: p.type, items: p.items.map(x => ({...x}))}
+    : {type: (preset && preset.type) || (["want", "sell", "free"].includes(ui.fo) && ui.tab === "trade" ? ui.fo : "want"), items: preset && preset.items ? preset.items.map(x => ({...x})) : []};
+  const pay = edit ? p.pay || {} : {};
+  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "거래 글 고치기" : "거래 글 쓰기"}</h3><p class="sub">게임 속 벨, 마일 여행권, 아이템으로만 거래해요</p></div>${XBTN}</div>
+    <div class="fld"><span>어떤 글인가요?</span><div class="tr-seg" role="radiogroup" aria-label="글 종류">${["want", "sell", "free"].map(t => `<button type="button" role="radio" class="tr-${t}" data-ty="${t}">${TRADE_T[t][0]}</button>`).join("")}</div></div>
+    <div class="fld"><span><b class="tr-fh" id="tf-ih"></b><i id="tf-in"></i></span><div class="res" id="tf-items"></div>
+      <div class="acts2"><button class="pill sun" type="button" id="tf-add">${ico("plus")}아이템·주민 고르기</button></div></div>
+    <div class="fld" id="tf-pay"><span><b class="tr-fh" id="tf-ph"></b><i>하나 이상</i></span>
+      <label class="tr-payrow">${itemPic(5851, 34)}<span class="tr-lb">마일 여행권</span><input id="tf-mile" type="number" inputmode="numeric" min="1" max="999" placeholder="0" value="${pay.mile || ""}"><span class="tr-u">장</span></label>
+      <label class="tr-payrow">${itemPic(7731, 34)}<span class="tr-lb">벨</span><input id="tf-bells" type="number" inputmode="numeric" min="1" max="999999999" placeholder="0" value="${pay.bells || ""}"><span class="tr-u">벨</span></label>
+      <label class="tr-payrow tr-swp">${ico("refresh")}<span class="tr-lb">맞교환</span><input id="tf-swap" maxlength="100" placeholder="예) 체리 10개" value="${esc(pay.swap || "")}"></label>
+      <label class="toggle"><input type="checkbox" id="tf-nego"${pay.nego ? " checked" : ""}>다른 제안도 받아요</label>
+    </div>
+    <label class="fld"><span><b class="tr-fh">하고 싶은 말</b><i id="tf-cnt">0/500</i></span><textarea id="tf-body" maxlength="500" placeholder="언제 비행장을 여는지, 어떻게 주고받을지 적어 주세요"></textarea></label>
+    <div id="tf-msg"></div>
+    <div class="acts2"><button class="pill leaf big" type="button" id="tf-ok">${edit ? "고친 대로 올리기" : "올리기"}</button></div>
+    <p class="note">현금, 계좌, 상품권으로 사고파는 글과 댓글은 올라가지 않아요.</p>`, () => { if(ui.tab === "trade") render(); });
+  const q = sel => sh.el.querySelector(sel);
+  if(edit){ q("#tf-body").value = p.body || ""; q("#tf-cnt").textContent = `${(p.body || "").length}/500`; }
+  function rowEdit(x, i){
+    const e = tEntry(x, 44), it = e.it;
+    const colors = it && it.vs.length ? `<select data-c="${i}" aria-label="${esc(e.name)} 색"><option value="">색 상관없음</option>${it.vs.map((v, j) => `<option value="${j}"${x.c === j ? " selected" : ""}>${esc(v)}</option>`).join("")}</select>` : "";
+    const qty = x.k === "i" ? `<span class="tr-qty"><button class="tr-qb" type="button" data-q="${i}" data-d="-1" aria-label="하나 줄이기"><svg><use href="#i-minus"/></svg></button><input class="num" type="number" inputmode="numeric" min="1" max="999" value="${x.n || 1}" data-n="${i}" aria-label="${esc(e.name)} 개수"><button class="tr-qb" type="button" data-q="${i}" data-d="1" aria-label="하나 늘리기"><svg><use href="#i-plus"/></svg></button><span>개</span></span>` : "";
+    return `<div class="srow tr-frow">${e.pic}<span class="tx"><b>${esc(e.name)}</b>${x.k === "i" ? "" : `<span>${esc(e.sub)}</span>`}${colors || qty ? `<span class="tr-fo">${colors}${qty}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(e.name)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
+  }
+  function drawItems(){
+    q("#tf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">아직 고른 게 없어요. 아래 버튼으로 골라 주세요.</p>`;
+    q("#tf-in").textContent = `${st.items.length}/20`;
+  }
+  function drawType(){
+    sh.el.querySelectorAll("[data-ty]").forEach(b => b.setAttribute("aria-checked", b.dataset.ty === st.type));
+    q("#tf-ih").textContent = {want:"구하는 것", sell:"파는 것", free:"나눠 줄 것"}[st.type];
+    q("#tf-ph").textContent = PAY_HEAD[st.type];
+    q("#tf-pay").hidden = st.type === "free";
+  }
+  const check = () => { const w = cashWord(q("#tf-body").value, q("#tf-swap").value); q("#tf-msg").innerHTML = w ? `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.</p>` : ""; return !w; };
+  drawType(); drawItems();
+  sh.el.addEventListener("input", e => {
+    const t = e.target;
+    if(t.id === "tf-body") q("#tf-cnt").textContent = `${t.value.length}/500`;
+    if(t.id === "tf-body" || t.id === "tf-swap") check();
+    if(t.dataset.n != null){ const n = Math.floor(+t.value); if(n >= 1) st.items[+t.dataset.n].n = Math.min(999, n); }
+  });
+  sh.el.addEventListener("change", e => {
+    const t = e.target;
+    if(t.dataset.c != null){ const x = st.items[+t.dataset.c]; if(t.value === "") delete x.c; else x.c = +t.value; drawItems(); }
+    if(t.dataset.n != null){ const x = st.items[+t.dataset.n]; x.n = Math.min(999, Math.max(1, Math.floor(+t.value) || 1)); t.value = x.n; }
+  });
+  sh.el.addEventListener("click", e => {
+    const t = e.target.closest("button"); if(!t) return;
+    if(t.dataset.ty){ st.type = t.dataset.ty; drawType(); return; }
+    if(t.dataset.rm != null){ st.items.splice(+t.dataset.rm, 1); drawItems(); return; }
+    if(t.dataset.q != null){ const x = st.items[+t.dataset.q]; x.n = Math.min(999, Math.max(1, (x.n || 1) + +t.dataset.d)); const inp = q(`[data-n="${t.dataset.q}"]`); if(inp) inp.value = x.n; return; }
+    if(t.id === "tf-add") return openTradePick(st.items, drawItems);
+    if(t.id === "tf-ok") return busyRun(t, q("#tf-msg"), async () => {
+      const out = {type: st.type, items: st.items, body: q("#tf-body").value, pay: {}};
+      const bad = m => { throw Object.assign(new Error(m), {status: 400}); };
+      if(!st.items.length) bad("items");
+      if(st.type !== "free"){
+        const mi = q("#tf-mile").value.trim(), be = q("#tf-bells").value.trim(), sw = q("#tf-swap").value.trim();
+        if(mi){ const n = Math.floor(+mi); if(!(n >= 1 && n <= 999)) bad("range"); out.pay.mile = n; }
+        if(be){ const n = Math.floor(+be); if(!(n >= 1 && n <= 999999999)) bad("range"); out.pay.bells = n; }
+        if(sw) out.pay.swap = sw; if(q("#tf-nego").checked) out.pay.nego = true;
+        if(!Object.keys(out.pay).length) bad("pay");
+      }
+      if(cashWord(out.body, out.pay.swap)) bad("cash");
+      const j = await AUTH.api(edit ? "posts/" + p.id : "posts", {method: "POST", body: JSON.stringify(out)});
+      TS.put(j.post); sh.close();
+      toast(edit ? "고친 대로 올렸어요" : ui.tab === "trade" ? "글을 올렸어요" : "글을 올렸어요. 거래 탭에서 볼 수 있어요");
+    }, tradeErr);
+  });
+}
+function openTradePick(chosen, done){
+  sheetOver = true;
+  const s = openSheet(`<div class="hd"><div><h3>아이템·주민 고르기</h3><p class="sub" id="tp-sub"></p></div>${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="tp-q" placeholder="아이템이나 주민 이름 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
+    <div class="bd-in" id="tp-res"></div>`, () => done());
+  const inp = s.el.querySelector("#tp-q"), out = s.el.querySelector("#tp-res");
+  const has = (k, id) => chosen.findIndex(x => x.k === k && String(x.id) === String(id));
+  const ck = `<span class="ck"><svg><use href="#i-check"/></svg></span>`;
+  const irow = it => `<button class="srow" type="button" data-pk="i:${it.id}" aria-pressed="${has("i", it.id) >= 0}">${framePic(it, 0, 42)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])}${it.vs.length ? ` · 색 ${it.vs.length}가지` : ""}</span></span>${ck}</button>`;
+  const vrow = v => `<button class="srow" type="button" data-pk="v:${v.f}" aria-pressed="${has("v", v.f) >= 0}">${vilPic(v, 42)}<span class="tx"><b>${esc(v.ko)}</b><span>주민 이사</span></span>${ck}</button>`;
+  const srow = k => { const e = tEntry({k:"s", id:k}, 42); return `<button class="srow" type="button" data-pk="s:${k}" aria-pressed="${has("s", k) >= 0}">${e.pic}<span class="tx"><b>${esc(e.name)}</b><span>${esc(e.sub)}</span></span>${ck}</button>`; };
+  const sec = (title, rows) => rows.length ? `<div class="shd">${title}</div><div class="res">${rows.join("")}</div>` : "";
+  function sub(){ s.el.querySelector("#tp-sub").textContent = chosen.length ? `${chosen.length}개 골랐어요 · 다 고르면 닫아 주세요` : "누르면 담기고, 한 번 더 누르면 빠져요"; }
+  function paint(){
+    const qv = inp.value.trim(); sub();
+    if(!qv){
+      const li = [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && tradable(it)).slice(0, 60), lv = VIL.filter(v => vlike.has(v.f)).slice(0, 30);
+      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).map(srow))
+        + sec(`${ico("heart")}<b>좋아요한 아이템</b>`, li.map(irow)) + sec(`${ico("heart")}<b>좋아하는 주민</b>`, lv.map(vrow));
+      return;
+    }
+    const iv = kSearch(TRADE_ITEMS, it => [it.ko, it.en], qv), vv = kSearch(VIL, v => [v.ko, v.en, v.ja], qv), LIM = 60;
+    out.innerHTML = (iv.length || vv.length) ? sec(`${ico("face")}<b>주민</b>`, vv.slice(0, 20).map(vrow)) + sec(`${ico("box")}<b>아이템</b>`, iv.slice(0, LIM).map(irow))
+      + (iv.length > LIM ? `<p class="sub">${fmt(iv.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`;
+  }
+  let tm = 0; inp.addEventListener("input", () => { clearTimeout(tm); tm = setTimeout(paint, 140); });
+  s.el.addEventListener("click", e => {
+    const b = e.target.closest("[data-pk]"); if(!b) return;
+    const [k, id] = b.dataset.pk.split(":"), i = has(k, id);
+    if(i >= 0){ chosen.splice(i, 1); b.setAttribute("aria-pressed", "false"); }
+    else {
+      if(chosen.length >= 20){ toast("한 글에는 20개까지 넣을 수 있어요"); return; }
+      chosen.push(k === "i" ? {k, id: +id, n: 1} : {k, id}); b.setAttribute("aria-pressed", "true");
+    }
+    sub();
+  });
+  paint();
+}
 function syncLine(){
   const st = SYNC.state;
   if(st === "busy") return `<p class="syncst">다른 기기와 기록을 맞추는 중이에요…</p>`;
@@ -3277,9 +3723,9 @@ function wireForm(sh){
   });
   return () => { const b = sh.el.querySelector('[data-fruit][aria-pressed="true"]'); return b ? b.dataset.fruit : ""; };
 }
-async function busyRun(btn, msg, f){
+async function busyRun(btn, msg, f, ef){
   if(btn.disabled) return; btn.disabled = true; msg.innerHTML = "";
-  try{ await f(); }catch(e){ msg.innerHTML = `<p class="err">${authErr(e)}</p>`; }
+  try{ await f(); }catch(e){ msg.innerHTML = `<p class="err">${(ef || authErr)(e)}</p>`; }
   btn.disabled = false;
 }
 function openSignin(mode){
