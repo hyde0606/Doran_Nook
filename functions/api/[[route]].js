@@ -1,6 +1,7 @@
 // 도란도란 동물의숲 server (Cloudflare Pages Functions): own sign-in (login id + password), profile, check-record sync,
-// trade posts (구해요 / 팔아요 / 나눔) with comments.
+// trade posts (구해요 / 팔아요 / 나눔) with comments, 자랑 posts (꿈번지 / 구역 / 패션) with photos, 추천 and comments.
 // Needs one D1 database bound to this Pages project as DB. Tables are made on the first request.
+// Photos need one R2 bucket bound as IMG; without it 자랑 still works for 꿈번지 without photos.
 // No e-mail and no outside sign-in: a forgotten password is reset by the admin (the first account made).
 
 const DAY = 86400000;
@@ -29,6 +30,18 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS posts_user ON posts(user_id, updated)`,
   `CREATE TABLE IF NOT EXISTS comments (id TEXT PRIMARY KEY, post_id TEXT NOT NULL, user_id TEXT NOT NULL, body TEXT NOT NULL, created INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS comments_post ON comments(post_id, created)`,
+  `CREATE TABLE IF NOT EXISTS shows (
+     id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, title TEXT NOT NULL DEFAULT '', body TEXT NOT NULL DEFAULT '',
+     code TEXT NOT NULL DEFAULT '', imgs TEXT NOT NULL DEFAULT '[]', items TEXT NOT NULL DEFAULT '[]',
+     likes INTEGER NOT NULL DEFAULT 0, cmts INTEGER NOT NULL DEFAULT 0, views INTEGER NOT NULL DEFAULT 0,
+     created INTEGER NOT NULL, updated INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS shows_kind ON shows(kind, created)`,
+  `CREATE INDEX IF NOT EXISTS shows_user ON shows(user_id, created)`,
+  `CREATE TABLE IF NOT EXISTS show_likes (show_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (show_id, user_id))`,
+  `CREATE INDEX IF NOT EXISTS show_likes_user ON show_likes(user_id)`,
+  `CREATE TABLE IF NOT EXISTS show_cmts (id TEXT PRIMARY KEY, show_id TEXT NOT NULL, user_id TEXT NOT NULL, body TEXT NOT NULL, created INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS show_cmts_show ON show_cmts(show_id, created)`,
+  `CREATE TABLE IF NOT EXISTS visits (user_id TEXT NOT NULL, day TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 1, dev TEXT NOT NULL DEFAULT '', PRIMARY KEY (user_id, day))`,
 ];
 let schemaReady = null;
 function setup(db){
@@ -135,6 +148,55 @@ async function postInput(b){
   if(hasCash(body, pay.swap)) return { err: "cash" };
   return { type, items, pay, body };
 }
+/* ---------- visits: one row per person per day (Korean time), for the admin's friend list ---------- */
+const kDay = t => new Date(t + 9 * 3600000).toISOString().slice(0, 10);
+function device(req){
+  const ua = req.headers.get("User-Agent") || "";
+  const d = /iPad/.test(ua) ? "아이패드" : /iPhone|iPod/.test(ua) ? "아이폰" : /Android/.test(ua) ? "안드로이드" : /Macintosh/.test(ua) ? "맥" : /Windows/.test(ua) ? "윈도 PC" : /CrOS|Linux/.test(ua) ? "PC" : "기타";
+  return /KAKAOTALK/i.test(ua) ? d + "(카톡)" : d;
+}
+async function noteVisit(db, req, userId){
+  const now = Date.now(), dev = device(req);
+  await db.prepare(`INSERT INTO visits (user_id, day, first, last, n, dev) VALUES (?1, ?2, ?3, ?3, 1, ?4)
+      ON CONFLICT(user_id, day) DO UPDATE SET last = ?3, n = n + 1, dev = CASE WHEN instr(dev, ?4) > 0 OR length(dev) > 60 THEN dev ELSE dev || ', ' || ?4 END`).bind(userId, kDay(now), now, dev).run();
+  if(Math.random() < 0.02) await db.prepare(`DELETE FROM visits WHERE day < ?`).bind(kDay(now - 400 * DAY)).run();
+}
+/* ---------- 자랑 (꿈번지 / 구역 / 패션) ---------- */
+const KINDS = ["dream", "area", "fashion"];
+const IMG_KEY = /^i\/[A-Za-z0-9_-]{12,24}\.(webp|jpg)$/;
+const MAX_IMG = 450 * 1024, MAX_IMGS = 4;
+const SHOW_SQL = `SELECT s.*, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM shows s JOIN users u ON u.id = s.user_id WHERE u.banned = 0`;
+const showOut = r => ({ id: r.id, kind: r.kind, title: r.title, body: r.body, code: r.code, imgs: JSON.parse(r.imgs), items: JSON.parse(r.items),
+  likes: r.likes, cmts: r.cmts, views: r.views, created: r.created, updated: r.updated, author: author(r) });
+const imgKeys = imgs => imgs.flatMap(x => [x.f, x.t]).filter(Boolean);
+async function showInput(b, env, u){
+  const kind = KINDS.includes(b.kind) ? b.kind : null; if(!kind) return { err: "kind" };
+  const title = cleanText(b.title).slice(0, 30), text = cleanBody(b.body, 500);
+  const digits = String(b.code || "").replace(/\D/g, "");
+  if(kind === "dream" && digits.length !== 12) return { err: "code" };
+  const code = kind === "dream" ? "DA-" + digits.replace(/(\d{4})(?=\d)/g, "$1-") : "";
+  if(!Array.isArray(b.imgs) || b.imgs.length > MAX_IMGS) return { err: "imgs" };
+  const imgs = [];
+  for(const x of b.imgs){
+    if(!x || !IMG_KEY.test(x.f) || !IMG_KEY.test(x.t)) return { err: "imgs" };
+    imgs.push({ f: x.f, t: x.t, w: intIn(x.w, 1, 4000) || 0, h: intIn(x.h, 1, 4000) || 0 });
+  }
+  if(imgs.length){
+    if(!env.IMG) return { err: "no_store" };
+    for(const k of imgKeys(imgs)){ const o = await env.IMG.head(k); if(!o || (o.customMetadata || {}).u !== u.id) return { err: "imgs" }; }
+  }
+  if(kind !== "dream" && !imgs.length) return { err: env.IMG ? "need_img" : "no_store" };
+  if(!Array.isArray(b.items) || b.items.length > 40) return { err: "items" };
+  const items = [], seen = new Set();
+  for(const x of b.items){
+    const id = intIn(x && x.id, 0, 9999999); if(id === null) return { err: "items" };
+    const o = { k: "i", id }, c = intIn(x.c, 0, 63); if(c !== null) o.c = c;
+    const key = id + ":" + (o.c ?? ""); if(seen.has(key)) continue; seen.add(key); items.push(o);
+  }
+  return { kind, title, body: text, code, imgs, items };
+}
+const sniffImg = a => a.length > 12 && a[0] === 0x52 && a[1] === 0x49 && a[2] === 0x46 && a[3] === 0x46 && a[8] === 0x57 && a[9] === 0x45 && a[10] === 0x42 && a[11] === 0x50 ? "webp"
+  : a.length > 3 && a[0] === 0xff && a[1] === 0xd8 && a[2] === 0xff ? "jpg" : "";
 
 const pub = u => ({ id: u.id, login: u.login, name: u.name, island: u.island, fruit: u.fruit, admin: u.role === "admin", mustChange: !!u.must_change, created: u.created });
 
@@ -169,8 +231,9 @@ export async function onRequest(ctx){
     if(!env.DB) return fail("no_db", 503);
     await setup(env.DB);
     const db = env.DB;
-    if(m === "GET" && path === "me"){ const u = await currentUser(req, env, url); return json({ user: u ? pub(u) : null }); }
+    if(m === "GET" && path === "me"){ const u = await currentUser(req, env, url); if(u) await noteVisit(db, req, u.id); return json({ user: u ? pub(u) : null }); }
     if(m === "GET" && path === "sync") return getSync(req, env, url);
+    let pm;
     if(m === "GET" && path === "posts"){
       const mine = url.searchParams.get("mine") === "1", before = intIn(url.searchParams.get("before"), 1, 9e15);
       let r;
@@ -180,15 +243,46 @@ export async function onRequest(ctx){
       } else r = await db.prepare(POST_SQL + ` AND p.status = 'open' AND p.updated < ? ORDER BY p.updated DESC LIMIT 200`).bind(before || 9e15).all();
       return json({ posts: r.results.map(postOut), more: r.results.length >= (mine ? 100 : 200) });
     }
-    let pm;
     if(m === "GET" && (pm = /^posts\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
       const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(pm[1]).first();
       if(!r) return fail("no_post", 404);
       const c = await db.prepare(`SELECT c.id, c.body, c.created, c.user_id, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM comments c JOIN users u ON u.id = c.user_id WHERE c.post_id = ? AND u.banned = 0 ORDER BY c.created LIMIT 300`).bind(pm[1]).all();
       return json({ post: postOut(r), comments: c.results.map(x => ({ id: x.id, body: x.body, created: x.created, author: author(x) })) });
     }
+    if(m === "GET" && (pm = /^img\/(i\/[A-Za-z0-9_-]{12,24}\.(webp|jpg))$/.exec(path))){
+      if(!env.IMG) return fail("no_store", 404);
+      const o = await env.IMG.get(pm[1]); if(!o) return fail("no_img", 404);
+      return new Response(o.body, { headers: { "Content-Type": pm[2] === "webp" ? "image/webp" : "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable", "ETag": o.httpEtag } });
+    }
+    if(m === "GET" && path === "shows"){
+      const kind = KINDS.includes(url.searchParams.get("kind")) ? url.searchParams.get("kind") : "", sort = url.searchParams.get("sort");
+      const mine = url.searchParams.get("mine") === "1", page = intIn(url.searchParams.get("page"), 0, 1000) || 0;
+      const where = [], args = [];
+      if(kind){ where.push("s.kind = ?"); args.push(kind); }
+      if(mine){ const me = await currentUser(req, env, url); if(!me) return fail("signin", 401); where.push("s.user_id = ?"); args.push(me.id); }
+      const order = sort === "hot" ? "s.likes DESC, s.created DESC" : sort === "view" ? "s.views DESC, s.created DESC" : "s.created DESC";
+      const r = await db.prepare(SHOW_SQL + where.map(w => " AND " + w).join("") + ` ORDER BY ${order} LIMIT 61 OFFSET ?`).bind(...args, page * 60).all();
+      return json({ shows: r.results.slice(0, 60).map(showOut), more: r.results.length > 60, store: !!env.IMG });
+    }
+    if(m === "GET" && path === "shows/likes"){
+      const me = await currentUser(req, env, url); if(!me) return json({ ids: [] });
+      const r = await db.prepare(`SELECT show_id FROM show_likes WHERE user_id = ? ORDER BY created DESC LIMIT 3000`).bind(me.id).all();
+      return json({ ids: r.results.map(x => x.show_id) });
+    }
+    if(m === "GET" && (pm = /^shows\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+      const r = await db.prepare(SHOW_SQL + ` AND s.id = ?`).bind(pm[1]).first();
+      if(!r) return fail("no_show", 404);
+      const c = await db.prepare(`SELECT c.id, c.body, c.created, c.user_id, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM show_cmts c JOIN users u ON u.id = c.user_id WHERE c.show_id = ? AND u.banned = 0 ORDER BY c.created LIMIT 300`).bind(pm[1]).all();
+      const me = await currentUser(req, env, url);
+      const liked = me ? !!(await db.prepare(`SELECT 1 AS x FROM show_likes WHERE show_id = ? AND user_id = ?`).bind(pm[1], me.id).first()) : false;
+      return json({ show: showOut(r), comments: c.results.map(x => ({ id: x.id, body: x.body, created: x.created, author: author(x) })), liked });
+    }
     if(m !== "GET" && !sameSite(req, url)) return fail("origin", 403);
     const ip = req.headers.get("CF-Connecting-IP") || "local";
+    if(m === "POST" && (pm = /^shows\/([A-Za-z0-9_-]{6,24})\/view$/.exec(path))){   // counted once a day for each connection
+      if(!(await overLimit(db, "sv:" + ip + ":" + pm[1], 1, DAY))) await db.prepare(`UPDATE shows SET views = views + 1 WHERE id = ?`).bind(pm[1]).run();
+      return json({ ok: true });
+    }
 
     if(m === "POST" && path === "signup"){
       const b = await body(req);
@@ -204,6 +298,7 @@ export async function onRequest(ctx){
           .bind(id, login, await hashPw(b.pw), name, island, fruit, now, now).run();
       }catch(e){ if(/UNIQUE/i.test(String(e.message))) return fail("login_taken", 409); throw e; }
       const u = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(id).first();
+      await noteVisit(db, req, id);
       return json({ user: pub(u) }, 200, { "Set-Cookie": await newSession(env, url, id) });
     }
 
@@ -220,6 +315,7 @@ export async function onRequest(ctx){
         return fail(fails >= MAX_FAILS ? "locked" : "wrong", fails >= MAX_FAILS ? 429 : 401, fails >= MAX_FAILS ? { wait: LOCK_MS / 60000 } : {});
       }
       await db.prepare(`UPDATE users SET fails = 0, lock_until = 0, seen = ? WHERE id = ?`).bind(now, u.id).run();
+      await noteVisit(db, req, u.id);
       return json({ user: pub(u) }, 200, { "Set-Cookie": await newSession(env, url, u.id) });
     }
 
@@ -255,14 +351,21 @@ export async function onRequest(ctx){
       const b = await body(req);
       if(!(await checkPw(String(b.pw || ""), u.pw))) return fail("wrong", 401);
       if(u.role === "admin" && (await db.prepare(`SELECT COUNT(*) AS n FROM users`).first()).n > 1) return fail("admin_last", 409);
+      const gone = (await db.prepare(`SELECT imgs FROM shows WHERE user_id = ?`).bind(u.id).all()).results.flatMap(x => imgKeys(JSON.parse(x.imgs)));
       await db.batch([
         db.prepare(`DELETE FROM sync WHERE user_id = ?`).bind(u.id),
+        db.prepare(`DELETE FROM visits WHERE user_id = ?`).bind(u.id),
         db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.user_id = ?))`).bind(u.id),
         db.prepare(`DELETE FROM comments WHERE user_id = ? OR post_id IN (SELECT id FROM posts WHERE user_id = ?)`).bind(u.id, u.id),
         db.prepare(`DELETE FROM posts WHERE user_id = ?`).bind(u.id),
+        db.prepare(`UPDATE shows SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM show_cmts c WHERE c.show_id = shows.id AND c.user_id = ?)), likes = MAX(0, likes - (SELECT COUNT(*) FROM show_likes l WHERE l.show_id = shows.id AND l.user_id = ?))`).bind(u.id, u.id),
+        db.prepare(`DELETE FROM show_cmts WHERE user_id = ? OR show_id IN (SELECT id FROM shows WHERE user_id = ?)`).bind(u.id, u.id),
+        db.prepare(`DELETE FROM show_likes WHERE user_id = ? OR show_id IN (SELECT id FROM shows WHERE user_id = ?)`).bind(u.id, u.id),
+        db.prepare(`DELETE FROM shows WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM sessions WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM users WHERE id = ?`).bind(u.id),
       ]);
+      if(env.IMG && gone.length) for(let i = 0; i < gone.length; i += 500) await env.IMG.delete(gone.slice(i, i + 500));
       return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(url, "", 0) });
     }
 
@@ -331,11 +434,113 @@ export async function onRequest(ctx){
       return json({ ok: true });
     }
 
+    if(m === "POST" && path === "img"){
+      if(!env.IMG) return fail("no_store", 503);
+      const a = new Uint8Array(await req.arrayBuffer());
+      if(a.length > MAX_IMG) return fail("too_big", 413);
+      const ext = sniffImg(a); if(!ext) return fail("not_img");
+      if(await overLimit(db, "im:" + u.id, 80, DAY)) return fail("slow_down", 429);
+      const key = `i/${rand(12)}.${ext}`;
+      await env.IMG.put(key, a, { httpMetadata: { contentType: ext === "webp" ? "image/webp" : "image/jpeg" }, customMetadata: { u: u.id } });
+      return json({ key });
+    }
+    if(m === "POST" && path === "shows"){
+      const v = await showInput(await body(req), env, u); if(v.err) return fail(v.err);
+      if(await overLimit(db, "sh:" + u.id, 20, DAY)) return fail("slow_down", 429);
+      const id = rand(9), now = Date.now();
+      await db.prepare(`INSERT INTO shows (id, user_id, kind, title, body, code, imgs, items, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(id, u.id, v.kind, v.title, v.body, v.code, JSON.stringify(v.imgs), JSON.stringify(v.items), now, now).run();
+      const r = await db.prepare(SHOW_SQL + ` AND s.id = ?`).bind(id).first();
+      return json({ show: showOut(r) });
+    }
+    if((pm = /^shows\/([A-Za-z0-9_-]{6,24})(\/comments|\/like)?$/.exec(path))){
+      const x = await db.prepare(`SELECT * FROM shows WHERE id = ?`).bind(pm[1]).first();
+      if(!x) return fail("no_show", 404);
+      const own = x.user_id === u.id, admin = u.role === "admin", now = Date.now();
+      if(pm[2] === "/like"){
+        if(m !== "POST") return fail("not_found", 404);
+        const on = !!(await body(req)).on;
+        if(on){ if(await overLimit(db, "lk:" + u.id, 500, DAY)) return fail("slow_down", 429); await db.prepare(`INSERT INTO show_likes (show_id, user_id, created) VALUES (?, ?, ?) ON CONFLICT DO NOTHING`).bind(x.id, u.id, now).run(); }
+        else await db.prepare(`DELETE FROM show_likes WHERE show_id = ? AND user_id = ?`).bind(x.id, u.id).run();
+        const n = await db.prepare(`UPDATE shows SET likes = (SELECT COUNT(*) FROM show_likes WHERE show_id = ?1) WHERE id = ?1 RETURNING likes`).bind(x.id).first();
+        return json({ likes: n.likes, liked: on });
+      }
+      if(pm[2] === "/comments"){
+        if(m !== "POST") return fail("not_found", 404);
+        const text = cleanBody((await body(req)).body, 300);
+        if(!text) return fail("empty");
+        if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
+        const id = rand(9);
+        await db.batch([
+          db.prepare(`INSERT INTO show_cmts (id, show_id, user_id, body, created) VALUES (?, ?, ?, ?, ?)`).bind(id, x.id, u.id, text, now),
+          db.prepare(`UPDATE shows SET cmts = cmts + 1 WHERE id = ?`).bind(x.id),
+        ]);
+        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit } } });
+      }
+      if(m === "DELETE"){
+        if(!own && !admin) return fail("not_yours", 403);
+        await db.batch([
+          db.prepare(`DELETE FROM show_cmts WHERE show_id = ?`).bind(x.id), db.prepare(`DELETE FROM show_likes WHERE show_id = ?`).bind(x.id),
+          db.prepare(`DELETE FROM shows WHERE id = ?`).bind(x.id),
+        ]);
+        const keys = imgKeys(JSON.parse(x.imgs)); if(env.IMG && keys.length) await env.IMG.delete(keys);
+        return json({ ok: true });
+      }
+      if(m === "POST"){
+        if(!own) return fail("not_yours", 403);
+        const v = await showInput(await body(req), env, u); if(v.err) return fail(v.err);
+        await db.prepare(`UPDATE shows SET kind = ?, title = ?, body = ?, code = ?, imgs = ?, items = ?, updated = ? WHERE id = ?`)
+          .bind(v.kind, v.title, v.body, v.code, JSON.stringify(v.imgs), JSON.stringify(v.items), now, x.id).run();
+        const keep = new Set(imgKeys(v.imgs)), drop = imgKeys(JSON.parse(x.imgs)).filter(k => !keep.has(k));
+        if(env.IMG && drop.length) await env.IMG.delete(drop);
+        const r = await db.prepare(SHOW_SQL + ` AND s.id = ?`).bind(x.id).first();
+        return json({ show: showOut(r) });
+      }
+    }
+    if(m === "DELETE" && (pm = /^scmts\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+      const c = await db.prepare(`SELECT c.*, s.user_id AS owner FROM show_cmts c JOIN shows s ON s.id = c.show_id WHERE c.id = ?`).bind(pm[1]).first();
+      if(!c) return fail("no_comment", 404);
+      if(c.user_id !== u.id && c.owner !== u.id && u.role !== "admin") return fail("not_yours", 403);
+      await db.batch([db.prepare(`DELETE FROM show_cmts WHERE id = ?`).bind(c.id), db.prepare(`UPDATE shows SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.show_id)]);
+      return json({ ok: true });
+    }
+
     if(path.startsWith("admin/")){
       if(u.role !== "admin") return fail("not_admin", 403);
       if(m === "GET" && path === "admin/users"){
-        const r = await db.prepare(`SELECT id, login, name, island, fruit, role, must_change, created, seen, banned FROM users ORDER BY created`).all();
-        return json({ users: r.results.map(x => ({ ...pub(x), seen: x.seen, banned: !!x.banned })) });
+        const since = kDay(Date.now() - 29 * DAY);
+        const r = await db.prepare(`SELECT u.id, u.login, u.name, u.island, u.fruit, u.role, u.must_change, u.created, u.seen, u.banned,
+            (SELECT COUNT(*) FROM visits v WHERE v.user_id = u.id AND v.day >= ?) AS d30,
+            (SELECT MAX(last) FROM visits v WHERE v.user_id = u.id) AS lastv,
+            (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) AS np,
+            (SELECT COUNT(*) FROM shows s WHERE s.user_id = u.id) AS ns,
+            (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) + (SELECT COUNT(*) FROM show_cmts c WHERE c.user_id = u.id) AS nc,
+            (SELECT updated FROM sync y WHERE y.user_id = u.id) AS synced
+          FROM users u ORDER BY u.created`).bind(since).all();
+        return json({ users: r.results.map(x => ({ ...pub(x), seen: Math.max(x.seen || 0, x.lastv || 0), banned: !!x.banned, d30: x.d30, posts: x.np, shows: x.ns, cmts: x.nc, synced: x.synced || 0 })) });
+      }
+      if(m === "GET" && (pm = /^admin\/users\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+        const t = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(pm[1]).first();
+        if(!t) return fail("no_user", 404);
+        const all = q => db.prepare(q).bind(t.id).all().then(r => r.results);
+        const [visits, sync, posts, shows, pc, sc, likes, sess] = await Promise.all([
+          all(`SELECT day, first, last, n, dev FROM visits WHERE user_id = ? ORDER BY day DESC LIMIT 120`),
+          db.prepare(`SELECT rev, code, updated FROM sync WHERE user_id = ?`).bind(t.id).first(),
+          all(`SELECT p.*, '' AS a_name, '' AS a_island, '' AS a_fruit FROM posts p WHERE p.user_id = ? ORDER BY p.created DESC LIMIT 200`),
+          all(`SELECT s.*, '' AS a_name, '' AS a_island, '' AS a_fruit FROM shows s WHERE s.user_id = ? ORDER BY s.created DESC LIMIT 200`),
+          all(`SELECT c.id, c.body, c.created, c.post_id, p.type, p.items FROM comments c LEFT JOIN posts p ON p.id = c.post_id WHERE c.user_id = ? ORDER BY c.created DESC LIMIT 100`),
+          all(`SELECT c.id, c.body, c.created, c.show_id, s.kind, s.title FROM show_cmts c LEFT JOIN shows s ON s.id = c.show_id WHERE c.user_id = ? ORDER BY c.created DESC LIMIT 100`),
+          db.prepare(`SELECT COUNT(*) AS n FROM show_likes WHERE user_id = ?`).bind(t.id).first(),
+          db.prepare(`SELECT COUNT(*) AS n, MAX(created) AS last FROM sessions WHERE user_id = ? AND expires > ?`).bind(t.id, Date.now()).first(),
+        ]);
+        return json({
+          user: { ...pub(t), seen: t.seen, banned: !!t.banned, fails: t.fails, locked: t.lock_until > Date.now() },
+          visits, sync: sync || null,
+          posts: posts.map(postOut), shows: shows.map(showOut),
+          comments: [...pc.map(c => ({ id: c.id, body: c.body, created: c.created, on: "trade", ref: c.post_id, type: c.type || "", items: c.items ? JSON.parse(c.items) : [] })),
+                     ...sc.map(c => ({ id: c.id, body: c.body, created: c.created, on: "show", ref: c.show_id, kind: c.kind || "", title: c.title || "" }))].sort((a, b) => b.created - a.created).slice(0, 100),
+          likesGiven: likes.n, devices: sess.n, lastSignin: sess.last || 0,
+        });
       }
       if(m === "POST" && path === "admin/reset"){
         const b = await body(req), t = await db.prepare(`SELECT id, role FROM users WHERE id = ?`).bind(String(b.id || "")).first();

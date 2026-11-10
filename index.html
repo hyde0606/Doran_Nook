@@ -370,6 +370,21 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .urow .wt{flex:1 1 auto} .urow .pill{flex:none; min-height:38px; padding:0 12px} .urow .fr{width:44px; height:44px; background:var(--paper)} .urow .fr .pic{--t:34px}
 .urow .me{flex:none; font-size:13px; color:var(--muted); padding:0 8px}
 .ures:empty{display:none}
+.urow.ad-row{display:grid; gap:8px}
+.ad-top{display:flex; align-items:center; gap:12px; min-width:0}
+.ad-facts{display:flex; flex-wrap:wrap; gap:4px 12px; font-size:13px; color:var(--muted)}
+.ad-facts b{font-weight:400; font-family:var(--f-display); color:var(--ink)}
+.ad-row .acts2 .pill{flex:1 1 auto}
+.ad-n{font-family:var(--f-text); font-size:13px; color:var(--muted); margin-left:4px}
+.ad-vis{display:grid; gap:4px; max-height:360px; overflow-y:auto; overscroll-behavior:contain}
+.ad-v{display:grid; grid-template-columns:minmax(0, 9.5em) minmax(0, 1fr) minmax(0, auto); gap:4px 10px; align-items:center; background:var(--chip); border-radius:10px; padding:7px 10px; font-size:13.5px}
+.ad-v b{font-weight:400; font-family:var(--f-display)}
+.ad-v span:last-child{color:var(--muted); text-align:right; overflow-wrap:anywhere}
+.ad-res{display:grid; gap:6px; margin-top:4px}
+.ad-vils{display:flex; flex-wrap:wrap; gap:6px}
+.ad-vils span{display:inline-flex; align-items:center; gap:4px; background:var(--chip); border-radius:16px; padding:2px 10px 2px 2px; font-size:13.5px}
+.ad-p .tx b{overflow-wrap:anywhere}
+@media (max-width:360px){ .ad-v{grid-template-columns:1fr; gap:2px} .ad-v span:last-child{text-align:left} .qgrid.ad-q{grid-template-columns:minmax(0, 1fr)} }
 /* 거래 */
 .tr-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap:14px; align-items:start}
 .tr-bar{grid-column:1/-1; display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13.5px; min-width:0}
@@ -3477,8 +3492,8 @@ function openTradeFind(x){
   s.el.addEventListener("click", ev => { const c = ev.target.closest("[data-trade]"); if(c){ sheetOver = true; openTrade(c.dataset.trade); } });
 }
 
-function openTrade(id){
-  let p = TS.find(id); if(!p) return;
+function openTrade(id, p0){
+  let p = TS.find(id) || p0; if(!p) return;
   let cmts = null, loadErr = false;
   const s = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="tr-t"></h3><p class="sub" id="tr-s"></p></div>${XBTN}</div><div class="bd-in" id="tr-body"></div>`, () => { stop(); if(ui.tab === "trade") render(); });
   const body = s.el.querySelector("#tr-body"), me = () => AUTH.me;
@@ -3699,7 +3714,7 @@ function acctHTML(){
       ${u.mustChange ? `<p class="err">임시 비밀번호로 들어왔어요. 새 비밀번호로 바꿔 주세요.</p>` : ""}
       <div id="ac-sync">${syncLine()}</div>
       <div class="acts2"><button class="pill ghost" type="button" id="ac-prof">프로필 고치기</button><button class="pill ghost" type="button" id="ac-pw">비밀번호 바꾸기</button></div>
-      <div class="acts2">${u.admin ? `<button class="pill soil" type="button" id="ac-admin">친구 계정 관리</button>` : ""}<button class="pill ghost" type="button" id="ac-out">로그아웃</button></div></div>`;
+      <div class="acts2">${u.admin ? `<button class="pill soil" type="button" id="ac-admin">친구 관리</button>` : ""}<button class="pill ghost" type="button" id="ac-out">로그아웃</button></div></div>`;
 }
 function mountAcct(box){
   const draw = () => {
@@ -3738,7 +3753,7 @@ function openSignin(mode){
     <label class="fld"><span>섬 이름</span><input id="si-island" maxlength="10" placeholder="예) 도란"></label>${fruitPick("")}` : ""}
     <div id="si-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="si-ok">${up ? "가입하기" : "로그인"}</button><button class="pill ghost" type="button" id="si-sw">${up ? "이미 계정이 있어요" : "처음이에요 (가입하기)"}</button></div>
-    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
+    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요. 관리자는 가입한 날, 접속한 날짜와 기기, 체크 기록, 쓴 글과 댓글을 볼 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
   const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
   q("#si-sw").addEventListener("click", () => { sh.close(); setTimeout(() => openSignin(up ? "in" : "up"), 0); });
   const go = () => busyRun(q("#si-ok"), q("#si-msg"), async () => {
@@ -3797,13 +3812,19 @@ function openPassword(forced){
 }
 function openAdmin(){
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div><h3>친구 계정 관리</h3><p class="sub">비밀번호를 잊은 친구에게 임시 비밀번호를 만들어 줘요</p></div>${XBTN}</div><div id="ad-list"><p>불러오는 중…</p></div>`);
+  const sh = openSheet(`<div class="hd"><div><h3>친구 관리</h3><p class="sub">관리자만 볼 수 있어요</p></div>${XBTN}</div><div id="ad-list"><p>불러오는 중…</p></div>`);
   const box = sh.el.querySelector("#ad-list");
   async function load(){
     let j; try{ j = await AUTH.api("admin/users"); }catch(e){ box.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
-    box.innerHTML = `<p class="cnt">가입한 사람 ${fmt(j.users.length)}명</p><div class="ulist">${j.users.map(x => `<div class="urow"><span class="fr">${fruitPic(x.fruit)}</span><div class="wt"><b>${esc(x.name)}</b><span>${esc(x.island)} 섬 · 아이디 ${esc(x.login)}</span><span>마지막 접속 ${ago(x.seen)}${x.mustChange ? " · 임시 비밀번호 받음" : ""}</span></div>${x.id === AUTH.me.id ? `<span class="me">나</span>` : `<button class="pill ghost" type="button" data-reset="${esc(x.id)}" data-name="${esc(x.name)}">임시 비밀번호</button>`}</div><div class="ures" data-for="${esc(x.id)}"></div>`).join("")}</div>`;
+    const fact = (k, v) => `<span>${k} <b>${v}</b></span>`;
+    box.innerHTML = `<p class="cnt">가입한 사람 ${fmt(j.users.length)}명</p><div class="ulist">${j.users.map(x => `<div class="urow ad-row">
+        <div class="ad-top"><span class="fr">${fruitPic(x.fruit)}</span><div class="wt"><b>${esc(x.name)}${x.id === AUTH.me.id ? " (나)" : ""}</b><span>${esc(islandText(x.island))} · 아이디 ${esc(x.login)}${x.admin ? " · 관리자" : ""}${x.mustChange ? " · 임시 비밀번호 받음" : ""}</span></div></div>
+        <div class="ad-facts">${fact("가입", dateText(x.created))}${fact("마지막 접속", ago(x.seen))}${fact("최근 30일 접속", fmt(x.d30 || 0) + "일")}${fact("거래 글", fmt(x.posts || 0))}${fact("자랑 글", fmt(x.shows || 0))}${fact("댓글", fmt(x.cmts || 0))}${fact("체크 기록 저장", x.synced ? ago(x.synced) : "없음")}</div>
+        <div class="acts2"><button class="pill leaf" type="button" data-user="${esc(x.id)}">자세히 보기</button>${x.id === AUTH.me.id ? "" : `<button class="pill ghost" type="button" data-reset="${esc(x.id)}" data-name="${esc(x.name)}">임시 비밀번호</button>`}</div>
+      </div><div class="ures" data-for="${esc(x.id)}"></div>`).join("")}</div>`;
   }
   box.addEventListener("click", e => {
+    const ub = e.target.closest("[data-user]"); if(ub) return openAdminUser(ub.dataset.user);
     const b = e.target.closest("[data-reset]"); if(!b) return;
     const out = box.querySelector(`.ures[data-for="${b.dataset.reset}"]`);
     out.innerHTML = `<div class="confirm"><p>${esc(b.dataset.name)}님의 비밀번호를 임시 비밀번호로 바꿀까요? 그 친구는 모든 기기에서 로그아웃돼요.</p><div class="acts2"><button class="pill danger" type="button" data-yes>바꾸기</button><button class="pill ghost" type="button" data-no>그만두기</button></div></div>`;
@@ -3820,6 +3841,71 @@ function openAdmin(){
   load();
 }
 
+// One friend, for the admin: everything the server keeps about them.
+function openAdminUser(id){
+  sheetOver = true;
+  const sh = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="au-t">친구 정보</h3><p class="sub" id="au-s">관리자만 볼 수 있어요</p></div>${XBTN}</div><div class="bd-in" id="au-body"><p class="sub">불러오는 중이에요…</p></div>`);
+  const body = sh.el.querySelector("#au-body");
+  const tile = (ic, k, v) => `<div class="qf">${ic}<div><span>${k}</span><b>${v}</b></div></div>`;
+  const hm = ms => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  const dayText = k => { const [y, m, d] = k.split("-").map(Number), w = "일월화수목금토"[new Date(y, m - 1, d).getDay()]; return `${y}.${String(m).padStart(2, "0")}.${String(d).padStart(2, "0")} (${w})`; };
+  const sec = (ic, title, inner) => `<div class="acq"><div class="shd">${ic}<b>${title}</b></div>${inner}</div>`;
+  let posts = [];
+  (async () => {
+    let j; try{ j = await AUTH.api("admin/users/" + encodeURIComponent(id)); }catch(e){ body.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
+    const u = j.user, who = {id: u.id, name: u.name, island: u.island, fruit: u.fruit};
+    posts = j.posts.map(x => ({...x, author: who}));
+    sh.el.querySelector("#au-t").textContent = u.name;
+    sh.el.querySelector("#au-s").textContent = `${islandText(u.island)} · 아이디 ${u.login}`;
+    // check records: read the saved backup code the same way the code box does
+    let rec = `<p class="sub">아직 저장된 체크 기록이 없어요.</p>`;
+    if(j.sync && j.sync.code){
+      try{
+        const r = await readCode(j.sync.code), has = new Set(r.ids);
+        const cnt = L => L.filter(it => has.has(it.id)).length;
+        const res = r.r.map(f => VBY.get(f)).filter(Boolean);
+        const tk = r.t ? Object.keys(r.t).length : 0, cust = r.td && Array.isArray(r.td.c) ? r.td.c.length : 0;
+        rec = `<p class="sub">${dateText(j.sync.updated)} ${hm(j.sync.updated)}에 마지막으로 저장했어요 (${ago(j.sync.updated)})</p>
+          <div class="qgrid ad-q">${[
+            tile(ico("sofa"), "아이템", `${fmt(cnt(TAB_ITEMS.item))} / ${fmt(TAB_ITEMS.item.length)}`),
+            tile(ico("book"), "카탈로그", `${fmt(cnt(ALL_CATALOG))} / ${fmt(ALL_CATALOG.length)}`),
+            tile(ico("museum"), "박물관 기증", `${fmt(cnt(TAB_ITEMS.museum))} / ${fmt(TAB_ITEMS.museum.length)}`),
+            tile(ico("photo"), "주민 사진", `${fmt(VIL.filter(v => v.photo && has.has(v.photo)).length)} / ${fmt(VIL.length)}`),
+            tile(ico("heart"), "좋아요한 아이템", `${fmt(r.w.length)}개`),
+            tile(ico("face"), "좋아하는 주민", `${fmt(r.vl.length)}명`),
+            tile(ico("coin"), "무트코인 기록", `${fmt(tk)}주`),
+            tile(ico("todo"), "직접 만든 할 일", `${fmt(cust)}개`),
+            tile(ico("island"), "섬 꾸미기 지도", r.is ? "있어요" : "없어요"),
+          ].join("")}</div>
+          ${res.length ? `<div class="ad-res"><span class="sub">우리 섬 주민 ${fmt(res.length)}명</span><div class="ad-vils">${res.map(v => `<span>${vilPic(v, 30)}${esc(v.ko)}</span>`).join("")}</div></div>` : ""}`;
+      }catch(e){ rec = `<p class="err">저장된 기록을 읽지 못했어요.</p>`; }
+    }
+    const since = Date.now() - 29 * 86400000, d30 = j.visits.filter(v => v.last >= since).length;
+    const kindName = {dream: "꿈번지", area: "구역", fashion: "패션"};
+    body.innerHTML = `
+      ${sec(ico("face"), "계정", `<div class="qgrid ad-q">${[
+        tile(ico("cal"), "가입한 날", `${dateText(u.created)} (${ago(u.created)})`),
+        tile(ico("clock"), "마지막 접속", u.seen ? `${dateText(u.seen)} ${hm(u.seen)}` : "—"),
+        tile(ico("lock"), "로그인된 기기", `${fmt(j.devices)}대`),
+        tile(ico("out"), "마지막 로그인", j.lastSignin ? ago(j.lastSignin) : "—"),
+        tile(ico("spark"), "상태", [u.admin ? "관리자" : "친구", u.mustChange ? "임시 비밀번호 받음" : "", u.locked ? "비밀번호 틀려서 잠김" : "", u.banned ? "막힘" : ""].filter(Boolean).join(" · ")),
+      ].join("")}</div>`)}
+      ${sec(ico("cal"), `접속 기록 <span class="ad-n">최근 30일 중 ${fmt(d30)}일</span>`, j.visits.length
+        ? `<div class="ad-vis">${j.visits.map(v => `<div class="ad-v"><b>${dayText(v.day)}</b><span>${fmt(v.n)}번 · ${hm(v.first)}${v.last - v.first > 60000 ? `~${hm(v.last)}` : ""}</span><span>${esc(v.dev)}</span></div>`).join("")}</div><p class="sub">한국 시간 기준, 하루에 한 줄이에요. 사이트를 열 때마다 횟수가 늘어요.</p>`
+        : `<p class="sub">아직 접속 기록이 없어요. 접속 기록은 2026년 11월 10일부터 남아요.</p>`)}
+      ${sec(ico("book"), "체크 기록", rec)}
+      ${sec(itemPic(7731, 24), `거래 글 <span class="ad-n">${fmt(posts.length)}개</span>`, posts.length
+        ? `<div class="res">${posts.map((x, i) => `<button class="srow ad-p" type="button" data-pi="${i}"><span class="tx"><b>${esc(tradeTitle(x))}</b><span>${TRADE_T[x.type][0]} · ${x.status === "done" ? "거래 완료" : "거래 중"} · 댓글 ${fmt(x.cmts || 0)} · ${dateText(x.created)}</span></span><span class="tr-go">자세히</span></button>`).join("")}</div>`
+        : `<p class="sub">쓴 거래 글이 없어요.</p>`)}
+      ${sec(ico("photo"), `자랑 글 <span class="ad-n">${fmt(j.shows.length)}개 · 추천한 글 ${fmt(j.likesGiven)}개</span>`, j.shows.length
+        ? `<div class="res">${j.shows.map(x => `<div class="srow"><span class="tx"><b>${esc(x.title || x.code || kindName[x.kind])}</b><span>${kindName[x.kind] || ""} · 추천 ${fmt(x.likes)} · 댓글 ${fmt(x.cmts)} · 조회 ${fmt(x.views)} · ${dateText(x.created)}</span></span></div>`).join("")}</div>`
+        : `<p class="sub">쓴 자랑 글이 없어요.</p>`)}
+      ${sec(ico("chat"), `댓글 <span class="ad-n">최근 ${fmt(j.comments.length)}개</span>`, j.comments.length
+        ? `<div class="cmts">${j.comments.map(c => `<div class="cmt"><div class="ch"><b>${c.on === "trade" ? `거래 · ${esc(c.items && c.items.length ? tradeTitle({items: c.items}) : "지워진 글")}` : `자랑 · ${esc(c.title || kindName[c.kind] || "지워진 글")}`}</b><span>${dateText(c.created)} ${hm(c.created)}</span></div><p>${esc(c.body)}</p></div>`).join("")}</div>`
+        : `<p class="sub">단 댓글이 없어요.</p>`)}`;
+  })();
+  body.addEventListener("click", e => { const b = e.target.closest("[data-pi]"); if(!b) return; const x = posts[+b.dataset.pi]; sheetOver = true; openTrade(x.id, x); });
+}
 function openBackup(){
   const s = openSheet(`<div class="hd"><h3>${AUTH.live ? "내 계정·기록" : "기록 옮기기"}</h3>${XBTN}</div>
     ${AUTH.live ? `<div id="acct-box"></div><h4 class="bk-h">코드로 옮기기</h4>` : ""}
