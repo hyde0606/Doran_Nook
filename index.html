@@ -601,7 +601,7 @@ html:not(.srv) .tabbar [data-tab="trade"]{display:none}
 }
 .tabbar button{border:0; background:transparent; color:var(--cream); opacity:.7; height:52px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:var(--f-display); font-size:clamp(11px, 3.1vw, 13.5px); line-height:1; white-space:nowrap; letter-spacing:-.01em; padding:0; min-width:0; transition:background .15s}
 .tabbar button svg{width:24px; height:24px}
-.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp) no-repeat; background-size:224px 28px; transition:transform .12s}
+.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp?v=99fcc0d9) no-repeat; background-size:224px 28px; transition:transform .12s}
 .tabbar [data-tab="item"] .tic{background-position:0px 0}
 .tabbar [data-tab="museum"] .tic{background-position:-28px 0}
 .tabbar [data-tab="villager"] .tic{background-position:-56px 0}
@@ -926,7 +926,7 @@ body.isl-on main.wrap{flex:1 1 auto; min-height:0; max-width:none; width:100%; m
 body.isl-on #grid{flex:1 1 auto; min-height:0; position:relative; display:block; margin:0}
 .ied{position:absolute; inset:0; overflow:hidden; background:#7bd8c6; touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
 #isl-cv{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:crosshair}
-.spr{display:block; background-image:url(img/isl.webp); background-repeat:no-repeat; flex:none}
+.spr{display:block; background-image:url(img/isl.webp?v=4d90f0f1); background-repeat:no-repeat; flex:none}
 .sbx{display:grid; place-items:center; width:var(--b); height:var(--b); flex:none}
 .irail, .ipanel, .itop .ig, .izoom, .isel{background:var(--paper); color:var(--ink); box-shadow:0 3px 0 rgba(0,0,0,.16), 0 0 0 1.5px var(--card-line)}
 .irail{position:absolute; z-index:2; display:flex; gap:4px; padding:6px; border-radius:18px}
@@ -1259,10 +1259,10 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
 /* ===== v25: species picture chip; the card's second row grows by 2px to hold it, the card keeps its height ===== */
 .vsp{display:inline-flex; align-items:center; gap:3px; height:22px; padding:0 9px 0 3px; border-radius:11px; background:var(--sp-bg); box-shadow:inset 0 0 0 1.5px var(--sp-line); font-size:14px; line-height:22px}
 .vn2 .vsp{line-height:22px}
-.vsi{display:block; flex:none; --z:19px; width:var(--z); height:var(--z); background:url(img/sp.webp) no-repeat; background-size:calc(var(--z) * 7) auto; background-position:calc(var(--sx) * var(--z) * -1) calc(var(--sy) * var(--z) * -1)}
+.vsi{display:block; flex:none; --z:19px; width:var(--z); height:var(--z); background:url(img/sp.webp?v=b1ba6a80) no-repeat; background-size:calc(var(--z) * 7) auto; background-position:calc(var(--sx) * var(--z) * -1) calc(var(--sy) * var(--z) * -1)}
 .vinfo .qf > .vsi.qi{--z:26px}
 .sub.vsub .vsp{background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.38)}
-.pic.sppic{background-image:url(img/sp.webp)}
+.pic.sppic{background-image:url(img/sp.webp?v=b1ba6a80)}
 .vph svg{display:none}
 
 .card.li.vb .tx{grid-template-rows:24px 22px 21px 36px}
@@ -2133,7 +2133,7 @@ function openDetail(it, startSel){
 
 /* ---------- Category popup ---------- */
 // img/cats.webp: one 96px tile per category (tile i = category i), so the popup doesn't download every category's pictures.
-const catIcon = i => `<span class="pic" style="background-image:url(img/cats.webp);--cols:11;--x:${i % 11};--y:${Math.floor(i / 11)}" aria-hidden="true"></span>`;
+const catIcon = i => `<span class="pic" style="background-image:url(img/cats.webp?v=2a89c76c);--cols:11;--x:${i % 11};--y:${Math.floor(i / 11)}" aria-hidden="true"></span>`;
 function catBtnHTML(i, label, ico, o, total, done, numText, cls){
   const pct = total ? o/total*100 : 0;
   return `<button class="cbtn${cls ? " " + cls : ""}${done?" done":""}" type="button" data-c="${i}" aria-current="${ui.cat===i}">${ico}<span class="ct"><span class="cn"><b>${esc(label)}</b></span><span class="num">${done ? `<em class="done-mark">완성</em>` : numText}</span><i><u style="width:${pct}%"></u></i></span></button>`;
@@ -2745,7 +2745,7 @@ const TI = D.ti || {cols:10, k:{}};
 function tIco(k, t){
   const i = TI.k[k];
   if(i == null) return `<span class="pic ph" style="--t:${t}px" aria-hidden="true"></span>`;
-  return `<span class="pic ti" style="--t:${t}px;background-image:url(img/todo.webp);--cols:${TI.cols};--x:${i % TI.cols};--y:${Math.floor(i / TI.cols)}" aria-hidden="true"></span>`;
+  return `<span class="pic ti" style="--t:${t}px;background-image:url(img/todo.webp?v=a9e1fe10);--cols:${TI.cols};--x:${i % TI.cols};--y:${Math.floor(i / TI.cols)}" aria-hidden="true"></span>`;
 }
 const GAME_H = 5;
 const gameNow = () => new Date(Date.now() - GAME_H * 3600e3);
@@ -3234,7 +3234,7 @@ function pickTalker(){
 let talkT = 0, typeT = 0, talkFinish = null;
 // img/emo.webp: the game's reaction stickers, one per mood, in this order (prep_emo.py)
 const MOODS = "nljhxkscdawbepgirqtz";
-const emoHTML = e => { const i = Math.max(0, MOODS.indexOf(e)); return `<span class="pic" style="background-image:url(img/emo.webp);--cols:10;--x:${i % 10};--y:${Math.floor(i / 10)}"></span>`; };
+const emoHTML = e => { const i = Math.max(0, MOODS.indexOf(e)); return `<span class="pic" style="background-image:url(img/emo.webp?v=204a0d3f);--cols:10;--x:${i % 10};--y:${Math.floor(i / 10)}"></span>`; };
 function showTalk(){
   const v = pickTalker(); if(!v) return; const ln = talkLine(v); if(!ln) return;
   let el = $("vtalk");
@@ -3265,7 +3265,7 @@ function showTalk(){
   };
   // wait for the face and the sticker pictures so the bubble never appears without them
   let started = false, left = 2; const once = () => { if(!started){ started = true; go(); } }, one = () => { if(--left <= 0) once(); };
-  [`img/vil-${Math.floor(v.i / 96)}.webp`, "img/emo.webp"].forEach(src => { const im = new Image(); im.onload = im.onerror = one; im.src = src; });
+  [`img/vil-${Math.floor(v.i / 96)}.webp`, "img/emo.webp?v=204a0d3f"].forEach(src => { const im = new Image(); im.onload = im.onerror = one; im.src = src; });
   setTimeout(once, 2500);
 }
 function hideTalk(){
@@ -4091,7 +4091,7 @@ function openSignin(mode){
     <label class="fld"><span>섬 이름</span><input id="si-island" maxlength="10" placeholder="예) 도란"></label>${fruitPick("")}` : ""}
     <div id="si-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="si-ok">${up ? "가입하기" : "로그인"}</button><button class="pill ghost" type="button" id="si-sw">${up ? "이미 계정이 있어요" : "처음이에요 (가입하기)"}</button></div>
-    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요. 관리자는 가입한 날, 접속한 날짜와 기기, 체크 기록, 쓴 글과 댓글을 볼 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
+    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
   const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
   q("#si-sw").addEventListener("click", () => { sh.close(); setTimeout(() => openSignin(up ? "in" : "up"), 0); });
   const go = () => busyRun(q("#si-ok"), q("#si-msg"), async () => {
@@ -4729,7 +4729,7 @@ function paintUndo(){ document.querySelectorAll("[data-a=undo]").forEach(b => b.
 /* ----- pictures (one sheet, loaded with the tab) ----- */
 const SPOS = {"w":1024,"h":914,"pos":{"b_light":[0,0,104,168],"b_able":[106,0,168,145],"b_me":[276,0,168,145],"b_camp":[446,0,168,135],"b_svc":[616,0,168,129],"b_house":[786,0,168,128],"b_mus":[0,170,168,123],"br_stone_vertical":[170,170,73,120],"br_wood_vertical":[245,170,83,120],"br_wood_tlbr":[330,170,119,120],"br_wood_trbl":[451,170,119,120],"b_shop":[572,170,168,117],"br_stone_tlbr":[742,170,120,106],"br_stone_trbl":[864,170,120,106],"t_1":[0,295,76,96],"t_21":[78,295,76,96],"t_22":[156,295,76,96],"t_23":[234,295,76,96],"t_24":[312,295,76,96],"t_25":[390,295,76,96],"t_26":[468,295,79,96],"t_27":[549,295,77,96],"t_3":[628,295,49,96],"t_5":[679,295,58,96],"t_4":[739,295,96,91],"st_stone_up":[837,295,51,88],"st_stone_down":[890,295,51,88],"st_wood_up":[943,295,58,88],"st_wood_down":[0,393,58,88],"b_air":[60,393,168,87],"br_wood_horizontal":[230,393,120,83],"br_stone_horizontal":[352,393,120,80],"m_icon-townhall":[474,393,80,80],"m_icon-museum":[556,393,80,80],"m_icon-nooks-cranny":[638,393,80,80],"m_icon-abel":[720,393,80,80],"m_icon-airport":[802,393,80,80],"m_icon-tent":[884,393,80,80],"m_amenity-lighthouse":[966,393,41,80],"m_icon-bridge":[0,483,40,80],"m_icon-stairs":[42,483,40,80],"m_tree-fruit":[84,483,78,80],"m_tree-pine":[164,483,60,80],"m_tree-palm":[226,483,70,80],"m_tree-bush":[298,483,80,76],"m_icon-house":[380,483,80,72],"u_cliff":[462,483,63,72],"u_path":[527,483,71,72],"u_flower":[600,483,44,72],"u_save":[646,483,47,72],"u_view":[695,483,41,72],"u_tree":[738,483,72,70],"u_bridge":[812,483,72,67],"u_hand":[886,483,68,65],"u_water":[0,565,72,64],"u_new":[74,565,72,64],"u_help":[148,565,72,64],"p_1":[222,565,64,64],"p_2":[288,565,64,64],"p_3":[354,565,64,64],"p_4":[420,565,64,64],"p_5":[486,565,64,64],"p_6":[552,565,64,64],"p_7":[618,565,64,64],"p_8":[684,565,64,64],"p_9":[750,565,64,64],"i_486277":[816,565,64,59],"i_449061":[882,565,64,59],"i_427897":[948,565,64,59],"i_414812":[0,631,64,59],"i_496423":[66,631,64,59],"i_444694":[132,631,64,59],"i_491227":[198,631,64,59],"i_470470":[264,631,64,59],"i_446351":[330,631,64,59],"i_403001":[396,631,64,59],"i_457259":[462,631,64,59],"i_466768":[528,631,64,59],"i_454782":[594,631,64,59],"i_486797":[660,631,64,59],"i_462979":[726,631,64,59],"i_477554":[792,631,64,59],"st_wood_left":[858,631,88,58],"st_wood_right":[0,692,88,58],"i_2931":[90,692,44,56],"i_2935":[136,692,44,56],"i_2939":[182,692,44,56],"i_2943":[228,692,44,56],"i_2947":[274,692,44,56],"i_2951":[320,692,44,56],"i_2955":[366,692,44,56],"i_2959":[412,692,44,56],"i_2963":[458,692,44,56],"i_2879":[504,692,34,56],"i_2883":[540,692,34,56],"i_2887":[576,692,34,56],"i_2891":[612,692,34,56],"i_2895":[648,692,34,56],"i_2899":[684,692,34,56],"i_2903":[720,692,34,56],"i_2907":[756,692,56,56],"i_2911":[814,692,56,56],"i_2915":[872,692,56,56],"i_2919":[930,692,56,56],"i_2923":[0,752,56,56],"i_2927":[58,752,56,56],"i_2304":[116,752,42,56],"i_2305":[160,752,42,56],"i_2863":[204,752,42,56],"i_2867":[248,752,42,56],"i_2871":[292,752,42,56],"i_2875":[336,752,42,56],"i_2979":[380,752,56,56],"i_2983":[438,752,56,56],"i_2987":[496,752,56,56],"i_2991":[554,752,56,56],"i_2995":[612,752,56,56],"i_2999":[670,752,56,56],"i_3730":[728,752,29,56],"i_3734":[759,752,29,56],"i_3738":[790,752,29,56],"i_3741":[821,752,29,56],"i_3744":[852,752,29,56],"i_3748":[883,752,29,56],"i_3751":[914,752,29,56],"i_3709":[945,752,42,56],"i_3713":[0,810,42,56],"i_3717":[44,810,42,56],"i_3720":[88,810,42,56],"i_3723":[132,810,42,56],"i_3727":[176,810,42,56],"i_3754":[220,810,48,56],"i_3758":[270,810,48,56],"i_3762":[320,810,48,56],"i_3765":[370,810,48,56],"i_3768":[420,810,48,56],"i_5175":[470,810,48,56],"i_2502":[520,810,56,56],"i_2624":[578,810,50,56],"u_bld":[630,810,72,55],"st_stone_left":[704,810,88,52],"st_stone_right":[794,810,88,52],"m_icon-player-house":[884,810,80,51],"u_trace":[0,868,72,46]},"col":{"p_1":"#ab8556","p_2":"#6f4f34","p_3":"#737473","p_4":"#9a5342","p_5":"#fae8ad","p_6":"#bab9b3","p_7":"#eeba87","p_8":"#da8a44","p_9":"#dfd9d8","i_2931":"#c6cca8","i_2935":"#bb1e26","i_2939":"#d4b40f","i_2943":"#d863a0","i_2947":"#de671c","i_2951":"#691963","i_2955":"#41343f","i_2959":"#2344c7","i_2963":"#d5aa24","i_2879":"#ced1b8","i_2883":"#cd3c38","i_2887":"#d6b53e","i_2891":"#d85b81","i_2895":"#d67f2f","i_2899":"#8042ce","i_2903":"#572c3a","i_2907":"#8b7cb8","i_2911":"#8d252f","i_2915":"#a7792b","i_2919":"#a04835","i_2923":"#5f2f89","i_2927":"#3e40a9","i_2304":"#d83b30","i_2305":"#d6d2b9","i_2863":"#ebc132","i_2867":"#eb6ca1","i_2871":"#eb8716","i_2875":"#5a201e","i_2979":"#b1bc9e","i_2983":"#9b2227","i_2987":"#bbb212","i_2991":"#c18eb1","i_2995":"#bb6814","i_2999":"#412a28","i_3730":"#d2d8c8","i_3734":"#efcb37","i_3738":"#f59bb5","i_3741":"#f1813a","i_3744":"#e1303d","i_3748":"#4d5de5","i_3751":"#8149e3","i_3709":"#d1cfde","i_3713":"#de831d","i_3717":"#2167e4","i_3720":"#ea9bdf","i_3723":"#d8474e","i_3727":"#751ba5","i_3754":"#c8d0a3","i_3758":"#e7ba20","i_3762":"#8c22ce","i_3765":"#e98dae","i_3768":"#ce232e","i_5175":"#6c751a","i_2502":"#adaaab","i_2624":"#b19559","i_486277":"#758fa9","i_449061":"#8d8e96","i_427897":"#787d93","i_414812":"#888d8b","i_496423":"#90867c","i_444694":"#5d869a","i_491227":"#887f67","i_470470":"#927765","i_446351":"#b9bfad","i_403001":"#cabc90","i_457259":"#d2bb90","i_466768":"#c49f82","i_454782":"#91bcb3","i_486797":"#cac9af","i_462979":"#d4d5bd","i_477554":"#a3b4c1"}};
 let SPR = null, sprReady = false;
-function sprLoad(){ if(SPR) return; SPR = new Image(); SPR.onload = () => { sprReady = true; islDraw(); }; SPR.src = "img/isl.webp"; }
+function sprLoad(){ if(SPR) return; SPR = new Image(); SPR.onload = () => { sprReady = true; islDraw(); }; SPR.src = "img/isl.webp?v=4d90f0f1"; }
 function sprHTML(name, box, cls){
   const p = SPOS.pos[name]; if(!p) return "";
   const [x, y, w, h] = p, k = box / Math.max(w, h), f = v => (v * k).toFixed(1) + "px";
