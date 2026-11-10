@@ -245,6 +245,8 @@ footer p{margin:2px 0}
 .sheet .hd .sub{color:var(--cream); opacity:.85}
 .sheet .hd .x{margin-left:auto; border:0; background:var(--cream); color:var(--soil-deep); border-radius:50%; width:36px; height:36px; display:grid; place-items:center; flex:none}
 .sheet .hd .x svg{width:15px; height:15px}
+.sheet .hd .x.nudge{animation:xnudge .5s ease}
+@keyframes xnudge{0%,100%{transform:none} 20%{transform:scale(1.18) rotate(-10deg)} 45%{transform:scale(1.18) rotate(10deg)} 70%{transform:scale(1.1) rotate(-5deg)}}
 .sheet .bd{scrollbar-color:var(--soil-light) transparent; padding:16px max(18px, env(safe-area-inset-left, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)); overflow-y:auto; overflow-x:hidden; scrollbar-gutter:stable; display:grid; grid-template-columns:minmax(0,1fr); gap:14px; align-content:start}
 .bd-in{min-width:0}
 .sheet p{margin:0}
@@ -1925,6 +1927,7 @@ let toastT=0;
 function toast(msg){ let t = document.querySelector(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t); } t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{ t.hidden=true; }, 2600); }
 const XBTN = `<button class="x" type="button" aria-label="닫기"><svg><use href="#i-x"/></svg></button>`;
 let sheetOver = false;   // set just before a sheet opens from inside another: it goes on top, and the first comes back when it shuts
+const TYPED = 'textarea, input:not([type]), input[type="text"], input[type="number"], input[type="password"], input[type="tel"]';   // what someone types (search boxes don't count)
 function openSheet(html, onClose, opt){
   hideTalk();
   // html = '<div class="hd">…XBTN</div>' + body. The body is wrapped in a scrollable .bd.
@@ -1941,7 +1944,27 @@ function openSheet(html, onClose, opt){
   };
   ov._close = close; ov._drop = () => ov.remove();
   const born = Date.now();
-  ov.addEventListener("click", e => { if(e.target===ov && Date.now()-born < 600) return; if(e.target===ov || e.target.closest(".x")) close(); });
+  // A tap outside shuts the window only when the press both began and ended on the backdrop: a drag that starts inside
+  // (selecting text, a slider) and lets go outside makes the browser fire its click on the backdrop, which must not count.
+  let downOv = false, typed = false, kept = false;
+  ov.addEventListener("pointerdown", e => { downOv = e.target === ov; });
+  ov.addEventListener("input", e => { if(e.target.matches && e.target.matches(TYPED)) typed = true; });
+  ov.addEventListener("change", e => { if(e.target.type === "file" && e.target.files && e.target.files.length) kept = true; });
+  ov._keep = () => { kept = true; };
+  const unsaved = () => kept || (typed && [...ov.querySelectorAll(TYPED)].some(f => f.value.trim()));
+  ov.addEventListener("click", e => {
+    if(e.target === ov){
+      const ok = downOv; downOv = false;
+      if(!ok || Date.now() - born < 600) return;
+      if(unsaved()){
+        toast("적던 내용이 있어서 닫지 않았어요. 닫으려면 오른쪽 위 X를 눌러 주세요");
+        const x = ov.querySelector(".hd .x"); if(x && !REDUCED){ x.classList.remove("nudge"); void x.offsetWidth; x.classList.add("nudge"); }
+        return;
+      }
+      return close();
+    }
+    if(e.target.closest(".x")) close();
+  });
   const f = (matchMedia("(pointer:fine)").matches && ov.querySelector(".bd input[type=search]")) || ov.querySelector(".x"); f && f.focus({preventScroll:true});
   return {el: ov.firstChild, close, ov};
 }
@@ -3738,6 +3761,7 @@ function openTradePick(chosen, done, opt){
       if(chosen.length >= MAX){ toast(`한 글에는 ${MAX}개까지 넣을 수 있어요`); return; }
       chosen.push(k === "i" ? {k, id: +id, n: 1} : {k, id}); b.setAttribute("aria-pressed", "true");
     }
+    const under = s.ov.previousElementSibling; if(under && under._keep) under._keep();
     sub();
   });
   paint();
