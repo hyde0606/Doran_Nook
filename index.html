@@ -1753,7 +1753,9 @@ function sortList(list){
   const key = so.startsWith("buy") ? buyPrice : (it => it.sell), d = so.endsWith("D") ? -1 : 1;
   return list.slice().sort((a,b) => { const x = key(a), y = key(b); return !x && !y ? 0 : !x ? 1 : !y ? -1 : d * (x - y); });
 }
+let NAVHOOK = null;   // set by BK below: notes a change of screen as a new history entry
 function render(){
+  if(NAVHOOK) NAVHOOK();
   renderTabbar();
   document.body.classList.toggle("isl-on", ui.tab === "island");
   $("welcome").classList.toggle("tabhide", ui.tab !== "item");
@@ -1971,21 +1973,77 @@ function openSheet(html, onClose, opt){
 // Escape shuts only the sheet on top
 document.addEventListener("keydown", e => { if(e.key !== "Escape") return; const ov = $("layer").lastElementChild; if(ov && ov._close){ e.preventDefault(); e.stopPropagation(); ov._close(); } });
 
-/* ---------- 뒤로 가기 ----------
+/* ---------- 뒤로 가기 (v34) ----------
+   Every change of screen adds a history entry {dn, v: the screen, i: how many screens deep, y: scroll, limit: rows shown}.
    The browser's back button (or a phone's back gesture) first shuts what is open on top: a sheet, then whatever a screen
-   adds with BK.add (the island: a picked building, then the option panel on a narrow screen). With nothing open, the first
-   press only says that one more press leaves; the second press leaves. One spare history entry makes this possible; it is
-   added on the person's own tap or key press, because browsers skip entries a page adds on its own. */
+   adds with BK.add (the island: a picked building, then the option panel on a narrow screen). With nothing open it goes to
+   the screen before, one by one; on the first screen it goes to the main screen (아이템), then says one more press leaves.
+   A spare entry on top (a copy of the current screen) is what lets back shut a window without leaving the screen; it is
+   added on the person's own tap or key press, because browsers skip entries a page adds on its own. A copy that comes back
+   up holds the screen already showing, so it is stepped over at once. */
 const BK = (() => {
-  let armed = false; const more = [];
-  const arm = () => { if(armed) return; try{ history.pushState({acnhBack: 1}, ""); armed = true; }catch(e){} };
-  addEventListener("pointerdown", arm, true); addEventListener("keydown", arm, true);
-  addEventListener("popstate", () => {
+  let armed = false, restoring = false, warned = false; const more = [];
+  const NAV = {v: null, i: 0, limit: 0};
+  const snapV = () => ({t: ui.tab, c: ui.cat, f: ui.tab === "island" ? "" : ui.fo});
+  const sameV = (a, b) => !!a && !!b && a.t === b.t && a.c === b.c && a.f === b.f;
+  const entry = (extra) => Object.assign({dn: 1, v: NAV.v, i: NAV.i, y: 0, limit: 0}, extra);
+  const arm = () => { if(armed || !NAV.v) return; try{ history.pushState(entry({spare: 1, y: $("page").scrollTop, limit: ui.limit}), ""); armed = true; }catch(e){} };
+  const touch = () => { warned = false; arm(); };
+  addEventListener("pointerdown", touch, true); addEventListener("keydown", touch, true);
+  NAVHOOK = () => {
+    if(restoring) return;
+    const v = snapV();
+    if(!NAV.v){   // the first drawing: this entry is the bottom screen, or where a reload left off
+      NAV.v = v; const h = history.state; NAV.i = h && h.dn && Number.isInteger(h.i) ? h.i : 0;
+      try{ history.replaceState(entry(), ""); }catch(e){}
+      return;
+    }
+    if(sameV(v, NAV.v)){ NAV.limit = ui.limit; return; }
+    try{
+      history.replaceState(entry({y: $("page").scrollTop, limit: NAV.limit}), "");   // the old screen keeps its place
+      NAV.v = v; NAV.i += 1; NAV.limit = ui.limit;
+      history.pushState(entry(), ""); armed = false;
+    }catch(e){ NAV.v = v; }
+  };
+  function show(st){
+    const v = st.v, t = TABS.includes(v.t) && (v.t !== "trade" || SRV) ? v.t : "item";
+    restoring = true;
+    try{
+      saveView();
+      if(t !== ui.tab){ ui.tab = t; Object.assign(ui, {fo: mem[t].fo, liked: mem[t].liked}); if(t === "dream") dreamLock(); }
+      ui.cat = Number.isInteger(v.c) ? v.c : mem[t].cat;
+      if(t !== "island" && TAB_FO[t].some(f => f[0] === v.f)) ui.fo = v.f;
+      ui.limit = st.limit || 0;
+      saveView(); renderTotals(); render();
+    } finally { restoring = false; }
+    NAV.v = snapV(); NAV.i = st.i || 0; NAV.limit = ui.limit;
+    const y = st.y || 0; $("page").scrollTo({top: y}); requestAnimationFrame(() => $("page").scrollTo({top: y}));
+  }
+  addEventListener("popstate", e => {
     armed = false;
+    const st = e.state && e.state.dn && e.state.v ? e.state : null;
+    // 1. something open on top shuts, and the screen stays
     const ov = $("layer").lastElementChild;
-    if(ov && ov._close){ ov._close(); arm(); return; }
-    for(const f of more) if(f()){ arm(); return; }
-    toast("뒤로 가기를 한 번 더 누르면 이 페이지를 나가요");
+    let shut = false;
+    if(ov && ov._close){ ov._close(); shut = true; }
+    else for(const f of more) if(f()){ shut = true; break; }
+    if(shut){
+      if(st && NAV.v && !sameV(st.v, NAV.v)){ try{ history.pushState(entry(), ""); }catch(e){} }   // a skipped spare: keep this screen's entry
+      arm(); return;
+    }
+    // 2. an earlier (or, with forward, a later) screen
+    if(st && !sameV(st.v, NAV.v)){ show(st); arm(); return; }
+    // 3. a copy of the screen already showing: step over it
+    if(st && st.i > 0){ NAV.i = st.i; history.back(); return; }
+    // 4. the first screen: the main screen first, then one more press leaves
+    if(!(ui.tab === "item" && ui.cat === 0 && ui.fo === "all")){
+      show({v: {t: "item", c: 0, f: "all"}, i: 0}); NAV.i = 0;
+      try{ history.replaceState(entry(), ""); }catch(e){}
+      arm(); return;
+    }
+    // already told: a copy of this first screen underneath is stepped over, so the press really leaves
+    if(warned){ history.back(); return; }
+    warned = true; toast("뒤로 가기를 한 번 더 누르면 이 페이지를 나가요");
   });
   return {add: f => more.push(f)};
 })();
