@@ -333,6 +333,7 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .pbar{height:10px; background:var(--paper2); border-radius:5px; overflow:hidden}
 .pbar i{display:block; height:100%; width:0; background:var(--leaf); transition:width .2s}
 .res{display:grid; gap:6px}
+.ph-cut{margin:4px 0 10px}
 .ri{display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:12px; background:var(--paper2)}
 .ri input{width:20px; height:20px; accent-color:var(--leaf); flex:none}
 .ri .pic{--t:42px}
@@ -6163,7 +6164,9 @@ function matchOne(text){
     if(it.k.length >= 3 && t.includes(it.k)){ const cov = it.k.length / t.length; inc = cov >= 0.8 ? 0.9 + 0.09 * cov : 0.5 + 0.45 * cov; }
     const L = Math.max(tj.length, it.j.length); const max = L * 0.4;
     const d = lev(tj, it.j, max);
-    take(it, Math.max(inc, d > max ? 0 : 1 - d/L));
+    let sc = d > max ? 0 : 1 - d/L;
+    if(sc >= 0.8 && d > 1 && Math.min(t.length, it.k.length) <= 3) sc = 0.78;
+    take(it, Math.max(inc, sc));
   }
   if(!best || bs < 0.62) return null;
   // far ahead of every other name: sure enough, even if a letter or two came out wrong
@@ -6202,7 +6205,13 @@ function latScore(junk, it){
 }
 // K.K. songs: the model also drops or garbles a rare syllable (왈츠 → "츠"); a lone match on the start or end is offered as 애매
 const KK = MATCHABLE.filter(it => /^K\.K\.[가-힣 ]+$/.test(it.ko)).map(it => ({it, h: hangulOnly(it.ko)}));
+const bmCache = new Map();
 function bestMatch(text){
+  let r = bmCache.get(text);
+  if(r === undefined){ r = bestMatch0(text) || null; if(bmCache.size > 30000) bmCache.clear(); bmCache.set(text, r); }
+  return r;
+}
+function bestMatch0(text){
   let r = matchOne(text);
   // an icon read as a letter or number in front of the name: up to two short tokens. A token of two or more Korean
   // letters is often part of the name read wrong (흑백 → 혹잭), so dropping it has to win clearly
@@ -6313,7 +6322,7 @@ function ocrSegments(bmp){
   const dv = new Float32Array(N);
   for(let r = 0; r < H; r++){ const r0 = Math.max(0, r-R), r1 = Math.min(H, r+R+1);
     for(let q = 0; q < W; q++) dv[r*W+q] = y[r*W+q] - boxMean(Math.max(0, q-R), r0, Math.min(W, q+R+1), r1); }
-  const maxH = Math.max(14, Math.round(H / 18));
+  const maxH = Math.max(14, Math.round(Math.min(H / 18, W / 14)));
   const uf = n => { const U = Array.from({length: n}, (_, i) => i); const f = a => { while(U[a] !== a){ U[a] = U[U[a]]; a = U[a]; } return a; }; return {f, u: (a, b) => { a = f(a); b = f(b); if(a !== b) U[b] = a; }}; };
   const group = (list, U) => { const m = new Map(); list.forEach((b, i) => { const a = U.f(i); let g = m.get(a);
     if(!g){ g = {x0:b.x0, y0:b.y0, x1:b.x1, y1:b.y1, n:0}; m.set(a, g); } g.x0 = Math.min(g.x0, b.x0); g.y0 = Math.min(g.y0, b.y0); g.x1 = Math.max(g.x1, b.x1); g.y1 = Math.max(g.y1, b.y1); g.n += b.n || 1; }); return [...m.values()]; };
@@ -6336,7 +6345,7 @@ function ocrSegments(bmp){
         const xo = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) + 1, vg = Math.max(a.y0, b.y0) - Math.min(a.y1, b.y1);
         const hm = Math.max(a.y1-a.y0, b.y1-b.y0) + 1;
         if(xo >= Math.min(a.x1-a.x0+1, b.x1-b.x0+1) * 0.5 && vg <= Math.max(3, hm * 0.6)) U1.u(i, j); } }
-    const syl0 = group(cc, U1).filter(g => g.y1-g.y0+1 <= maxH), hs = syl0.map(g => g.y1-g.y0+1).sort((a, b) => a - b), medH = hs.length ? hs[hs.length >> 1] : maxH;
+    const syl0 = group(cc, U1).filter(g => g.y1-g.y0+1 <= maxH), hs = syl0.filter(g => { const h = g.y1-g.y0+1, w = g.x1-g.x0+1; return h >= 7 && w >= h * 0.5 && w <= h * 1.8; }).map(g => g.y1-g.y0+1).sort((a, b) => a - b), medH = hs.length ? hs[hs.length >> 1] : maxH;
     const syl = syl0.filter(g => g.y1-g.y0+1 <= Math.max(14, medH * 4)).sort((a, b) => a.x0 - b.x0);
     syl.forEach(g => g.n = 1);
     // 2. boxes of about the same height side by side join into a line; a gap wider than ~1 letter splits it.
@@ -6374,13 +6383,38 @@ function ocrSegments(bmp){
       if((hi > lo ? 1 : -1) !== sign) continue;
       // a picture has shades on both sides of its middle shade; a panel with letters has only the letters' side
       const other = (sign > 0 ? lo : hi) / area;
-      if(other < 0.02 && sd < 26 && fill < 0.45) out.push({x0, y0, x1, y1, rx0: L.x0, ry0: L.y0, rx1: L.x1, ry1: L.y1, h, n: L.n, sd, fill, sign});
+      if(other < 0.02 && sd < 26 && fill < 0.45) out.push({x0, y0, x1, y1, rx0: L.x0, ry0: L.y0, rx1: L.x1, ry1: L.y1, h, n: L.n, sd, fill, sign, med});
     }
   }
   // the light rim around dark letters (or the other way round) makes a ghost line in the other colour: drop it
   const iou = (a, b) => { const w = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0), h = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0); if(w <= 0 || h <= 0) return 0;
     const i = w * h; return i / ((a.x1-a.x0)*(a.y1-a.y0) + (b.x1-b.x0)*(b.y1-b.y0) - i); };
   const lines = out.filter(a => !out.some(b => b !== a && iou(a, b) > 0.3 && (b.n > a.n || (b.n === a.n && b.fill < a.fill))));
+  // Names cut off by the edge of their panel (the last row of each screenshot in a collage, or of the picture itself)
+  // cannot be read; they are marked so the person can be told how many. Looking straight down (and up) from every
+  // line, over the width of its first three letters: letters that run right into a border, with no other line found
+  // in between, are a cut row (cutD / cutU on the line they were seen from). A found line that itself touches a border
+  // gets touch = 1 (below) or -1 (above). ocrLines counts them, only next to lines that turned out to be names.
+  (() => {
+    const big = lines.filter(l => l.n >= 2);
+    // ink(): how much of the row is the letters' own shade (darker than the panel for dark letters, lighter for light)
+    const ink = (l, r, xa, xb) => { let n = 0; for(let q = xa; q <= xb; q++) if(l.sign * (y[r*W+q] - l.med) > 40) n++; return n / (xb - xa + 1); };
+    // edge(): a flat band of another shade (the gap between two screenshots), not a picture
+    const edge = (l, r, xa, xb) => { if(r < 0 || r >= H) return true; let n = 0, a = 0, b = 0;
+      for(let q = xa; q <= xb; q++){ const v = y[r*W+q]; if(Math.abs(v - l.med) > 40) n++; a += v; b += v * v; }
+      const N = xb - xa + 1, m = a / N; return n / N > 0.85 && Math.sqrt(Math.max(0, b / N - m * m)) < 10; };
+    for(const l of big){ const xa = l.rx0, xb = Math.min(W - 1, l.rx0 + Math.round(l.h * 3)), far = Math.round(l.h * 5);
+      const hit = r => lines.some(o => o !== l && o.rx0 <= xb && o.rx1 >= xa && r >= o.ry0 && r <= o.ry1);
+      for(const dir of [1, -1]){ let t = 0, last = -9, k = 2;
+        for(; k <= far; k++){ const r = dir > 0 ? l.ry1 + k : l.ry0 - k;
+          if(hit(r)){ k = -1; break; }
+          if(edge(l, r, xa, xb) && edge(l, r + dir, xa, xb)) break;
+          if(r < 0 || r >= H) break;
+          const f = ink(l, r, xa, xb); if(f >= 0.08 && f <= 0.8){ t++; last = k; } }
+        if(k < 0 || k > far) continue;                       // another line comes first, or no border near
+        if(k <= 3){ l.touch = dir; continue; }              // this line itself runs into the border
+        if(t >= 2 && last >= k - 2){ if(dir > 0) l.cutD = true; else l.cutU = true; } } }
+  })();
   return {W, H, s0, dv, lines};
 }
 // lay the kept lines out one per row, dark text on white, scaled so letters are ~40px tall
@@ -6403,35 +6437,117 @@ function ocrSheet(seg){
 }
 
 // Everything readable in one picture (a File, a Blob or a canvas): the whole picture, then the lines found one by one.
-async function ocrLines(w, src){
+/* ----- second reader (v39): PaddleOCR's Korean line reader (PP-OCRv5 mobile, Apache-2.0) on ONNX Runtime Web (MIT).
+   It reads the lines the finder cut out, one by one. Tesseract and it get different names wrong (Tesseract garbles
+   Latin words, this one drops a letter at a line's end), so together they cover what either misses.
+   Only on the stand-alone site (the files are not on the artifact copy); if anything fails, Tesseract reads alone. ----- */
+let ppPromise = null;
+function getPP(){
+  if(!ppPromise) ppPromise = (async () => {
+    try{
+      if(!window.DN_SERVER || typeof WebAssembly !== "object") return null;
+      if(!window.ort) await loadScript("ocr/pp/ort.wasm.min.js");
+      ort.env.wasm.wasmPaths = absURL("ocr/pp/"); ort.env.wasm.numThreads = 1;
+      const [mr, dr] = await Promise.all([fetch(absURL("ocr/pp/kor-rec.bin")), fetch(absURL("ocr/pp/dict.txt"))]);
+      if(!mr.ok || !dr.ok) return null;
+      let buf = new Uint8Array(await mr.arrayBuffer());
+      // the model is stored gzipped; a host that already unpacked it on the way is fine too
+      if(buf[0] === 0x1f && buf[1] === 0x8b){
+        if(typeof DecompressionStream !== "function") return null;
+        buf = new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());
+      }
+      const chars = (await dr.text()).split("\n"); if(chars[chars.length - 1] === "") chars.pop(); chars.push(" ");
+      const sess = await ort.InferenceSession.create(buf, {executionProviders: ["wasm"]});
+      const c = document.createElement("canvas");
+      return {sess, chars, c, g: c.getContext("2d", {willReadFrequently: true})};
+    }catch(e){ return null; }
+  })();
+  return ppPromise;
+}
+// one line (a box from ocrSegments, in the scaled picture's coordinates) cut from the full picture, 48px tall
+async function ppRead(pp, bmp, s0, l){
+  const pad = Math.round(l.h * 0.6), x0 = l.x0 / s0, y0 = l.y0 / s0;
+  const w0 = Math.min(bmp.width - x0, (l.x1 - l.x0 + 1 + pad) / s0), h0 = Math.min(bmp.height - y0, (l.y1 - l.y0 + 1) / s0);
+  if(w0 < 2 || h0 < 2) return "";
+  const W = Math.max(16, Math.min(1920, Math.round(w0 * 48 / h0))), N = 48 * W;
+  pp.c.width = W; pp.c.height = 48; pp.g.imageSmoothingQuality = "high"; pp.g.drawImage(bmp, x0, y0, w0, h0, 0, 0, W, 48);
+  const d = pp.g.getImageData(0, 0, W, 48).data, a = new Float32Array(3 * N);
+  for(let i = 0; i < N; i++){ a[i] = d[i*4+2] / 127.5 - 1; a[N+i] = d[i*4+1] / 127.5 - 1; a[2*N+i] = d[i*4] / 127.5 - 1; }
+  const r = await pp.sess.run({[pp.sess.inputNames[0]]: new ort.Tensor("float32", a, [1, 3, 48, W])});
+  const o = r[pp.sess.outputNames[0]], T = o.dims[1], K = o.dims[2], v = o.data; let s = "", last = 0;
+  for(let t = 0; t < T; t++){ let bi = 0, bv = -1; const base = t * K;
+    for(let k = 0; k < K; k++){ const x = v[base + k]; if(x > bv){ bv = x; bi = k; } }
+    if(bi && bi !== last) s += pp.chars[bi] || ""; last = bi; }
+  return s.trim();
+}
+const ocrT = {seg: 0, pp: 0, whole: 0, sheet: 0, again: 0, n: 0, lines: 0, ppLines: 0, sheetLines: 0, againLines: 0};   // where the time goes (ms)
+let ocrCut = 0;   // names cut off at the edge of their panel in the photos of this run (told to the user with the results)
+async function ocrLines(w, src, opt){
   const bmp = src instanceof HTMLCanvasElement ? src : await createImageBitmap(src);
   const out = [];
-  await w.setParameters({tessedit_pageseg_mode: "3"});
-  const r = await w.recognize(await prepImage(bmp));
-  out.push(...(r.data.text || "").split(/\n+/));
-  const seg = ocrSegments(bmp);
+  let T = performance.now(); const lap = k => { const t = performance.now(); ocrT[k] += t - T; T = t; };
+  const seg = ocrSegments(bmp); lap("seg"); ocrT.n++;
   const all = seg.lines.slice().sort((a, b) => b.n - a.n).slice(0, 480);
+  const pp = await Promise.race([getPP(), new Promise(r => setTimeout(() => r(null), 90000))]);
+  // Tesseract reads the whole picture as it is in its own worker, while the second reader works here
+  await w.setParameters({tessedit_pageseg_mode: "3"});
+  const whole = w.recognize(await prepImage(bmp)).then(r => (r.data.text || "").split(/\n+/), () => []);
+  // 1. the second reader goes over every line that can be a name: a line it reads surely Tesseract need not read again
+  const ptxt = all.map(() => ""), ttxt = all.map(() => ""), done = all.map(() => false);
+  if(pp){
+    try{ for(let i = 0, k = 0; i < all.length; i++){ const l = all[i]; if(l.n < 2 && l.rx1 - l.rx0 < l.h * 1.3) continue;   // one box about as wide as tall: a piece of a picture
+      ptxt[i] = await ppRead(pp, bmp, seg.s0, l); ocrT.ppLines++; if(++k % 6 === 0) await new Promise(r => setTimeout(r, 0)); } }catch(e){}
+    // two boxes side by side on one row are often one name the finder split (DAL | 안대): read joined, and when the
+    // joined reading is a sure name its halves do not count on their own (안대 alone would be a different item)
+    for(let i = 0; i < all.length; i++){ if(!ptxt[i]) continue; const a = all[i];
+      for(let j = 0; j < all.length; j++){ if(j === i || !ptxt[j]) continue; const b = all[j], gap = b.rx0 - a.rx1;
+        if(gap < -2 || gap > Math.max(a.h, b.h) * 1.6) continue;
+        if(Math.min(a.ry1, b.ry1) - Math.max(a.ry0, b.ry0) < Math.min(a.h, b.h) * 0.5) continue;
+        const joined = ptxt[i] + " " + ptxt[j], m = bestMatch(joined); out.push(joined);
+        if(m && m.score >= 0.9) done[i] = done[j] = true; } }
+    ptxt.forEach((t, i) => { if(!t || done[i]) return; out.push(t); const m = bestMatch(t); if(m && m.score >= 0.9) done[i] = true; });
+  }
+  lap("pp"); ocrT.lines += all.length;
+  // 2. Tesseract: the lines the second reader was not sure of, laid out one per row
+  const tess = await whole; lap("whole");   // everything Tesseract read, to compare with the second reader at the end
+  const rest = all.map((l, i) => i).filter(i => !done[i]);
   await w.setParameters({tessedit_pageseg_mode: "6"});
-  for(let k = 0; k < all.length; k += 60){
-    const sh = ocrSheet({...seg, lines: all.slice(k, k + 60)});
+  for(let k = 0; k < rest.length; k += 60){
+    const idx = rest.slice(k, k + 60), sh = ocrSheet({...seg, lines: idx.map(i => all[i])});
     const r2 = await w.recognize(sh.canvas, {}, {text: true, blocks: true});
     const txt = sh.rows.map(() => "");
     (r2.data.blocks || []).forEach(b => b.paragraphs.forEach(p => p.lines.forEach(l => {
       const cy = (l.bbox.y0 + l.bbox.y1) / 2, i = sh.rows.findIndex(R => cy >= R.top - 8 && cy <= R.top + R.h + 8);
       if(i >= 0 && l.text.trim()) txt[i] += (txt[i] ? " " : "") + l.text.trim(); })));
-    sh.rows.forEach((R, i) => { if(txt[i]) out.push(txt[i]); });
-    // a line the sheet read as nothing useful gets one more try on its own
+    sh.rows.forEach((R, i) => { if(txt[i]){ tess.push(txt[i]); ttxt[idx[i]] = txt[i]; } }); lap("sheet"); ocrT.sheetLines += idx.length;
+    // a line neither reader made a name of gets one more try on its own
     let again = 0;
     for(let i = 0; i < sh.rows.length && again < 30; i++){ const l = sh.rows[i].l; if(l.n < 2 && l.rx1 - l.rx0 < l.h * 1.8) continue;
       const m = txt[i] && bestMatch(txt[i]); if(m && m.score >= 0.8) continue;
+      const m2 = ptxt[idx[i]] && bestMatch(ptxt[idx[i]]); if(m2 && m2.score >= 0.8) continue;
       if(!again) await w.setParameters({tessedit_pageseg_mode: "7"});
-      again++; const r3 = await w.recognize(ocrSheet({...seg, lines: [l]}).canvas); out.push((r3.data.text || "").trim()); }
-    if(again) await w.setParameters({tessedit_pageseg_mode: "6"});
-    // a name that wraps onto a second line in its tile (K.K.샤미센 연주 / 곡): also try the two lines joined
-    sh.rows.forEach((A, i) => { if(!txt[i]) return; const a = A.l;
-      sh.rows.forEach((B, j) => { if(j === i || !txt[j]) return; const b = B.l, cx = (b.rx0 + b.rx1) / 2;
-        if(b.ry0 > a.ry1 - 2 && b.ry0 - a.ry1 < a.h * 1.2 && cx > a.rx0 && cx < a.rx1 && b.rx1 - b.rx0 <= (a.rx1 - a.rx0) * 1.2) out.push(txt[i] + txt[j]); }); });
+      again++; const r3 = await w.recognize(ocrSheet({...seg, lines: [l]}).canvas), t3 = (r3.data.text || "").trim(); tess.push(t3); }
+    if(again) await w.setParameters({tessedit_pageseg_mode: "6"}); lap("again"); ocrT.againLines += again;
   }
+  out.push(...tess);
+  // both readers took something in this picture for the same name, each not quite sure (풍선캠 and 풍선명 for 풍선껌):
+  // together they are, and the name itself goes in
+  // (the same reading from both is no proof: then the text really says that, and it may be a name we do not have)
+  if(pp){ const tset = new Set(tess.map(t => clean(t || ""))), tf = new Map(matchLines(tess.filter(t => t && t.trim())).map(x => [x.it.id, x.score]));
+    ptxt.forEach(t => { const x = t && bestMatch(t); if(x && x.score >= 0.75 && x.score < 0.8 && (tf.get(x.it.id) || 0) >= 0.75 && !tset.has(clean(t))) out.push(x.it.ko); }); }
+  // rows cut off by a border, next to lines that are names: told to the person with the results (a row cut at the
+  // bottom of one screenshot often goes on at the top of the next, so the larger of the two counts is used)
+  if(!(opt && opt.video)){
+    const sure = all.map((l, i) => [ptxt[i], ttxt[i]].some(t => { const m = t && bestMatch(t); return !!m && m.score >= 0.8; }));
+    const near = (l, d) => all.some((o, j) => { if(!sure[j] || Math.abs(o.rx0 - l.rx0) > l.h) return false; const g = d > 0 ? l.ry0 - o.ry1 : o.ry0 - l.ry1; return g >= 0 && g <= l.h * 5; });
+    let down = 0, up = 0;
+    all.forEach((l, i) => { if(sure[i]){ if(l.cutD) down++; if(l.cutU) up++; } else if(l.touch && l.n >= 2 && near(l, l.touch)){ if(l.touch > 0) down++; else up++; } });
+    ocrCut += Math.max(down, up); ocrT.cutDown = down; ocrT.cutUp = up;
+  }
+  // a name that wraps onto a second line in its tile (K.K.샤미센 연주 / 곡): also try the two lines joined
+  all.forEach((a, i) => { const ta = [ptxt[i], ttxt[i]].filter(Boolean); if(!ta.length) return;
+    all.forEach((b, j) => { if(j === i) return; const tb = [ptxt[j], ttxt[j]].filter(Boolean); if(!tb.length) return; const cx = (b.rx0 + b.rx1) / 2;
+      if(b.ry0 > a.ry1 - 2 && b.ry0 - a.ry1 < a.h * 1.2 && cx > a.rx0 && cx < a.rx1 && b.rx1 - b.rx0 <= (a.rx1 - a.rx0) * 1.2) ta.forEach(x => tb.forEach(y => out.push(x + y))); }); });
   return out;
 }
 // A screen recording: step through it and read a frame each time the list has moved about 40% of a screen.
@@ -6457,7 +6573,7 @@ async function readVideo(file, w, onStep){
       return {s: Math.abs(best), e: be}; };
     const fc = document.createElement("canvas"); fc.width = VW; fc.height = VH; const fg = fc.getContext("2d");
     let prev = null, moved = 0, frames = 0;
-    const read = async t => { fg.drawImage(v, 0, 0, VW, VH); out.push(...await ocrLines(w, fc)); frames++; onStep(t / dur, frames); };
+    const read = async t => { fg.drawImage(v, 0, 0, VW, VH); out.push(...await ocrLines(w, fc, {video: true})); frames++; onStep(t / dur, frames); };
     for(let t = Math.min(0.15, dur / 2); t <= dur; t += 0.25){
       await seek(t); const p = profile();
       if(!prev){ prev = p; await read(t); continue; }
@@ -6512,7 +6628,7 @@ function openPhoto(){
   async function run(files){
     if(!files.length) return;
     drop.hidden = true; stat.hidden = false; res.innerHTML = "";
-    const lines = [];
+    const lines = []; ocrCut = 0; if(!useClaude) getPP();
     try{
       for(let i=0;i<files.length;i++){
         const base = `사진 ${i+1}/${files.length}`;
@@ -6522,7 +6638,7 @@ function openPhoto(){
         } else {
           const vid = /^video\//.test(files[i].type), name = files.length > 1 ? `${vid ? "영상" : "사진"} ${i+1}/${files.length}` : (vid ? "영상" : "사진");
           const w = await getWorker(m => {
-            if(m.status && m.status.includes("loading")) txt.textContent = `글자 인식 준비 중… (처음 한 번만 약 5MB를 받아요)`;
+            if(m.status && m.status.includes("loading")) txt.textContent = `글자 인식 준비 중… (처음 한 번만 약 ${window.DN_SERVER ? 17 : 5}MB를 받아요)`;
             if(!vid && m.status === "recognizing text") txt.textContent = `${name} · 읽는 중…`;
           });
           if(vid){
@@ -6546,7 +6662,7 @@ function openPhoto(){
     stat.hidden = true; drop.hidden = false;
     if(!list.length){ res.innerHTML = `<p class="err">아이템 이름을 찾지 못했어요. 목록의 이름이 크게 보이게 찍었는지 확인해 주세요.</p>`; return; }
     const fresh = list.filter(r => !own.has(r.it.id)).length;
-    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${fresh < list.length ? ` (그중 ${fmt(list.length-fresh)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.</p>
+    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${fresh < list.length ? ` (그중 ${fmt(list.length-fresh)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.</p>${ocrCut ? `<p class="sub ph-cut">칸이나 화면 끝에서 글자가 잘려 못 읽은 이름이 ${fmt(ocrCut)}개쯤 있어요. 조금씩 겹치게 찍거나 화면 기록 영상으로 올리면 빠짐없이 읽어요.</p>` : ""}
       <div class="res">${list.map(r => { const done = own.has(r.it.id); return `<label class="ri${done?" done":""}"><input type="checkbox" data-id="${r.it.id}" ${done?"disabled":""} ${!done && r.score>=0.8?"checked":""}>${picHTML(r.it)}<span class="tx"><b>${esc(r.it.ko)}</b><span>${esc(CATS[r.it.lc][0])} · 읽은 글자: ${esc(r.raw.replace(/\s+/g, " ").trim().slice(0,30))}</span></span><span class="sc">${done ? "등록됨" : (r.score>=0.8 ? "확실" : "애매")}</span></label>`; }).join("")}</div>
       <div class="acts2"><button class="pill leaf" type="button" id="ph-ok">선택한 아이템 등록</button></div>`;
     res.querySelector("#ph-ok").addEventListener("click", () => {

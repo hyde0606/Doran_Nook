@@ -1,0 +1,10 @@
+Files in this folder
+
+kor-rec.bin, dict.txt
+  PaddleOCR "korean_PP-OCRv5_mobile_rec" text recognition model (Korean and English) and its character list.
+  Copyright (c) PaddlePaddle Authors. Licensed under the Apache License, Version 2.0
+  (http://www.apache.org/licenses/LICENSE-2.0). ONNX conversion from the ppu-paddle-ocr-models project (Apache-2.0).
+  kor-rec.bin is the unmodified .onnx file, gzip-compressed.
+
+ort.wasm.min.js, ort-wasm-simd-threaded.mjs, ort-wasm-simd-threaded.wasm
+  ONNX Runtime Web 1.31.1. Copyright (c) Microsoft Corporation. Licensed under the MIT License.
