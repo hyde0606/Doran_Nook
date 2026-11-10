@@ -6128,13 +6128,23 @@ if(/[?&]t=1\b/.test(location.search)) window.__isl = {view, ISL, isl, undoS, get
 
 
 /* ---------- Matching (OCR / Claude results -> items) ---------- */
+const LOOKALIKE = (() => {
+  const S = new Set(), add = (base, pairs) => pairs.forEach(([x, y]) => { const a = base + x, b = base + y; S.add(a * 65536 + b); S.add(b * 65536 + a); });
+  add(0x1100, [[0,1],[3,4],[7,8],[9,10],[12,13],[12,14],[11,18],[11,6],[5,16],[3,5],[3,16],[5,17],[6,7],[6,17],[0,15],[16,17],[2,3],[9,12]]);   // 초성
+  add(0x1161, [[4,6],[0,2],[1,5],[1,3],[5,7],[8,12],[13,17],[8,18],[13,18],[8,13],[19,20],[11,19],[16,19],[11,16],[9,14],[0,1],[4,5],[6,7]]);   // 중성
+  add(0x11A7, [[1,2],[19,20],[7,8],[16,21],[21,27],[1,4]]);   // 받침
+  return S;
+})();
+const isJong = c => c >= 0x11A8 && c <= 0x11C2;
 function lev(a, b, max){
   const n=a.length, m=b.length; if(Math.abs(n-m) > max) return max+1;
   let prev = new Array(m+1), cur = new Array(m+1);
-  for(let j=0;j<=m;j++) prev[j]=j;
+  prev[0] = 0; for(let j=1;j<=m;j++) prev[j] = prev[j-1] + (isJong(b.charCodeAt(j-1)) ? 0.6 : 1);
   for(let i=1;i<=n;i++){
-    cur[0]=i; let best=cur[0]; const ca=a.charCodeAt(i-1);
-    for(let j=1;j<=m;j++){ const v = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (ca===b.charCodeAt(j-1)?0:1)); cur[j]=v; if(v<best) best=v; }
+    const ca=a.charCodeAt(i-1), da = isJong(ca) ? 0.6 : 1;
+    cur[0]=prev[0]+da; let best=cur[0];
+    for(let j=1;j<=m;j++){ const cb = b.charCodeAt(j-1), sub = ca === cb ? 0 : LOOKALIKE.has(ca * 65536 + cb) ? 0.4 : 1;
+      const v = Math.min(prev[j]+da, cur[j-1]+(isJong(cb) ? 0.6 : 1), prev[j-1]+sub); cur[j]=v; if(v<best) best=v; }
     if(best > max) return max+1;
     [prev,cur]=[cur,prev];
   }
@@ -6145,25 +6155,32 @@ function matchOne(text){
   if(t.length < 2) return null;
   if(t.length <= 2){ const it = MATCHABLE.find(x => x.k === t); return it ? {it, score: 1} : null; }   // too short to guess from
   const tj = jamo(t);
-  let best=null, bs=0;
+  let best=null, bs=0, s2=0;
+  const take = (it, sc) => { if(sc > bs){ if(!best || best.k !== it.k) s2 = Math.max(s2, bs); bs = sc; best = it; } else if(sc > s2 && best && best.k !== it.k) s2 = sc; };
   for(const it of MATCHABLE){
     if(it.k === t) return {it, score:1};
-    if(it.k.length >= 3 && t.includes(it.k)){ const sc = 0.9 + Math.min(0.09, it.k.length/t.length*0.09); if(sc>bs){ bs=sc; best=it; } continue; }
-    const L = Math.max(tj.length, it.j.length); const max = Math.floor(L*0.4);
-    const d = lev(tj, it.j, max); if(d > max) continue;
-    const sc = 1 - d/L; if(sc > bs){ bs=sc; best=it; }
+    let inc = 0;
+    if(it.k.length >= 3 && t.includes(it.k)){ const cov = it.k.length / t.length; inc = cov >= 0.8 ? 0.9 + 0.09 * cov : 0.5 + 0.45 * cov; }
+    const L = Math.max(tj.length, it.j.length); const max = L * 0.4;
+    const d = lev(tj, it.j, max);
+    take(it, Math.max(inc, d > max ? 0 : 1 - d/L));
   }
-  return best && bs >= 0.62 ? {it:best, score:bs} : null;
+  if(!best || bs < 0.62) return null;
+  // far ahead of every other name: sure enough, even if a letter or two came out wrong
+  if(bs < 0.8 && bs >= 0.66 && t.length >= 4 && bs - s2 >= 0.12) return {it: best, score: 0.8, loose: bs};
+  return {it: best, score: bs};
 }
 // The whole-picture pass can read two tiles side by side as one line ("0 안대 04 티셔츠"): such a line is also cut where a new
 // name seems to start (a token that begins with a non-Korean scribble), and the pieces win when they match surely.
 function splitLine(raw){
-  const segs = []; let cur = [];
-  for(const t of raw.trim().split(/\s+/)){
-    if(cur.length && /^[^가-힣]/.test(t) && !/^[\d,.]+벨$/.test(t) && /[가-힣]/.test(cur.join(""))){ segs.push(cur.join(" ")); cur = []; }
-    cur.push(t);
+  const segs = [];
+  for(const part of raw.trim().split(/\s{3,}/)){ let cur = [];
+    for(const t of part.split(/\s+/)){
+      if(cur.length && /^[^가-힣]/.test(t) && !/^[\d,.]+벨$/.test(t) && /[가-힣]/.test(cur.join(""))){ segs.push(cur.join(" ")); cur = []; }
+      cur.push(t);
+    }
+    if(cur.length) segs.push(cur.join(" "));
   }
-  if(cur.length) segs.push(cur.join(" "));
   return segs;
 }
 // The Korean reading model sees "K.K." as "<.<.", "《.6." and the like: a dotted scribble before a name is also tried as K.K.
@@ -6175,18 +6192,44 @@ MATCHABLE.forEach(it => { if(!/[A-Za-z]/.test(it.ko)) return; const h = hangulOn
 // what Latin capitals the Korean model tends to turn into what (DAL → "ㅁ&^Ｌ", "04ㅅ", "ㅁㄴ")
 const LOOKS = {"ㅁ":"DOBMH","ㅇ":"O","ㄴ":"L","ㄷ":"C","ㄱ":"T","ㅅ":"AM","ㅂ":"B","ㅍ":"I","ㅣ":"IL","|":"IL","^":"A","Λ":"A","4":"A","0":"OD","o":"O","l":"IL","1":"IL","5":"S","8":"B","6":"G","7":"JT","3":"J"};
 function latScore(junk, it){
-  const P = it.ko.replace(/[^A-Za-z]/g, "").toUpperCase(); let n = 0;
-  for(const ch of junk){ const u = ch.normalize("NFKC").toUpperCase(), set = (LOOKS[ch] || "") + (/[A-Z]/.test(u) ? u : ""); if([...set].some(x => P.includes(x))) n++; }
-  return n - Math.abs(junk.length - P.length) * 0.75;
+  const P = it.ko.replace(/[^A-Za-z]/g, "").toUpperCase(), J = [...junk];
+  const sets = J.map(ch => { const u = ch.normalize("NFKC").toUpperCase(); return (LOOKS[ch] || "") + (/[A-Z]/.test(u) ? u : ""); });
+  let prev = new Array(P.length + 1).fill(0);
+  for(let i = 0; i < J.length; i++){ const cur = [0];
+    for(let j = 1; j <= P.length; j++) cur[j] = sets[i].includes(P[j-1]) ? prev[j-1] + 1 : Math.max(prev[j], cur[j-1]);
+    prev = cur; }
+  return prev[P.length] - Math.abs(J.length - P.length) * 0.75;
 }
 // K.K. songs: the model also drops or garbles a rare syllable (왈츠 → "츠"); a lone match on the start or end is offered as 애매
 const KK = MATCHABLE.filter(it => /^K\.K\.[가-힣 ]+$/.test(it.ko)).map(it => ({it, h: hangulOnly(it.ko)}));
 function bestMatch(text){
   let r = matchOne(text);
+  // an icon read as a letter or number in front of the name: up to two short tokens. A token of two or more Korean
+  // letters is often part of the name read wrong (흑백 → 혹잭), so dropping it has to win clearly
+  let t = text, viaCut = false;
+  for(let k = 0; k < 2; k++){
+    const mm = t.match(/^\s*(\S{1,4})\s+(?=\S)/); if(!mm) break;
+    const tok = mm[1], cut = t.slice(mm[0].length); if(hangulOnly(cut).length < 3) break;
+    if(!r || r.score < 0.9){ const x = matchOne(cut), need = (tok.match(/[가-힣]/g) || []).length >= 2 ? 0.08 : 0.02;
+      if(x && (!r || x.score > r.score + need)){ r = x; viaCut = true; } }
+    if(/[가-힣]/.test(tok)) break;
+    t = cut;
+  }
   const f = kkFix(text); if(f !== text){ const x = matchOne(f); if(x && (!r || x.score > r.score)) r = x; }
   if(/^K\.K\./.test(f) && (!r || r.score < 0.7)){ const h = hangulOnly(f.slice(4));
     if(h.length >= 1){ const c = KK.filter(k => k.h.length - h.length <= 1 && k.h.length >= h.length && (k.h.startsWith(h) || k.h.endsWith(h)));
       if(c.length === 1) r = {it: c[0].it, score: 0.7}; } }
+  if(/^K\.K\./.test(f) && (!r || /^K\.K\./.test(r.it.ko))){
+    const hs = hangulOnly(f.slice(4)), h = jamo(hs);
+    if(hs.length >= 2 || (r && r.score >= 0.8)){
+      const sc = KK.map(k => { const kj = jamo(k.h), L = Math.max(h.length, kj.length); let s = 1 - lev(h, kj, L) / (L + 1);
+        if(hs.length >= 2 && k.h.startsWith(hs)) s = Math.max(s, hs.length / k.h.length >= 0.6 ? 0.8 : 0.7);
+        return {it: k.it, s}; }).sort((a, b) => b.s - a.s);
+      const t = sc[0], gap = t.s - (sc[1] ? sc[1].s : 0);
+      // a far-ahead guess is only sure when the scribble really looked like K.K. (two dots), not just "8."
+      const two = /^\s*(K\.K\.|[^\s가-힣]{1,3}\.\s*[^\s가-힣]{1,3}\.)/.test(text);
+      const s = t.s >= 0.95 ? 1 : t.s >= 0.8 ? t.s : (t.s >= 0.66 && gap >= 0.12 && hs.length >= 2 && two) ? 0.8 : t.s >= 0.62 ? t.s : 0;
+      if(s) r = {it: t.it, score: s}; else if(hs.length >= 2) r = null; } }
   // a Latin part read as junk: the Korean part picks among the Latin-named items that have exactly it, by the junk's shape
   const m = text.replace(/[\d,.]+\s*벨/g, "").match(/^\s*([^가-힣]*?)\s*([가-힣].*)$/);
   if(m){ const junk = m[1].replace(/[\s.,·]/g, ""), L = LAT_BY_H.get(hangulOnly(m[2]));
@@ -6198,9 +6241,18 @@ function bestMatch(text){
       const plain = r && !/[A-Za-z]/.test(r.it.ko);
       // junk letters before the Korean part are a Latin word, so they win over the plain Korean name (안대): surely when there
       // are two or more, as a guess (애매) when there is one and the plain name only matched loosely because of it
-      if(!r || r.score < score || (plain && junk.length >= 2 && gap >= 0.5 && sc[0].s >= 1) || (plain && r.score < 1 && hangulOnly(r.it.ko) === hangulOnly(m[2]))) r = {it: sc[0].it, score}; } }
+      if(!r || r.score < score || (plain && junk.length >= 2 && gap >= 0.5 && sc[0].s >= 1) || (plain && (r.score < 1 || (viaCut && junk.length >= 2)))) r = {it: sc[0].it, score}; } }
+  const nm = text.match(/[0oO]\s*[.,·]\s*(\d)\s*([가-힣])\s*$/);
+  if(nm && (!r || r.score < 0.9)){
+    const parts = ch => { const c = ch.charCodeAt(0) - 0xAC00; return [c / 588 | 0, (c % 588) / 28 | 0, c % 28]; };
+    const a = parts(nm[2]);
+    for(const it of NUMBERED){ const im = it.ko.match(/^No\.(\d+) ([가-힣])$/);
+      if(!im || im[1] !== nm[1]) continue;
+      const b = parts(im[2]), d = a.filter((x, i) => x !== b[i]).length, score = [0.9, 0.8, 0.7][d];
+      if(score && (!r || r.score < score)) r = {it, score}; } }
   return r;
 }
+const NUMBERED = MATCHABLE.filter(it => /^No\.\d+ [가-힣]$/.test(it.ko));
 function matchLines(lines){
   const found = new Map(), add = (r, raw) => { const prev = found.get(r.it.id); if(!prev || prev.score < r.score) found.set(r.it.id, {it:r.it, score:r.score, raw}); };
   for(const raw of lines){
@@ -6210,6 +6262,11 @@ function matchLines(lines){
     if(w && w.score >= 0.9){ add(w, raw); sm.forEach(([r, x]) => { if(r.score >= 0.95) add(r, x); }); continue; }
     if(sm.some(([r]) => r.score >= 0.8)){ sm.forEach(([r, x]) => { if(r.score >= 0.7) add(r, x); }); continue; }
     if(w) add(w, raw);
+  }
+  for(const f of found.values()){
+    if(f.score < 0.8 || /[A-Za-z]/.test(f.it.ko)) continue;
+    const h = hangulOnly(f.it.ko), L = LAT_BY_H.get(h);
+    if(L && L.some(it => found.has(it.id)) && hangulOnly(f.raw) !== h) f.score = 0.7;
   }
   return [...found.values()].sort((a,b) => b.score - a.score);
 }
@@ -6278,8 +6335,9 @@ function ocrSegments(bmp){
       for(let j = i+1; j < cc.length && cc[j].x0 <= a.x1; j++){ const b = cc[j];
         const xo = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) + 1, vg = Math.max(a.y0, b.y0) - Math.min(a.y1, b.y1);
         const hm = Math.max(a.y1-a.y0, b.y1-b.y0) + 1;
-        if(xo >= Math.min(a.x1-a.x0+1, b.x1-b.x0+1) * 0.5 && vg <= Math.max(3, hm * 0.45)) U1.u(i, j); } }
-    const syl = group(cc, U1).filter(g => g.y1-g.y0+1 <= maxH).sort((a, b) => a.x0 - b.x0);
+        if(xo >= Math.min(a.x1-a.x0+1, b.x1-b.x0+1) * 0.5 && vg <= Math.max(3, hm * 0.6)) U1.u(i, j); } }
+    const syl0 = group(cc, U1).filter(g => g.y1-g.y0+1 <= maxH), hs = syl0.map(g => g.y1-g.y0+1).sort((a, b) => a - b), medH = hs.length ? hs[hs.length >> 1] : maxH;
+    const syl = syl0.filter(g => g.y1-g.y0+1 <= Math.max(14, medH * 4)).sort((a, b) => a.x0 - b.x0);
     syl.forEach(g => g.n = 1);
     // 2. boxes of about the same height side by side join into a line; a gap wider than ~1 letter splits it.
     //    A tiny piece (a dot) joins the letter next to it; a much taller box (a border) joins nothing.
@@ -6288,12 +6346,21 @@ function ocrSegments(bmp){
       for(let j = i+1; j < syl.length; j++){ const b = syl[j], hb = b.y1-b.y0+1, hm = Math.max(ha, hb), hn = Math.min(ha, hb), gap = b.x0 - a.x1;
         if(gap > ha * 1.1 + 4) break;
         const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) + 1;
-        if(hm <= hn * 2.2){ if(gap <= hm * 1.1 && ov >= hn * 0.5 && Math.abs((a.y0+a.y1) - (b.y0+b.y1)) / 2 <= hm * 0.6) U2.u(i, j); }
-        else if(hn < hm * 0.45){ const s = ha < hb ? a : b, L = ha < hb ? b : a, cy = (s.y0 + s.y1) / 2;
+        if(hm <= hn * 1.7){ if(gap <= hm * 1.1 && ov >= hn * 0.5 && Math.abs((a.y0+a.y1) - (b.y0+b.y1)) / 2 <= hm * 0.6) U2.u(i, j); }
+        else if(hn < hm * 0.45 && hm <= Math.max(14, medH * 2.5)){ const s = ha < hb ? a : b, L = ha < hb ? b : a, cy = (s.y0 + s.y1) / 2;
           if(gap <= hm * 0.45 && cy >= L.y0 && cy <= L.y1) U2.u(i, j); } } }
     // 3. keep lines that sit on a flat background (text on a panel), not inside pictures
-    for(const L of group(syl, U2)){
-      const h = L.y1-L.y0+1, w = L.x1-L.x0+1; if(h < 9 || h > maxH || w < h * 0.6) continue;
+    const chroma = b => { const v = [];
+      for(let r = b.y0; r <= b.y1; r++) for(let q = b.x0; q <= b.x1; q++){ const k = r*W+q; if(ink[k]){ const i = k*4; v.push(Math.max(d[i], d[i+1], d[i+2]) - Math.min(d[i], d[i+1], d[i+2])); } }
+      v.sort((a, b) => a - b); return v.length ? v[v.length >> 1] : 0; };
+    const mem = new Map(); syl.forEach((b, i) => { const a = U2.f(i); if(!mem.has(a)) mem.set(a, []); mem.get(a).push(b); });
+    const lines0 = [...mem.values()].map(ms => {
+      ms.sort((a, b) => a.x0 - b.x0);
+      if(ms.length >= 3){ const c = ms.map(chroma), base = c.slice().sort((a, b) => a - b)[c.length >> 1], loud = x => Math.abs(x - base) > Math.max(35, base * 0.5);
+        while(ms.length > 2 && loud(c[0])){ ms.shift(); c.shift(); } while(ms.length > 2 && loud(c[c.length-1])){ ms.pop(); c.pop(); } }
+      return {x0: Math.min(...ms.map(b => b.x0)), y0: Math.min(...ms.map(b => b.y0)), x1: Math.max(...ms.map(b => b.x1)), y1: Math.max(...ms.map(b => b.y1)), n: ms.length}; });
+    for(const L of lines0){
+      const h = L.y1-L.y0+1, w = L.x1-L.x0+1; if(h < 8 || h > maxH || w < h * 0.6) continue;
       const m = Math.round(h * 0.35), x0 = Math.max(0, L.x0-m), y0 = Math.max(0, L.y0-m), x1 = Math.min(W-1, L.x1+m), y1 = Math.min(H-1, L.y1+m);
       let n = 0, s = 0, s2 = 0, ni = 0; const hist = new Uint32Array(256);
       for(let r = y0; r <= y1; r++) for(let q = x0; q <= x1; q++){ const k = r*W+q; hist[y[k] | 0]++;
@@ -6320,7 +6387,7 @@ function ocrSegments(bmp){
 function ocrSheet(seg){
   const keep = seg.lines.slice().sort((a, b) => a.y0 - b.y0 || a.x0 - b.x0);
   const rows = []; let Y = 20, maxW = 0;
-  for(const l of keep){ const sc = Math.min(3, Math.max(1, 40 / l.h)); const w = Math.round((l.x1-l.x0+1)*sc), h = Math.round((l.y1-l.y0+1)*sc);
+  for(const l of keep){ const sc = Math.min(4, Math.max(1, 40 / l.h)); const w = Math.round((l.x1-l.x0+1)*sc), h = Math.round((l.y1-l.y0+1)*sc);
     rows.push({l, sc, top: Y, w, h}); Y += h + Math.round(28); maxW = Math.max(maxW, w); }
   const c = document.createElement("canvas"); c.width = maxW + 40; c.height = Y + 20;
   const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
@@ -6343,7 +6410,7 @@ async function ocrLines(w, src){
   const r = await w.recognize(await prepImage(bmp));
   out.push(...(r.data.text || "").split(/\n+/));
   const seg = ocrSegments(bmp);
-  const all = seg.lines.slice().sort((a, b) => b.n - a.n).slice(0, 160);
+  const all = seg.lines.slice().sort((a, b) => b.n - a.n).slice(0, 480);
   await w.setParameters({tessedit_pageseg_mode: "6"});
   for(let k = 0; k < all.length; k += 60){
     const sh = ocrSheet({...seg, lines: all.slice(k, k + 60)});
@@ -6355,7 +6422,7 @@ async function ocrLines(w, src){
     sh.rows.forEach((R, i) => { if(txt[i]) out.push(txt[i]); });
     // a line the sheet read as nothing useful gets one more try on its own
     let again = 0;
-    for(let i = 0; i < sh.rows.length && again < 12; i++){ const l = sh.rows[i].l; if(l.n < 3) continue;
+    for(let i = 0; i < sh.rows.length && again < 30; i++){ const l = sh.rows[i].l; if(l.n < 2 && l.rx1 - l.rx0 < l.h * 1.8) continue;
       const m = txt[i] && bestMatch(txt[i]); if(m && m.score >= 0.8) continue;
       if(!again) await w.setParameters({tessedit_pageseg_mode: "7"});
       again++; const r3 = await w.recognize(ocrSheet({...seg, lines: [l]}).canvas); out.push((r3.data.text || "").trim()); }
