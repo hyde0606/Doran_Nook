@@ -6128,6 +6128,17 @@ function matchOne(text){
   }
   return best && bs >= 0.62 ? {it:best, score:bs} : null;
 }
+// The whole-picture pass can read two tiles side by side as one line ("0 안대 04 티셔츠"): such a line is also cut where a new
+// name seems to start (a token that begins with a non-Korean scribble), and the pieces win when they match surely.
+function splitLine(raw){
+  const segs = []; let cur = [];
+  for(const t of raw.trim().split(/\s+/)){
+    if(cur.length && /^[^가-힣]/.test(t) && !/^[\d,.]+벨$/.test(t) && /[가-힣]/.test(cur.join(""))){ segs.push(cur.join(" ")); cur = []; }
+    cur.push(t);
+  }
+  if(cur.length) segs.push(cur.join(" "));
+  return segs;
+}
 // The Korean reading model sees "K.K." as "<.<.", "《.6." and the like: a dotted scribble before a name is also tried as K.K.
 const kkFix = t => t.replace(/^\s*[^\s가-힣]{1,3}\.\s*[^\s가-힣]{0,3}\.?\s*(?=[가-힣])/, "K.K.");
 const hangulOnly = t => t.replace(/[^가-힣]/g, "");
@@ -6150,19 +6161,29 @@ function bestMatch(text){
     if(h.length >= 1){ const c = KK.filter(k => k.h.length - h.length <= 1 && k.h.length >= h.length && (k.h.startsWith(h) || k.h.endsWith(h)));
       if(c.length === 1) r = {it: c[0].it, score: 0.7}; } }
   // a Latin part read as junk: the Korean part picks among the Latin-named items that have exactly it, by the junk's shape
-  const m = text.match(/^\s*([^가-힣]*?)\s*([가-힣].*)$/);
+  const m = text.replace(/[\d,.]+\s*벨/g, "").match(/^\s*([^가-힣]*?)\s*([가-힣].*)$/);
   if(m){ const junk = m[1].replace(/[\s.,·]/g, ""), L = LAT_BY_H.get(hangulOnly(m[2]));
-    if(junk.length && L && (junk.length >= 2 || /[A-Za-zㄱ-ㅣＡ-Ｚａ-ｚ&^Λ]/.test(junk))){
+    if(junk.length && L){
       const sc = L.map(it => ({it, s: latScore(junk, it)})).sort((a, b) => b.s - a.s);
       const gap = sc.length === 1 ? 9 : sc[0].s - sc[1].s;
       const score = gap >= 1 && junk.length >= 2 ? 0.8 : gap >= 0.5 ? 0.7 : 0.6;
       // two or more junk letters before the Korean part are a Latin word, so they win over the plain Korean name (안대)
-      if(!r || r.score < score || (junk.length >= 2 && gap >= 0.5 && sc[0].s >= 1 && !/[A-Za-z]/.test(r.it.ko))) r = {it: sc[0].it, score}; } }
+      const plain = r && !/[A-Za-z]/.test(r.it.ko);
+      // junk letters before the Korean part are a Latin word, so they win over the plain Korean name (안대): surely when there
+      // are two or more, as a guess (애매) when there is one and the plain name only matched loosely because of it
+      if(!r || r.score < score || (plain && junk.length >= 2 && gap >= 0.5 && sc[0].s >= 1) || (plain && r.score < 1 && hangulOnly(r.it.ko) === hangulOnly(m[2]))) r = {it: sc[0].it, score}; } }
   return r;
 }
 function matchLines(lines){
-  const found = new Map();
-  for(const raw of lines){ const r = bestMatch(raw); if(!r) continue; const prev = found.get(r.it.id); if(!prev || prev.score < r.score) found.set(r.it.id, {it:r.it, score:r.score, raw}); }
+  const found = new Map(), add = (r, raw) => { const prev = found.get(r.it.id); if(!prev || prev.score < r.score) found.set(r.it.id, {it:r.it, score:r.score, raw}); };
+  for(const raw of lines){
+    const w = bestMatch(raw), segs = splitLine(raw);
+    if(segs.length < 2){ if(w) add(w, raw); continue; }
+    const sm = segs.map(x => [bestMatch(x), x]).filter(x => x[0]);
+    if(w && w.score >= 0.9){ add(w, raw); sm.forEach(([r, x]) => { if(r.score >= 0.95) add(r, x); }); continue; }
+    if(sm.some(([r]) => r.score >= 0.8)){ sm.forEach(([r, x]) => { if(r.score >= 0.7) add(r, x); }); continue; }
+    if(w) add(w, raw);
+  }
   return [...found.values()].sort((a,b) => b.score - a.score);
 }
 
