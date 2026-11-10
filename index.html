@@ -420,7 +420,7 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .fm-v span:last-child{color:var(--muted); text-align:right; overflow-wrap:anywhere}
 .fm-res{display:grid; gap:6px; margin-top:4px}
 .fm-vils{display:flex; flex-wrap:wrap; gap:6px}
-.fm-vils span{display:inline-flex; align-items:center; gap:4px; background:var(--chip); border-radius:16px; padding:2px 10px 2px 2px; font-size:13.5px}
+.fm-vils > span{display:inline-flex; align-items:center; gap:4px; background:var(--chip); border-radius:16px; padding:2px 10px 2px 2px; font-size:13.5px}
 .fm-p .tx b{overflow-wrap:anywhere}
 @media (max-width:360px){ .fm-v{grid-template-columns:1fr; gap:2px} .fm-v span:last-child{text-align:left} .qgrid.fm-q{grid-template-columns:minmax(0, 1fr)} }
 /* 거래 */
@@ -698,6 +698,14 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .cmt .ch{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted)}
 .cmt .ch b{font-family:var(--f-display); font-weight:400; font-size:14.5px; color:var(--ink)}
 .cmt .ch button{margin-left:auto; border:0; background:transparent; color:var(--muted); font-size:12.5px; padding:2px 6px}
+.acq .shd b:has(.fm-n){white-space:normal; min-width:0} .shd b .fm-n{white-space:nowrap; display:inline-block}
+.fm-c{cursor:pointer}
+.fm-c .ch{display:grid; grid-template-columns:minmax(0, 1fr) auto; column-gap:8px; row-gap:0}
+.fm-c .ch b{grid-column:1; grid-row:1; min-width:0; overflow-wrap:anywhere} .fm-c .ch .tr-go{grid-column:2; grid-row:1; align-self:center} .fm-c .ch > span:not(.tr-go){grid-column:1 / -1; grid-row:2}
+@media (hover:hover){ .fm-c:hover{box-shadow:inset 0 0 0 2px var(--card-line)} }
+.cmt.hl{animation:cmthl 2.8s ease-out}
+@keyframes cmthl{0%, 50%{box-shadow:0 0 0 3px var(--sun)} 100%{box-shadow:0 0 0 3px transparent}}
+@media (prefers-reduced-motion: reduce){ .cmt.hl{animation:none; box-shadow:0 0 0 3px var(--sun)} }
 .cmt p{white-space:pre-wrap; font-size:14.5px; line-height:1.5; overflow-wrap:anywhere}
 .fld{display:grid; gap:6px; min-width:0}
 .fld > span{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:baseline}
@@ -3617,7 +3625,14 @@ function openTradeFind(x){
   s.el.addEventListener("click", ev => { const c = ev.target.closest("[data-trade]"); if(c){ sheetOver = true; openTrade(c.dataset.trade); } });
 }
 
-function openTrade(id, p0){
+// Opened for one comment: scroll the window to it and let it glow
+function focusCmt(body, opt){
+  if(!opt || !opt.cmt) return;
+  const el = [...body.querySelectorAll(".cmt[data-cid]")].find(e => e.dataset.cid === String(opt.cmt));
+  if(!el){ toast("지워진 댓글이에요"); return; }
+  requestAnimationFrame(() => { el.scrollIntoView({block: "center", behavior: "smooth"}); el.classList.add("hl"); });
+}
+function openTrade(id, p0, opt){
   let p = TS.find(id) || p0; if(!p) return;
   let cmts = null, loadErr = false;
   const s = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="tr-t"></h3><p class="sub" id="tr-s"></p></div>${XBTN}</div><div class="bd-in" id="tr-body"></div>`, () => { stop(); if(ui.tab === "trade") render(); });
@@ -3627,7 +3642,7 @@ function openTrade(id, p0){
   function cmtsHTML(){
     if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
     if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
-    return cmts.map(c => `<div class="cmt"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === p.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+    return cmts.map(c => `<div class="cmt" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === p.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
   }
   function head(){
     s.el.querySelector("#tr-t").textContent = tradeTitle(p);
@@ -3658,7 +3673,7 @@ function openTrade(id, p0){
   function drawCmts(){ const cl = body.querySelector("#tr-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#tr-cn"); if(cn) cn.textContent = `댓글 ${fmt(p.cmts || 0)}`; }
   const stop = AUTH.sub(draw);
   draw();
-  AUTH.api("posts/" + encodeURIComponent(id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); draw(); })
+  AUTH.api("posts/" + encodeURIComponent(id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); draw(); focusCmt(body, opt); })
     .catch(e => { if(e.message === "no_post"){ TS.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
   s.el.addEventListener("input", e => {
@@ -3909,7 +3924,7 @@ const SHOW_ERR = {
 };
 const showErr = e => SHOW_ERR[e && e.message] || authErr(e);
 const viewedShows = new Set();
-function openShow(id, x0){
+function openShow(id, x0, opt){
   let x = SH.find(id) || x0; if(!x) return;
   let cmts = null, loadErr = false, liked = SH.liked(id), at = 0;
   if(!viewedShows.has(id)){ viewedShows.add(id); AUTH.api("shows/" + encodeURIComponent(id) + "/view", {method: "POST", body: "{}"}).catch(() => {}); }
@@ -3920,7 +3935,7 @@ function openShow(id, x0){
   function cmtsHTML(){
     if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
     if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
-    return cmts.map(c => `<div class="cmt"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === x.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+    return cmts.map(c => `<div class="cmt" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === x.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
   }
   function picHTML2(){
     if(!x.imgs.length) return x.kind === "dream" ? "" : `<div class="dbig"><svg class="fi" style="width:44px;height:44px;opacity:.5" aria-hidden="true"><use href="#i-image"/></svg></div>`;
@@ -3958,7 +3973,7 @@ function openShow(id, x0){
   function drawCmts(){ const cl = body.querySelector("#sh-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#sh-cn"); if(cn) cn.textContent = `댓글 ${fmt(x.cmts || 0)}`; const st = body.querySelector("#sh-stat"); if(st) st.innerHTML = statHTML(x); }
   const stop = AUTH.sub(draw);
   draw();
-  AUTH.api("shows/" + encodeURIComponent(id)).then(j => { x = j.show; cmts = j.comments; liked = j.liked; SH.setLiked(x.id, liked); SH.put(x); draw(); })
+  AUTH.api("shows/" + encodeURIComponent(id)).then(j => { x = j.show; cmts = j.comments; liked = j.liked; SH.setLiked(x.id, liked); SH.put(x); draw(); focusCmt(body, opt); })
     .catch(e => { if(e.message === "no_show"){ SH.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
   s.el.addEventListener("input", e => { if(e.target.id === "shc-text") body.querySelector("#shc-cnt").textContent = `${e.target.value.length}/300`; });
@@ -4246,11 +4261,11 @@ function openAdminUser(id){
   const hm = ms => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
   const dayText = k => { const [y, m, d] = k.split("-").map(Number), w = "일월화수목금토"[new Date(y, m - 1, d).getDay()]; return `${y}.${String(m).padStart(2, "0")}.${String(d).padStart(2, "0")} (${w})`; };
   const sec = (ic, title, inner) => `<div class="acq"><div class="shd">${ic}<b>${title}</b></div>${inner}</div>`;
-  let posts = [];
+  let posts = [], shows = [], cms = [];
   (async () => {
     let j; try{ j = await AUTH.api("admin/users/" + encodeURIComponent(id)); }catch(e){ body.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
     const u = j.user, who = {id: u.id, name: u.name, island: u.island, fruit: u.fruit};
-    posts = j.posts.map(x => ({...x, author: who}));
+    posts = j.posts.map(x => ({...x, author: who})); shows = j.shows.map(x => ({...x, author: who})); cms = j.comments;
     sh.el.querySelector("#au-t").textContent = u.name;
     sh.el.querySelector("#au-s").textContent = `${islandText(u.island)} · 아이디 ${u.login}`;
     // check records: read the saved backup code the same way the code box does
@@ -4294,13 +4309,25 @@ function openAdminUser(id){
         ? `<div class="res">${posts.map((x, i) => `<button class="srow fm-p" type="button" data-pi="${i}"><span class="tx"><b>${esc(tradeTitle(x))}</b><span>${TRADE_T[x.type][0]} · ${x.status === "done" ? "거래 완료" : "거래 중"} · 댓글 ${fmt(x.cmts || 0)} · ${dateText(x.created)}</span></span><span class="tr-go">자세히</span></button>`).join("")}</div>`
         : `<p class="sub">쓴 거래 글이 없어요.</p>`)}
       ${sec(ico("photo"), `자랑 글 <span class="fm-n">${fmt(j.shows.length)}개 · 추천한 글 ${fmt(j.likesGiven)}개</span>`, j.shows.length
-        ? `<div class="res">${j.shows.map(x => `<div class="srow"><span class="tx"><b>${esc(x.title || x.code || kindName[x.kind])}</b><span>${kindName[x.kind] || ""} · 추천 ${fmt(x.likes)} · 댓글 ${fmt(x.cmts)} · 조회 ${fmt(x.views)} · ${dateText(x.created)}</span></span></div>`).join("")}</div>`
+        ? `<div class="res">${j.shows.map((x, i) => `<button class="srow fm-p" type="button" data-si="${i}"><span class="tx"><b>${esc(x.title || x.code || kindName[x.kind])}</b><span>${kindName[x.kind] || ""} · 추천 ${fmt(x.likes)} · 댓글 ${fmt(x.cmts)} · 조회 ${fmt(x.views)} · ${dateText(x.created)}</span></span><span class="tr-go">자세히</span></button>`).join("")}</div>`
         : `<p class="sub">쓴 자랑 글이 없어요.</p>`)}
       ${sec(ico("chat"), `댓글 <span class="fm-n">최근 ${fmt(j.comments.length)}개</span>`, j.comments.length
-        ? `<div class="cmts">${j.comments.map(c => `<div class="cmt"><div class="ch"><b>${c.on === "trade" ? `거래 · ${esc(c.items && c.items.length ? tradeTitle({items: c.items}) : "지워진 글")}` : `자랑 · ${esc(c.title || kindName[c.kind] || "지워진 글")}`}</b><span>${dateText(c.created)} ${hm(c.created)}</span></div><p>${esc(c.body)}</p></div>`).join("")}</div>`
+        ? `<div class="cmts">${j.comments.map((c, i) => `<div class="cmt fm-c" role="button" tabindex="0" data-ci="${i}"><div class="ch"><b>${c.on === "trade" ? `거래 · ${esc(c.items && c.items.length ? tradeTitle({items: c.items}) : "지워진 글")}` : `자랑 · ${esc(c.title || kindName[c.kind] || "지워진 글")}`}</b><span>${dateText(c.created)} ${hm(c.created)}</span><span class="tr-go">글 보기</span></div><p>${esc(c.body)}</p></div>`).join("")}</div>`
         : `<p class="sub">단 댓글이 없어요.</p>`)}`;
   })();
-  body.addEventListener("click", e => { const b = e.target.closest("[data-pi]"); if(!b) return; const x = posts[+b.dataset.pi]; sheetOver = true; openTrade(x.id, x); });
+  // a comment opens its post (fetched first, it may not be in the lists) scrolled to that comment
+  const goCmt = async c => {
+    try{
+      if(c.on === "trade"){ const r = await AUTH.api("posts/" + encodeURIComponent(c.ref)); sheetOver = true; openTrade(r.post.id, r.post, {cmt: c.id}); }
+      else { const r = await AUTH.api("shows/" + encodeURIComponent(c.ref)); sheetOver = true; openShow(r.show.id, r.show, {cmt: c.id}); }
+    }catch(e){ toast(e && (e.message === "no_post" || e.message === "no_show") ? "지워진 글이에요" : "글을 열지 못했어요. 다시 해 주세요."); }
+  };
+  body.addEventListener("click", e => {
+    const b = e.target.closest("[data-pi]"); if(b){ const x = posts[+b.dataset.pi]; sheetOver = true; openTrade(x.id, x); return; }
+    const sb = e.target.closest("[data-si]"); if(sb){ const x = shows[+sb.dataset.si]; sheetOver = true; openShow(x.id, x); return; }
+    const cb = e.target.closest("[data-ci]"); if(cb) goCmt(cms[+cb.dataset.ci]);
+  });
+  body.addEventListener("keydown", e => { const cb = e.target.closest && e.target.closest("[data-ci]"); if(cb && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); goCmt(cms[+cb.dataset.ci]); } });
 }
 function openBackup(){
   const s = openSheet(`<div class="hd"><h3>${AUTH.live ? "내 계정·기록" : "기록 옮기기"}</h3>${XBTN}</div>
