@@ -24,6 +24,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>html,body{margin:0;padding:0}</style>
+<script>window.DN_SERVER = 1;</script>
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -344,6 +345,38 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .toggle input{width:18px; height:18px; accent-color:var(--plum)}
 .err{background:var(--berry-soft); color:var(--berry); border-radius:12px; padding:10px 12px; font-size:14px}
 .confirm{background:var(--berry-soft); border-radius:12px; padding:12px; display:grid; gap:8px}
+/* v29 account */
+.acct{display:grid; gap:10px; padding-bottom:16px; border-bottom:2px dashed var(--card-line)}
+.acct h4,.bk-h,.leave h4{margin:0; font-family:var(--f-display); font-weight:400; font-size:19px; color:var(--h-ink); line-height:1.25}
+.acct p,.leave p{margin:0; line-height:1.5}
+.who,.urow{display:flex; align-items:center; gap:12px; min-width:0}
+.fr{width:52px; height:52px; flex:none; border-radius:50%; background:var(--paper2); display:grid; place-items:center}
+.fr .pic{--t:40px} .fr .fi{width:26px; height:26px; color:var(--leaf)}
+.wt{display:grid; gap:2px; min-width:0}
+.wt b{font-family:var(--f-display); font-weight:400; font-size:18px; color:var(--h-ink); overflow-wrap:anywhere}
+.wt span{font-size:13px; color:var(--muted); overflow-wrap:anywhere}
+.syncst{margin:0; font-size:13.5px; color:var(--muted); display:flex; gap:6px; align-items:center}
+.syncst.ok{color:var(--leaf)} .syncst.ok .fi{width:16px; height:16px; flex:none} .syncst.bad{color:var(--berry)}
+.pwrow{display:flex; gap:8px; align-items:stretch; min-width:0}
+.pwrow input{flex:1 1 auto; min-width:0; width:auto}
+.pwrow .pill{flex:none; min-width:68px; min-height:0}
+.fruits{display:flex; flex-wrap:wrap; gap:8px}
+.fruits button{display:grid; justify-items:center; gap:2px; border:0; border-radius:14px; background:var(--paper2); color:var(--ink); padding:6px 8px 5px; min-width:58px; font:inherit; font-size:13px; cursor:pointer}
+.fruits button .pic{--t:36px}
+.fruits button[aria-pressed="true"]{background:var(--leaf); color:var(--leaf-ink); box-shadow:0 3px 0 var(--grass-deep)}
+.leave{display:grid; gap:8px; margin-top:6px; padding-top:14px; border-top:2px dashed var(--card-line)}
+.ulist{display:grid; gap:10px}
+.urow{background:var(--paper2); border-radius:14px; padding:10px}
+.urow .wt{flex:1 1 auto} .urow .pill{flex:none; min-height:38px; padding:0 12px} .urow .fr{width:44px; height:44px; background:var(--paper)} .urow .fr .pic{--t:34px}
+.urow .me{flex:none; font-size:13px; color:var(--muted); padding:0 8px}
+.ures:empty{display:none}
+.tempbox{display:grid; gap:8px; background:var(--plum-soft); border-radius:12px; padding:12px}
+.tempbox p{margin:0; line-height:1.5}
+.tempbox input{border:0; background:var(--paper); color:var(--ink); border-radius:10px; padding:10px 12px; font-size:18px; letter-spacing:.06em}
+#ad-list .cnt{margin:0 0 8px; color:var(--muted)}
+.ib.signed{position:relative}
+.ib.signed::after{content:""; position:absolute; right:1px; top:1px; width:11px; height:11px; border-radius:50%; background:var(--leaf); box-shadow:0 0 0 2px var(--cream)}
+@media (max-width:300px){ .urow{flex-wrap:wrap} .urow .pill{flex:1 1 100%} }
 
 /* Category popup */
 .kind{display:grid; gap:10px}
@@ -1404,7 +1437,7 @@ const res = new Set();      // villagers living on my island (file names, e.g. b
 const vlike = new Set();    // 좋아하는 주민 (file names)
 function load(){ try{ const raw = localStorage.getItem(KEY); if(!raw) return false; const s = JSON.parse(raw); (s.o||[]).forEach(id => BY_ID.has(id) && own.add(id)); Object.entries(s.m||{}).forEach(([k,v]) => { const id=+k; if(BY_ID.has(id) && v) vmask.set(id, v); }); (s.w||[]).forEach(id => BY_ID.has(id) && like.set(id, (s.wm && s.wm[id]) || 1)); (s.r||[]).forEach(f => res.add(f)); (s.vl||[]).forEach(f => vlike.add(f)); return true; }catch(e){ return false; } }
 let saveT = 0;
-function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try{ localStorage.setItem(KEY, JSON.stringify(serial())); }catch(e){} }, 250); }
+function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try{ lsSet(KEY, JSON.stringify(serial())); }catch(e){} }, 250); }
 function serial(){ const m = {}; vmask.forEach((v,k) => { if(v) m[k]=v; }); const wm = {}; like.forEach((v,k) => { if(BY_ID.get(k).vs.length) wm[k]=v; }); return {v:1, o:[...own].sort((a,b)=>a-b), m, w:[...like.keys()].sort((a,b)=>a-b), wm, r:[...res], vl:[...vlike]}; }
 
 /* ---------- View state (kept per device) ---------- */
@@ -2592,7 +2625,7 @@ const TD_VIS = [["fox", "여욱", "미술품·가구"], ["cml", "사하라", "�
 const TD_KEY = KEY + ":todo";
 let td = {hide:[], cust:[], d:{k:"", ids:[]}, w:{k:"", ids:[], vis:[]}, s:[]};
 try{ const v = JSON.parse(localStorage.getItem(TD_KEY) || "null"); if(v) td = Object.assign(td, v); }catch(e){}
-const tdSave = () => { try{ localStorage.setItem(TD_KEY, JSON.stringify(td)); }catch(e){} };
+const tdSave = () => { try{ lsSet(TD_KEY, JSON.stringify(td)); }catch(e){} };
 { const nm = t => String(t || "").replace(/\s+/g, ""), twin = x => TD_DEF.find(d => d.t === x.t && nm(d.n) === nm(x.n));
   const dup = td.cust.filter(twin);
   if(dup.length){ dup.forEach(x => { const d = twin(x); [td.d, td.w].forEach(b => { const i = b.ids.indexOf(x.id); if(i >= 0){ b.ids.splice(i, 1); if(!b.ids.includes(d.id)) b.ids.push(d.id); } }); }); td.cust = td.cust.filter(x => !dup.includes(x)); tdSave(); } }
@@ -2811,7 +2844,7 @@ const slotName = i => `${TK_DAYS[i >> 1]}요일 ${i & 1 ? "오후" : "오전"}`;
 let tkWeeks = {};
 try{ tkWeeks = JSON.parse(localStorage.getItem(TK_KEY) || "{}") || {}; }catch(e){ tkWeeks = {}; }
 const tkHasData = w => w && (w.buy || w.qty || w.sold || w.first || w.prev >= 0 || (w.p || []).some(x => x > 0));
-function tkSave(){ const keys = Object.keys(tkWeeks).filter(k => tkHasData(tkWeeks[k])).sort().slice(-26), o = {}; keys.forEach(k => o[k] = tkWeeks[k]); try{ localStorage.setItem(TK_KEY, JSON.stringify(o)); }catch(e){} }
+function tkSave(){ const keys = Object.keys(tkWeeks).filter(k => tkHasData(tkWeeks[k])).sort().slice(-26), o = {}; keys.forEach(k => o[k] = tkWeeks[k]); try{ lsSet(TK_KEY, JSON.stringify(o)); }catch(e){} }
 const weekLabel = k => `${mdText(parseYmd(k))} 일요일부터`;
 const shiftWeek = (k, n) => ymd(addD(parseYmd(k), 7 * n));
 function tkWeek(k){ if(!tkWeeks[k]) tkWeeks[k] = {buy:null, qty:null, sold:null, first:false, prev:-1, p:Array(12).fill(null)}; return tkWeeks[k]; }
@@ -3092,8 +3125,258 @@ async function readCode(code){
   acc = 0; const wl = (o.w||[]).map(x => (acc += x));
   return {ids, m: o.m || {}, w: wl, wm: o.wm || {}, r: o.r || [], vl: o.vl || [], t: o.t || null, td: o.td || null, is: typeof o.is === "string" ? o.is : null};
 }
+async function applyCode(r, replace){
+  if(replace){ own.clear(); vmask.clear(); like.clear(); res.clear(); vlike.clear(); }
+  r.r.forEach(f => VBY.has(f) && res.add(f)); r.vl.forEach(f => VBY.has(f) && vlike.add(f));
+  r.w.forEach(id => BY_ID.has(id) && like.set(id, (like.get(id)||0) | (r.wm[id]||1)));
+  let n=0; r.ids.forEach(id => { if(BY_ID.has(id)){ if(!own.has(id)) n++; own.add(id); } });
+  Object.entries(r.m).forEach(([k,m]) => { const id=+k; if(BY_ID.has(id)) vmask.set(id, (replace?0:(vmask.get(id)||0)) | m); });
+  tkUnpack(r.t, replace); tdUnpack(r.td, replace);
+  if(r.is && (replace || !islHas())){ try{ const g = await islRead(r.is); islSet(g); islSave(true); undoS.length = redoS.length = 0; }catch(e){} }
+  save(); refreshAll(); return n;
+}
+
+/* ---------- Sign-in and record sync (v29). Only on the site's own server (window.DN_SERVER). ---------- */
+var syncHook;   // set by SYNC; var so saves made before it exists don't trip
+function lsSet(k, v){ localStorage.setItem(k, v); if(syncHook) syncHook(k); }
+const AUTH = (() => {
+  const on = !!window.DN_SERVER;
+  let me = null, live = false, ready = false;
+  const subs = new Set(), emit = () => subs.forEach(f => { try{ f(me); }catch(e){} });
+  async function api(path, opt = {}){
+    let r;
+    try{ r = await fetch("/api/" + path, {method: opt.method || "GET", body: opt.body, keepalive: !!opt.keepalive, credentials: "same-origin", cache: "no-store",
+      headers: {"X-DN": "1", ...(opt.body ? {"Content-Type": "application/json"} : {})}}); }
+    catch(e){ const x = new Error("network"); x.status = 0; throw x; }
+    let j = null; try{ j = await r.json(); }catch(e){}
+    if(!r.ok){ const x = new Error((j && j.error) || "http"); x.status = r.status; x.data = j; throw x; }
+    return j;
+  }
+  function setMe(u){
+    const was = me && me.id; me = u || null; emit();
+    if(me && me.id !== was) SYNC.begin(me.id); else if(!me && was) SYNC.end();
+  }
+  async function start(){
+    if(!on) return;
+    try{ const j = await api("me"); live = true; ready = true; setMe(j.user); }
+    catch(e){ live = false; ready = true; emit(); return; }
+    if(me && me.mustChange) setTimeout(() => { toast("임시 비밀번호로 들어왔어요. 새 비밀번호로 바꿔 주세요"); openPassword(true); }, 600);
+  }
+  return {on, api, start, setMe, get me(){ return me; }, get live(){ return live; }, get ready(){ return ready; }, sub: f => { subs.add(f); return () => subs.delete(f); }};
+})();
+const SYNC = (() => {
+  const LS = KEY + ":sync", WATCH = new Set([KEY, KEY + ":todo", KEY + ":turnip", KEY + ":island"]);   // TD_KEY, TK_KEY, ISLKEY (ISLKEY is made further down)
+  let st = {uid: "", rev: 0, dirty: false}; try{ Object.assign(st, JSON.parse(localStorage.getItem(LS) || "{}")); }catch(e){}
+  let uid = "", last = null, timer = 0, chain = Promise.resolve(), state = "off", at = 0, pulled = 0;
+  const subs = new Set(), emit = () => subs.forEach(f => { try{ f(); }catch(e){} });
+  const keep = () => { try{ localStorage.setItem(LS, JSON.stringify(st)); }catch(e){} };
+  const set = v => { state = v; if(v === "ok") at = Date.now(); emit(); };
+  const run = f => (chain = chain.then(f).catch(() => set("err")));
+  if(AUTH.on) syncHook = k => {
+    if(!WATCH.has(k)) return;
+    if(!st.dirty){ st.dirty = true; keep(); }
+    if(uid){ clearTimeout(timer); timer = setTimeout(push, 3000); }
+  };
+  async function take(code, replace){ await applyCode(await readCode(code), replace); }
+  async function upload(base, code, again){
+    code = code || await makeCode();
+    try{
+      const r = await AUTH.api("sync", {method: "PUT", body: JSON.stringify({base, code}), keepalive: code.length < 60000});
+      st = {uid, rev: r.rev, dirty: false}; keep(); last = code; set("ok");
+    }catch(e){
+      if(e.status === 409 && e.data && e.data.rev && !again){ await take(e.data.code, false); return upload(e.data.rev, null, true); }
+      set(e.status === 401 ? "out" : "err");
+    }
+  }
+  function pull(){ return run(async () => {
+    if(!uid) return;
+    set("busy");
+    let srv; try{ srv = await AUTH.api("sync"); }catch(e){ set(e.status === 401 ? "out" : "err"); return; }
+    pulled = Date.now();
+    if(!srv.rev) return upload(0);
+    if(st.uid !== uid || (st.dirty && srv.rev !== st.rev)){ await take(srv.code, false); return upload(srv.rev); }   // first time here, or both sides changed: put them together
+    if(srv.rev !== st.rev){ await take(srv.code, true); st = {uid, rev: srv.rev, dirty: false}; keep(); last = await makeCode(); set("ok"); return; }   // another device saved newer records
+    if(st.dirty) return upload(st.rev);
+    set("ok");
+  }); }
+  function push(){ clearTimeout(timer); return run(async () => {
+    if(!uid || !st.dirty) return;
+    const code = await makeCode();
+    if(code === last){ st.dirty = false; keep(); set("ok"); return; }
+    return upload(st.rev, code);
+  }); }
+  document.addEventListener("visibilitychange", () => {
+    if(!uid) return;
+    if(document.visibilityState === "hidden"){ if(st.dirty) push(); }
+    else if(Date.now() - pulled > 30000) pull();
+  });
+  return {
+    begin(id){ uid = id; pull(); },
+    end(){ uid = ""; clearTimeout(timer); st = {uid: "", rev: 0, dirty: st.dirty}; keep(); set("off"); },
+    now: () => (uid ? pull() : null),
+    get state(){ return state; }, get at(){ return at; },
+    sub: f => { subs.add(f); return () => subs.delete(f); },
+  };
+})();
+
+const FRUIT_IDS = [["사과", 2213], ["배", 2285], ["복숭아", 2286], ["체리", 2287], ["오렌지", 2214]];
+const fruitPic = name => { const f = FRUIT_IDS.find(x => x[0] === name), it = f && BY_ID.get(f[1]); return it ? picHTML(it) : `<svg class="fi" aria-hidden="true"><use href="#i-leaf"/></svg>`; };
+const AUTH_ERR = {
+  login_rule: "아이디는 2~16자로, 한글·영문 소문자·숫자·_만 쓸 수 있어요.",
+  pw_rule: "비밀번호는 8자 이상으로 정해 주세요.",
+  name_rule: "대표 이름과 섬 이름은 1~10자로 넣어 주세요.",
+  login_taken: "이미 누가 쓰고 있는 아이디예요. 다른 아이디로 정해 주세요.",
+  wrong: "아이디나 비밀번호가 맞지 않아요.",
+  slow_down: "너무 자주 시도했어요. 잠시 뒤에 다시 해 주세요.",
+  banned: "이 계정은 쓸 수 없어요.",
+  admin_last: "관리자 계정은 다른 친구 계정이 남아 있으면 지울 수 없어요.",
+  network: "인터넷 연결을 확인하고 다시 해 주세요.",
+  signin: "로그인이 풀렸어요. 다시 로그인해 주세요.",
+};
+const authErr = e => e && e.message === "locked" ? `비밀번호가 여러 번 틀려서 ${(e.data && e.data.wait) || 10}분 동안 잠겼어요. 잠시 뒤에 다시 해 주세요.` : AUTH_ERR[e && e.message] || "잠시 문제가 생겼어요. 다시 해 주세요.";
+const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? "방금" : m < 60 ? `${m}분 전` : m < 1440 ? `${Math.round(m / 60)}시간 전` : `${Math.round(m / 1440)}일 전`; };
+function syncLine(){
+  const st = SYNC.state;
+  if(st === "busy") return `<p class="syncst">다른 기기와 기록을 맞추는 중이에요…</p>`;
+  if(st === "ok") return `<p class="syncst ok">${ico("check")}<span>다른 기기와 기록이 같아요 · ${ago(SYNC.at)}</span></p>`;
+  if(st === "err") return `<p class="syncst bad">인터넷이 불안정해서 아직 못 맞췄어요. 다시 열면 이어서 해요.</p>`;
+  if(st === "out") return `<p class="syncst bad">로그인이 풀렸어요. 다시 로그인해 주세요.</p>`;
+  return "";
+}
+function acctHTML(){
+  const u = AUTH.me;
+  if(!u) return `<div class="acct"><h4>로그인</h4>
+      <p>로그인하면 폰과 PC의 체크 기록이 저절로 같아져요. 보기와 체크는 로그인 없이도 그대로 쓸 수 있어요.</p>
+      <div class="acts2"><button class="pill leaf" type="button" id="ac-in">로그인</button><button class="pill sun" type="button" id="ac-up">처음이에요 (가입하기)</button></div></div>`;
+  return `<div class="acct"><h4>내 계정</h4>
+      <div class="who"><span class="fr">${fruitPic(u.fruit)}</span><div class="wt"><b>${esc(u.name)}</b><span>${esc(u.island)} 섬 · 아이디 ${esc(u.login)}${u.admin ? " · 관리자" : ""}</span></div></div>
+      ${u.mustChange ? `<p class="err">임시 비밀번호로 들어왔어요. 새 비밀번호로 바꿔 주세요.</p>` : ""}
+      <div id="ac-sync">${syncLine()}</div>
+      <div class="acts2"><button class="pill ghost" type="button" id="ac-prof">프로필 고치기</button><button class="pill ghost" type="button" id="ac-pw">비밀번호 바꾸기</button></div>
+      <div class="acts2">${u.admin ? `<button class="pill soil" type="button" id="ac-admin">친구 계정 관리</button>` : ""}<button class="pill ghost" type="button" id="ac-out">로그아웃</button></div></div>`;
+}
+function mountAcct(box){
+  const draw = () => {
+    if(!box.isConnected) return stop();
+    box.innerHTML = AUTH.live ? acctHTML() : "";
+    const on = (id, f) => { const b = box.querySelector(id); if(b) b.addEventListener("click", f); };
+    on("#ac-in", () => openSignin("in")); on("#ac-up", () => openSignin("up"));
+    on("#ac-prof", openProfile); on("#ac-pw", () => openPassword(false)); on("#ac-admin", openAdmin);
+    on("#ac-out", async () => { try{ await AUTH.api("logout", {method: "POST", body: "{}"}); }catch(e){} AUTH.setMe(null); toast("로그아웃했어요. 이 기기의 기록은 그대로 남아 있어요"); });
+  };
+  const s1 = AUTH.sub(draw), s2 = SYNC.sub(() => { const el = box.querySelector("#ac-sync"); if(el) el.innerHTML = syncLine(); else if(!box.isConnected) stop(); });
+  function stop(){ s1(); s2(); }
+  draw(); if(AUTH.me) SYNC.now();
+}
+const pwField = (id, label, ac, ph) => `<label class="fld"><span>${label}</span><span class="pwrow"><input id="${id}" type="password" autocomplete="${ac}" maxlength="64" placeholder="${ph}"><button class="pill ghost" type="button" data-show="${id}">보기</button></span></label>`;
+const fruitPick = cur => `<div class="fld"><span>섬 과일</span><div class="fruits" role="group" aria-label="섬 과일">${FRUIT_IDS.map(([n]) => `<button type="button" data-fruit="${n}" aria-pressed="${n === cur}">${fruitPic(n)}<span>${n}</span></button>`).join("")}</div></div>`;
+function wireForm(sh){
+  sh.el.addEventListener("click", e => {
+    const sb = e.target.closest("[data-show]"); if(sb){ const i = sh.el.querySelector("#" + sb.dataset.show); const hid = i.type === "password"; i.type = hid ? "text" : "password"; sb.textContent = hid ? "숨기기" : "보기"; return; }
+    const fb = e.target.closest("[data-fruit]"); if(fb){ const was = fb.getAttribute("aria-pressed") === "true"; sh.el.querySelectorAll("[data-fruit]").forEach(b => b.setAttribute("aria-pressed", "false")); fb.setAttribute("aria-pressed", String(!was)); }
+  });
+  return () => { const b = sh.el.querySelector('[data-fruit][aria-pressed="true"]'); return b ? b.dataset.fruit : ""; };
+}
+async function busyRun(btn, msg, f){
+  if(btn.disabled) return; btn.disabled = true; msg.innerHTML = "";
+  try{ await f(); }catch(e){ msg.innerHTML = `<p class="err">${authErr(e)}</p>`; }
+  btn.disabled = false;
+}
+function openSignin(mode){
+  const up = mode === "up";
+  sheetOver = true;
+  const sh = openSheet(`<div class="hd"><div><h3>${up ? "가입하기" : "로그인"}</h3><p class="sub">${up ? "이메일이나 전화번호는 받지 않아요" : "가입할 때 정한 아이디로 들어와요"}</p></div>${XBTN}</div>
+    <label class="fld"><span>아이디${up ? "<i>2~16자, 한글·영문 소문자·숫자·_</i>" : ""}</span><input id="si-id" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${up ? "예) dorandoran" : "아이디"}"></label>
+    ${pwField("si-pw", up ? "비밀번호<i>8자 이상</i>" : "비밀번호", up ? "new-password" : "current-password", up ? "8자 이상" : "비밀번호")}
+    ${up ? `<label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="si-name" maxlength="10" placeholder="예) 링크"></label>
+    <label class="fld"><span>섬 이름</span><input id="si-island" maxlength="10" placeholder="예) 도란"></label>${fruitPick("")}` : ""}
+    <div id="si-msg"></div>
+    <div class="acts2"><button class="pill leaf" type="button" id="si-ok">${up ? "가입하기" : "로그인"}</button><button class="pill ghost" type="button" id="si-sw">${up ? "이미 계정이 있어요" : "처음이에요 (가입하기)"}</button></div>
+    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
+  const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
+  q("#si-sw").addEventListener("click", () => { sh.close(); setTimeout(() => openSignin(up ? "in" : "up"), 0); });
+  const go = () => busyRun(q("#si-ok"), q("#si-msg"), async () => {
+    const body = {login: q("#si-id").value.trim(), pw: q("#si-pw").value};
+    if(up) Object.assign(body, {name: q("#si-name").value.trim(), island: q("#si-island").value.trim().replace(/\s*섬$/, ""), fruit: fruit()});
+    const j = await AUTH.api(up ? "signup" : "login", {method: "POST", body: JSON.stringify(body)});
+    AUTH.setMe(j.user); sh.close();
+    toast(up ? `${j.user.name}님, 반가워요! 기록을 맞추고 있어요` : `${j.user.name}님, 어서 오세요! 기록을 맞추고 있어요`);
+    if(j.user.mustChange) setTimeout(() => openPassword(true), 300);
+  });
+  q("#si-ok").addEventListener("click", go);
+  sh.el.addEventListener("keydown", e => { if(e.key === "Enter" && e.target.tagName === "INPUT") go(); });
+  setTimeout(() => q("#si-id").focus(), 60);
+}
+function openProfile(){
+  const u = AUTH.me; if(!u) return;
+  sheetOver = true;
+  const sh = openSheet(`<div class="hd"><div><h3>프로필 고치기</h3><p class="sub">거래할 때 친구들에게 보여요</p></div>${XBTN}</div>
+    <label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="pf-name" maxlength="10" value="${esc(u.name)}"></label>
+    <label class="fld"><span>섬 이름</span><input id="pf-island" maxlength="10" value="${esc(u.island)}"></label>
+    ${fruitPick(u.fruit)}
+    <div id="pf-msg"></div>
+    <div class="acts2"><button class="pill leaf" type="button" id="pf-ok">저장하기</button><button class="pill ghost" type="button" id="pf-no">그만두기</button></div>
+    <div class="leave"><h4>계정 지우기</h4><p>계정과 서버에 맞춰 둔 기록이 지워져요. 이 기기의 체크 기록은 그대로 남아요.</p>
+      <div class="acts2"><button class="pill danger" type="button" id="pf-del">계정 지우기</button></div><div id="pf-del-box"></div></div>`);
+  const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
+  q("#pf-no").addEventListener("click", () => sh.close());
+  q("#pf-ok").addEventListener("click", () => busyRun(q("#pf-ok"), q("#pf-msg"), async () => {
+    const j = await AUTH.api("me", {method: "POST", body: JSON.stringify({name: q("#pf-name").value.trim(), island: q("#pf-island").value.trim().replace(/\s*섬$/, ""), fruit: fruit()})});
+    AUTH.setMe(j.user); sh.close(); toast("프로필을 저장했어요");
+  }));
+  q("#pf-del").addEventListener("click", () => {
+    const box = q("#pf-del-box");
+    box.innerHTML = `<div class="confirm"><p>정말 지울까요? 지운 계정은 되돌릴 수 없어요. 비밀번호를 넣어 주세요.</p>${pwField("pf-pw", "비밀번호", "current-password", "비밀번호")}<div id="pf-del-msg"></div><div class="acts2"><button class="pill danger" type="button" id="pf-yes">네, 지울게요</button><button class="pill ghost" type="button" id="pf-keep">그만두기</button></div></div>`;
+    q("#pf-keep").addEventListener("click", () => { box.innerHTML = ""; });
+    q("#pf-yes").addEventListener("click", () => busyRun(q("#pf-yes"), q("#pf-del-msg"), async () => {
+      await AUTH.api("leave", {method: "POST", body: JSON.stringify({pw: q("#pf-pw").value})});
+      AUTH.setMe(null); sh.close(); toast("계정을 지웠어요. 이 기기의 기록은 그대로 있어요");
+    }));
+  });
+}
+function openPassword(forced){
+  if(!AUTH.me) return;
+  sheetOver = true;
+  const sh = openSheet(`<div class="hd"><div><h3>비밀번호 바꾸기</h3><p class="sub">${forced ? "임시 비밀번호 대신 쓸 비밀번호를 정해요" : "다른 기기는 다시 로그인해야 해요"}</p></div>${XBTN}</div>
+    ${pwField("pw-old", forced ? "받은 임시 비밀번호" : "지금 비밀번호", "current-password", forced ? "임시 비밀번호" : "지금 비밀번호")}
+    ${pwField("pw-new", "새 비밀번호<i>8자 이상</i>", "new-password", "8자 이상")}
+    <div id="pw-msg"></div>
+    <div class="acts2"><button class="pill leaf" type="button" id="pw-ok">바꾸기</button><button class="pill ghost" type="button" id="pw-no">그만두기</button></div>`);
+  const q = id => sh.el.querySelector(id); wireForm(sh);
+  q("#pw-no").addEventListener("click", () => sh.close());
+  q("#pw-ok").addEventListener("click", () => busyRun(q("#pw-ok"), q("#pw-msg"), async () => {
+    const j = await AUTH.api("password", {method: "POST", body: JSON.stringify({old: q("#pw-old").value, pw: q("#pw-new").value})});
+    AUTH.setMe(j.user); sh.close(); toast("비밀번호를 바꿨어요");
+  }));
+}
+function openAdmin(){
+  sheetOver = true;
+  const sh = openSheet(`<div class="hd"><div><h3>친구 계정 관리</h3><p class="sub">비밀번호를 잊은 친구에게 임시 비밀번호를 만들어 줘요</p></div>${XBTN}</div><div id="ad-list"><p>불러오는 중…</p></div>`);
+  const box = sh.el.querySelector("#ad-list");
+  async function load(){
+    let j; try{ j = await AUTH.api("admin/users"); }catch(e){ box.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
+    box.innerHTML = `<p class="cnt">가입한 사람 ${fmt(j.users.length)}명</p><div class="ulist">${j.users.map(x => `<div class="urow"><span class="fr">${fruitPic(x.fruit)}</span><div class="wt"><b>${esc(x.name)}</b><span>${esc(x.island)} 섬 · 아이디 ${esc(x.login)}</span><span>마지막 접속 ${ago(x.seen)}${x.mustChange ? " · 임시 비밀번호 받음" : ""}</span></div>${x.id === AUTH.me.id ? `<span class="me">나</span>` : `<button class="pill ghost" type="button" data-reset="${esc(x.id)}" data-name="${esc(x.name)}">임시 비밀번호</button>`}</div><div class="ures" data-for="${esc(x.id)}"></div>`).join("")}</div>`;
+  }
+  box.addEventListener("click", e => {
+    const b = e.target.closest("[data-reset]"); if(!b) return;
+    const out = box.querySelector(`.ures[data-for="${b.dataset.reset}"]`);
+    out.innerHTML = `<div class="confirm"><p>${esc(b.dataset.name)}님의 비밀번호를 임시 비밀번호로 바꿀까요? 그 친구는 모든 기기에서 로그아웃돼요.</p><div class="acts2"><button class="pill danger" type="button" data-yes>바꾸기</button><button class="pill ghost" type="button" data-no>그만두기</button></div></div>`;
+    out.querySelector("[data-no]").addEventListener("click", () => { out.innerHTML = ""; });
+    out.querySelector("[data-yes]").addEventListener("click", async ev => {
+      ev.target.disabled = true;
+      try{
+        const j = await AUTH.api("admin/reset", {method: "POST", body: JSON.stringify({id: b.dataset.reset})});
+        out.innerHTML = `<div class="tempbox"><p>임시 비밀번호예요. 친구에게 알려 주세요. 로그인하면 새 비밀번호로 바꾸라고 안내돼요.</p><div class="pwrow"><input readonly value="${esc(j.temp)}" class="num" aria-label="임시 비밀번호"><button class="pill leaf" type="button" data-copy>복사</button></div></div>`;
+        out.querySelector("[data-copy]").addEventListener("click", () => copyText(j.temp, "임시 비밀번호를 복사했어요"));
+      }catch(err){ out.innerHTML = `<p class="err">${authErr(err)}</p>`; }
+    });
+  });
+  load();
+}
+
 function openBackup(){
-  const s = openSheet(`<div class="hd"><h3>기록 옮기기</h3>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><h3>${AUTH.live ? "내 계정·기록" : "기록 옮기기"}</h3>${XBTN}</div>
+    ${AUTH.live ? `<div id="acct-box"></div><h4 class="bk-h">코드로 옮기기</h4>` : ""}
     <p class="sub">다른 기기에서 이어 하려면 아래 코드를 복사해서, 그 기기에서 이 페이지를 열고 "코드 붙여넣기"에 넣으세요.</p>
     <textarea id="bk-out" readonly aria-label="내 백업 코드">코드를 만드는 중…</textarea>
     <div class="acts2"><button class="pill leaf" type="button" id="bk-copy">코드 복사</button></div>
@@ -3103,6 +3386,7 @@ function openBackup(){
     <div id="bk-msg"></div>
     <div class="acts2" style="justify-content:flex-end"><button class="pill danger" type="button" id="bk-reset">기록 전부 지우기</button></div>`);
   const out = s.el.querySelector("#bk-out"), msg = s.el.querySelector("#bk-msg");
+  if(AUTH.live) mountAcct(s.el.querySelector("#acct-box"));
   makeCode().then(c => { out.value = c; });
   s.el.querySelector("#bk-copy").addEventListener("click", () => {
     const v = out.value;
@@ -3112,15 +3396,7 @@ function openBackup(){
   async function apply(replace){
     const v = s.el.querySelector("#bk-in").value; if(!v.trim()){ msg.innerHTML = `<p class="err">붙여 넣은 코드가 없어요.</p>`; return; }
     try{
-      const r = await readCode(v);
-      if(replace){ own.clear(); vmask.clear(); like.clear(); res.clear(); vlike.clear(); }
-      r.r.forEach(f => VBY.has(f) && res.add(f)); r.vl.forEach(f => VBY.has(f) && vlike.add(f));
-      r.w.forEach(id => BY_ID.has(id) && like.set(id, (like.get(id)||0) | (r.wm[id]||1)));
-      let n=0; r.ids.forEach(id => { if(BY_ID.has(id)){ if(!own.has(id)) n++; own.add(id); } });
-      Object.entries(r.m).forEach(([k,m]) => { const id=+k; if(BY_ID.has(id)) vmask.set(id, (replace?0:(vmask.get(id)||0)) | m); });
-      tkUnpack(r.t, replace); tdUnpack(r.td, replace);
-      if(r.is && (replace || !islHas())){ try{ const g = await islRead(r.is); islSet(g); islSave(true); undoS.length = redoS.length = 0; }catch(e){} }
-      save(); refreshAll(); s.close(); toast(replace ? `기록을 바꿨어요 (${fmt(own.size)}개 등록)` : `${fmt(n)}개를 새로 합쳤어요`);
+      const n = await applyCode(await readCode(v), replace); s.close(); toast(replace ? `기록을 바꿨어요 (${fmt(own.size)}개 등록)` : `${fmt(n)}개를 새로 합쳤어요`);
     }catch(e){ msg.innerHTML = `<p class="err">${e.message==="nodecomp" ? "이 브라우저는 압축된 코드를 풀 수 없어요. 최신 크롬, 사파리, 엣지에서 열어 주세요." : "코드를 읽지 못했어요. AC1. 부터 끝까지 빠짐없이 붙여 넣었는지 확인해 주세요."}</p>`; }
   }
   s.el.querySelector("#bk-merge").addEventListener("click", () => apply(false));
@@ -3132,6 +3408,8 @@ function openBackup(){
   });
 }
 $("btn-backup").addEventListener("click", openBackup);
+if(AUTH.on){ const b = $("btn-backup"); b.setAttribute("aria-label", "내 계정·기록 옮기기"); b.title = "내 계정·기록 옮기기";
+  AUTH.sub(u => b.classList.toggle("signed", !!u)); AUTH.start(); }
 
 /* ---------- 섬 꾸미기 (v21) ---------- */
 /* Coast pieces, cliff layouts, the 75 starting-island layouts and the building, tree, bridge and map-icon pictures
@@ -3541,7 +3819,7 @@ function islLoad(){
 function islSave(edited){
   if(edited) ISL.e = 1;
   clearTimeout(islSaveT);
-  islSaveT = setTimeout(() => { try{ localStorage.setItem(ISLKEY, JSON.stringify({v: 2, q: b64u(ISL.q), p: b64u(ISL.p), d: b64u(ISL.d), o: ISL.o, m: ISL.m, e: ISL.e})); }catch(e){ toast("기기 저장 공간이 모자라 섬 지도를 저장하지 못했어요"); } }, 400);
+  islSaveT = setTimeout(() => { try{ lsSet(ISLKEY, JSON.stringify({v: 2, q: b64u(ISL.q), p: b64u(ISL.p), d: b64u(ISL.d), o: ISL.o, m: ISL.m, e: ISL.e})); }catch(e){ toast("기기 저장 공간이 모자라 섬 지도를 저장하지 못했어요"); } }, 400);
 }
 const islHas = () => { islInit(); return !!ISL.e; };
 function islInit(){
