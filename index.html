@@ -370,6 +370,42 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .urow .wt{flex:1 1 auto} .urow .pill{flex:none; min-height:38px; padding:0 12px} .urow .fr{width:44px; height:44px; background:var(--paper)} .urow .fr .pic{--t:34px}
 .urow .me{flex:none; font-size:13px; color:var(--muted); padding:0 8px}
 .ures:empty{display:none}
+/* 자랑 */
+.sh-card .dimg{position:relative}
+.sh-card .dct b{white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere}
+.sh-card .sh-who{display:flex; align-items:center; gap:5px; white-space:normal; overflow:visible; overflow-wrap:anywhere}
+.sh-who .fr{width:22px; height:22px; flex:none; background:transparent}
+.sh-who .fr .pic{--t:22px}
+.sh-n{position:absolute; right:8px; bottom:8px; display:inline-flex; align-items:center; gap:4px; background:rgba(30,22,12,.66); color:#fff; border-radius:10px; padding:3px 8px; font-size:12.5px}
+.dimg .sh-n svg{width:14px; height:14px; opacity:1; color:#fff}
+.sh-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.sh-tag{font-family:var(--f-display); font-size:13px; line-height:1.2; border-radius:8px; padding:3px 9px; white-space:nowrap}
+.sh-tag.sh-dream{background:var(--plum-soft); color:var(--plum)}
+.sh-tag.sh-area{background:var(--sprout); color:var(--leaf)}
+.sh-tag.sh-fashion{background:var(--like-soft); color:var(--like)}
+.sh-it{font-size:12.5px; color:var(--muted)}
+.tr-seg button.sh-dream[aria-checked="true"]{background:var(--plum); color:#fff}
+.tr-seg button.sh-area[aria-checked="true"]{background:var(--leaf); color:var(--leaf-ink)}
+.tr-seg button.sh-fashion[aria-checked="true"]{background:var(--like); color:#fff}
+.sh-sort{display:inline-flex; gap:2px; padding:3px; border-radius:12px; background:var(--card); margin-right:auto; flex-wrap:wrap}
+.sh-sort button{border:0; border-radius:9px; background:transparent; color:var(--ink); padding:6px 10px; font-family:var(--f-display); font-size:13.5px; white-space:nowrap}
+.sh-sort button[aria-pressed="true"]{background:var(--leaf); color:var(--leaf-ink)}
+.tr-bar > .sh-sort + .pill{margin-left:0}
+.sh-photo{display:grid; gap:8px}
+.sh-photo .dbig.tall img{background:var(--paper2)}
+.sh-nav{display:flex; align-items:center; justify-content:center; gap:12px}
+.sh-nav .fi{width:16px; height:16px}
+.sh-nav [data-go="-1"] .fi{transform:rotate(90deg)} .sh-nav [data-go="1"] .fi{transform:rotate(-90deg)}
+.sh-pics{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(104px, 100%), 1fr)); gap:8px}
+.sh-pics:empty{display:none}
+.sh-pic{display:grid; gap:5px; min-width:0; align-content:start}
+.sh-pic img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border-radius:12px; background:var(--paper2)}
+.sh-pa{display:flex; gap:4px; flex-wrap:wrap}
+.sh-pa > *{border:0; border-radius:9px; padding:5px 9px; font-size:12.5px; line-height:1.2; background:var(--card); color:var(--ink); white-space:nowrap}
+.sh-pa .on{background:var(--sun); color:#4a3a1c; font-family:var(--f-display)}
+.sh-pa .sh-rm{margin-left:auto}
+.sh-add{cursor:pointer; justify-self:start}
+.sh-add[hidden]{display:none}
 .urow.ad-row{display:grid; gap:8px}
 .ad-top{display:flex; align-items:center; gap:12px; min-width:0}
 .ad-facts{display:flex; flex-wrap:wrap; gap:4px 12px; font-size:13px; color:var(--muted)}
@@ -563,7 +599,7 @@ html:not(.srv) .tabbar [data-tab="trade"]{display:none}
 }
 .tabbar button{border:0; background:transparent; color:var(--cream); opacity:.7; height:52px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-family:var(--f-display); font-size:clamp(11px, 3.1vw, 13.5px); line-height:1; white-space:nowrap; letter-spacing:-.01em; padding:0; min-width:0; transition:background .15s}
 .tabbar button svg{width:24px; height:24px}
-.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp) no-repeat; background-size:196px 28px; transition:transform .12s}
+.tabbar .tic{display:block; width:28px; height:28px; flex:none; background:url(img/tabs.webp) no-repeat; background-size:224px 28px; transition:transform .12s}
 .tabbar [data-tab="item"] .tic{background-position:0px 0}
 .tabbar [data-tab="museum"] .tic{background-position:-28px 0}
 .tabbar [data-tab="villager"] .tic{background-position:-56px 0}
@@ -571,6 +607,7 @@ html:not(.srv) .tabbar [data-tab="trade"]{display:none}
 .tabbar [data-tab="todo"] .tic{background-position:-112px 0}
 .tabbar [data-tab="island"] .tic{background-position:-140px 0}
 .tabbar [data-tab="trade"] .tic{background-position:-168px 0}
+html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .tabbar button[aria-current="page"] .tic{transform:scale(1.1)}
 .ia .sbx, .imrow > .sbx{border-radius:9px}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .ia .sbx, :root:not([data-theme="light"]) .imrow > .sbx{background:rgba(246,234,208,.9)} }
@@ -1355,7 +1392,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
   <button type="button" data-tab="item"><i class="tic" aria-hidden="true"></i>아이템</button>
   <button type="button" data-tab="museum"><i class="tic" aria-hidden="true"></i>박물관</button>
   <button type="button" data-tab="villager"><i class="tic" aria-hidden="true"></i>주민</button>
-  <button type="button" data-tab="dream"><i class="tic" aria-hidden="true"></i>꿈번지</button>
+  <button type="button" data-tab="dream"><i class="tic" aria-hidden="true"></i><span class="tl-dream">꿈번지</span></button>
   <button type="button" data-tab="trade"><i class="tic" aria-hidden="true"></i>거래</button>
   <button type="button" data-tab="todo"><i class="tic" aria-hidden="true"></i>할 일</button>
   <button type="button" data-tab="island"><i class="tic" aria-hidden="true"></i>섬 꾸미기</button>
@@ -1539,13 +1576,15 @@ let saveT = 0;
 function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try{ lsSet(KEY, JSON.stringify(serial())); }catch(e){} }, 250); }
 function serial(){ const m = {}; vmask.forEach((v,k) => { if(v) m[k]=v; }); const wm = {}; like.forEach((v,k) => { if(BY_ID.get(k).vs.length) wm[k]=v; }); return {v:1, o:[...own].sort((a,b)=>a-b), m, w:[...like.keys()].sort((a,b)=>a-b), wm, r:[...res], vl:[...vlike]}; }
 
-if(window.DN_SERVER) document.documentElement.classList.add("srv");   // own server: the 거래 tab shows
+if(window.DN_SERVER) document.documentElement.classList.add("srv");   // own server: the 거래 tab shows, 꿈번지 becomes 자랑
+const SRV = !!window.DN_SERVER;
+if(SRV) document.querySelector(".tl-dream").textContent = "자랑";
 /* ---------- View state (kept per device) ---------- */
 const ui = { tab:"item", cat:0, fo:"all", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1, liked:false, view:"list", sort:"base", limit:0,
   mmon:"all", msort:"base", vpers:-1, vgen:-1, vbm:false, vsort:"name", q:"" };
 // Each bottom tab remembers its own category, status tab and 좋아요 switch.
 const TABS = ["item", "museum", "villager", "dream", "trade", "todo", "island"];
-const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:"new"}, trade:{cat:-1, fo:"all"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
+const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:SRV ? "all" : "new"}, trade:{cat:-1, fo:"all"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
 const mem = {}; TABS.forEach(t => mem[t] = {...TAB_DEF[t], liked:false});
 const SORTS = {base:"기본 순서", name:"이름 순", buyD:"구매가 높은 순", buyA:"구매가 낮은 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
 const MSORTS = {base:"기본 순서", name:"이름 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
@@ -1555,7 +1594,7 @@ const TAB_FO = {
   item: [["all","전체"], ["none","미보유"], ["part","일부 보유","일부"], ["done","완료"]],
   museum: [["all","전체"], ["none","미기증"], ["done","기증 완료","기증"]],
   villager: [["all","전체"], ["res","우리 섬"], ["nophoto","사진 없음"], ["photo","사진 있음"]],
-  dream: [["new","최신순","최신"], ["hot","인기순","인기"], ["view","많이 본 순","조회"]],
+  dream: SRV ? [["all","전체"], ["dream","꿈번지"], ["area","구역"], ["fashion","패션"]] : [["new","최신순","최신"], ["hot","인기순","인기"], ["view","많이 본 순","조회"]],
   trade: [["all","전체"], ["want","구해요"], ["sell","팔아요"], ["free","나눔"]],
   todo: [["day","매일"], ["week","매주"], ["season","시즌"], ["turnip","무트코인"]],
   island: [["land","땅"], ["water","물"], ["path","길"], ["deco","나무·꽃"], ["build","건물"]]
@@ -1717,7 +1756,7 @@ function render(){
   document.body.classList.toggle("isl-on", ui.tab === "island");
   $("welcome").classList.toggle("tabhide", ui.tab !== "item");
   if(ui.tab === "villager") return renderVillagers();
-  if(ui.tab === "dream") return renderDreams();
+  if(ui.tab === "dream") return SRV ? renderShows() : renderDreams();
   if(ui.tab === "trade") return renderTrades();
   if(ui.tab === "todo") return renderTodo();
   if(ui.tab === "island") return renderIsland();
@@ -1740,7 +1779,7 @@ function setTabs(counts){
   const el = $("tabs");
   if(el.dataset.tab !== ui.tab){
     el.dataset.tab = ui.tab;
-    el.setAttribute("aria-label", ui.tab === "island" ? "도구" : ui.tab === "dream" ? "정렬" : ui.tab === "trade" ? "글 종류" : ui.tab === "villager" ? "주민 상태" : "보유 상태");
+    el.setAttribute("aria-label", ui.tab === "island" ? "도구" : ui.tab === "dream" ? (SRV ? "종류" : "정렬") : ui.tab === "trade" ? "글 종류" : ui.tab === "villager" ? "주민 상태" : "보유 상태");
     el.innerHTML = TAB_FO[ui.tab].map(([v, l, short]) => `<button type="button" role="tab" data-fo="${v}">${short ? `<span class="mob">${short}</span><span class="desk">${l}</span>` : l}${counts ? `<span class="tn num"></span>` : ""}${ui.tab === "dream" && v !== "new" ? `<span class="cd num" aria-hidden="true"></span>` : ""}</button>`).join("");
   }
   el.querySelectorAll("button").forEach(b => { const f = b.dataset.fo; b.setAttribute("aria-selected", ui.fo === f); const tn = b.querySelector(".tn"); if(tn && counts) tn.textContent = fmt(counts[f] || 0); });
@@ -1749,6 +1788,7 @@ function setTabs(counts){
 let dreamLockUntil = 0, dreamLockTimer = 0;
 const dreamLeft = () => Math.max(0, Math.ceil((dreamLockUntil - Date.now()) / 1000));
 function dreamLock(){
+  if(SRV) return;
   ui.fo = mem.dream.fo = "new"; dreamLockUntil = Date.now() + 5000;
   clearInterval(dreamLockTimer);
   dreamLockTimer = setInterval(() => { paintDreamLock(); if(!dreamLeft()){ clearInterval(dreamLockTimer); dreamLockTimer = 0; } }, 200);
@@ -1771,17 +1811,17 @@ function setPick(name, kind, kindCls, cnt){
 }
 function renderHead(){
   $("btn-like").setAttribute("aria-pressed", ui.liked);
-  $("btn-like").title = $("btn-like").ariaLabel = ui.tab === "villager" ? "좋아하는 주민만 보기" : ui.tab === "dream" ? "좋아요한 꿈번지만 보기" : ui.tab === "trade" ? "좋아요한 아이템·주민이 들어간 글만 보기" : "좋아요만 보기";
+  $("btn-like").title = $("btn-like").ariaLabel = ui.tab === "villager" ? "좋아하는 주민만 보기" : ui.tab === "dream" ? (SRV ? "추천한 글만 보기" : "좋아요한 꿈번지만 보기") : ui.tab === "trade" ? "좋아요한 아이템·주민이 들어간 글만 보기" : "좋아요만 보기";
   const fl = $("btn-filt"), dreamMode = ui.tab === "dream", todo = ui.tab === "todo", island = ui.tab === "island";
   const pk = $("btn-pick"); pk.querySelector(".ps use").setAttribute("href", island ? "#i-menu" : "#i-search"); pk.title = pk.ariaLabel = island ? "섬 메뉴" : "카테고리 고르기와 검색";
-  const [flb, fic, ft] = island ? ["저장·공유", "share", "섬 지도 저장과 공유"] : dreamMode ? ["등록", "plus", "꿈번지 등록"] : ui.tab === "trade" ? ["글쓰기", "plus", "거래 글 쓰기"] : !todo ? ["필터·정렬", "sliders", "필터와 정렬"]
+  const [flb, fic, ft] = island ? ["저장·공유", "share", "섬 지도 저장과 공유"] : dreamMode ? (SRV ? ["올리기", "plus", "자랑 올리기"] : ["등록", "plus", "꿈번지 등록"]) : ui.tab === "trade" ? ["글쓰기", "plus", "거래 글 쓰기"] : !todo ? ["필터·정렬", "sliders", "필터와 정렬"]
     : ui.fo === "season" ? ["설정", "sliders", "시즌 설정"] : ui.fo === "turnip" ? ["지난 기록", "cal", "무트코인 지난 기록"] : ["고치기", "sliders", "할 일 고치기"];
   fl.querySelector(".lb").textContent = flb; fl.querySelector("use").setAttribute("href", "#i-" + fic); fl.title = fl.ariaLabel = ft;
   $("btn-like").classList.toggle("tabhide", todo || island);
   if(island) return renderIslandHead();
   if(todo) return renderTodoHead();
   if(ui.tab === "villager") return renderVillagerHead();
-  if(ui.tab === "dream") return renderDreamHead();
+  if(ui.tab === "dream") return SRV ? renderShowHead() : renderDreamHead();
   if(ui.tab === "trade") return renderTradeHead();
   const all = listFor(ui.cat); const o = ownedIn(all); const isCat = catIsCatalog(ui.cat);
   const museum = ui.tab === "museum";
@@ -1832,6 +1872,7 @@ $("grid").addEventListener("click", e => {
   if(lpFired){ lpFired = false; return; }
   const dc = e.target.closest("[data-dream]"); if(dc){ openDream(dc.dataset.dream); return; }
   const tc = e.target.closest("[data-trade]"); if(tc){ openTrade(tc.dataset.trade); return; }
+  const sc = e.target.closest("[data-show]"); if(sc){ openShow(sc.dataset.show); return; }
   const b = e.target.closest("[data-act]"); if(!b) return;
   const card = b.closest(".card");
   if(card.dataset.v){
@@ -2109,8 +2150,8 @@ function catsHTML(){
 // One sheet for both: type to search this tab, or leave the box empty and pick a category.
 function openFind(){
   const T = ui.tab;
-  const what = T === "villager" ? "주민 이름" : T === "dream" ? "제목, 섬 이름, 대표 이름" : T === "trade" ? "아이템, 주민, 이름, 섬 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
-  const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? "꿈번지를 찾아요" : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
+  const what = T === "villager" ? "주민 이름" : T === "dream" ? (SRV ? "제목, 이름, 섬 이름, 아이템" : "제목, 섬 이름, 대표 이름") : T === "trade" ? "아이템, 주민, 이름, 섬 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
+  const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? (SRV ? "자랑 글을 찾아요" : "꿈번지를 찾아요") : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
   const s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="bd-in" id="f-cats">${T === "dream" || T === "trade" ? `<p class="sub">찾을 말을 넣어 주세요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.</p>` : catsHTML()}</div>
@@ -2128,6 +2169,7 @@ function openFind(){
     if(!q){ out.innerHTML = ""; return; }
     let list, html, wrap, hint;
     if(T === "villager"){ list = searchIn(VIL, v => [v.ko, v.en, v.ja], q); html = vilCardHTML; wrap = "grid list vgrid"; hint = "누르면 사진 받은 걸로 체크돼요. ⋯를 누르면 자세히 보여요."; }
+    else if(T === "dream" && SRV){ list = searchIn(SH.list, showNames, q); html = x => showCardHTML(x); wrap = "dgrid"; hint = "누르면 자세히 보여요."; }
     else if(T === "dream"){ list = searchIn(DS.list, x => [x.title, x.island, x.owner, x.text], q); html = x => dreamCardHTML(x); wrap = "dgrid"; hint = "누르면 자세히 보여요."; }
     else if(T === "trade"){ list = searchIn(tradeAll(), tradeNames, q); html = x => tradeCardHTML(x); wrap = "tgrid"; hint = "누르면 자세히 보여요."; }
     else { list = searchList(q); html = cardHTML; wrap = "grid list"; hint = (T === "museum" ? "누르면 기증한 걸로 체크돼요." : "누르면 바로 체크돼요.") + " ⋯를 누르면 자세히 보여요."; }
@@ -2139,6 +2181,7 @@ function openFind(){
   s.el.addEventListener("click", e => {
     const d = e.target.closest("[data-dream]"); if(d){ sheetOver = true; openDream(d.dataset.dream); return; }
     const tr = e.target.closest("[data-trade]"); if(tr){ sheetOver = true; openTrade(tr.dataset.trade); return; }
+    const sw = e.target.closest("[data-show]"); if(sw){ sheetOver = true; openShow(sw.dataset.show); return; }
     const ab = e.target.closest("[data-act]"), card = ab && ab.closest(".sgrid .card");
     if(card){
       const a = ab.dataset.act;
@@ -2240,7 +2283,7 @@ function openFilters(){
     else if(e.target.closest("#f-reset")){ ui.sort="base"; ui.buyable=false; ui.showNS=true; ui.showNC=true; ui.new3=false; ui.diy=false; ui.remake=false; ui.src=-1; sync(); }
   });
 }
-$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? openDreamForm() : ui.tab === "trade" ? openTradeForm() : ui.tab === "villager" ? openVilFilters() : openFilters());
+$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? (SRV ? openShowForm() : openDreamForm()) : ui.tab === "trade" ? openTradeForm() : ui.tab === "villager" ? openVilFilters() : openFilters());
 document.addEventListener("change", e => { if(e.target.id === "f-src"){ ui.src = +e.target.value; ui.limit = 0; saveView(); render(); renderHead(); } });
 
 $("btn-like").addEventListener("click", () => {
@@ -2248,6 +2291,7 @@ $("btn-like").addEventListener("click", () => {
   if(!ui.liked) return;
   if(ui.tab === "villager" && !vlike.size) toast("아직 좋아하는 주민이 없어요. ♡를 눌러 모아 보세요");
   else if((ui.tab === "item" || ui.tab === "museum") && !listFor(-3).length) toast("아직 좋아요한 것이 없어요. ♡를 눌러 모아 보세요");
+  else if(ui.tab === "dream" && SRV && !SH.likedCount()) toast("아직 추천한 글이 없어요. 마음에 드는 글에서 추천을 눌러 보세요");
   else if(ui.tab === "trade" && !like.size && !vlike.size) toast("아직 좋아요한 아이템이나 주민이 없어요. ♡를 눌러 모아 보세요");
 });
 
@@ -3658,10 +3702,11 @@ function openTradeForm(p, preset){
     }, tradeErr);
   });
 }
-function openTradePick(chosen, done){
+function openTradePick(chosen, done, opt){
+  const only = !!(opt && opt.items), POOL = (opt && opt.items) || TRADE_ITEMS, inPool = new Set(POOL), MAX = (opt && opt.max) || 20;
   sheetOver = true;
-  const s = openSheet(`<div class="hd"><div><h3>아이템·주민 고르기</h3><p class="sub" id="tp-sub"></p></div>${XBTN}</div>
-    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="tp-q" placeholder="아이템이나 주민 이름 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
+  const s = openSheet(`<div class="hd"><div><h3>${only ? "아이템 고르기" : "아이템·주민 고르기"}</h3><p class="sub" id="tp-sub"></p></div>${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="tp-q" placeholder="${only ? "아이템 이름" : "아이템이나 주민 이름"} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="bd-in" id="tp-res"></div>`, () => done());
   const inp = s.el.querySelector("#tp-q"), out = s.el.querySelector("#tp-res");
   const has = (k, id) => chosen.findIndex(x => x.k === k && String(x.id) === String(id));
@@ -3674,12 +3719,13 @@ function openTradePick(chosen, done){
   function paint(){
     const qv = inp.value.trim(); sub();
     if(!qv){
-      const li = [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && tradable(it)).slice(0, 60), lv = VIL.filter(v => vlike.has(v.f)).slice(0, 30);
-      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).map(srow))
+      const li = [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && inPool.has(it)).slice(0, 60), lv = only ? [] : VIL.filter(v => vlike.has(v.f)).slice(0, 30);
+      const picked = only ? chosen.map(x => BY_ID.get(x.id)).filter(Boolean) : [];
+      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + (only ? sec(`${ico("check")}<b>고른 아이템</b>`, picked.map(irow)) : sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).map(srow)))
         + sec(`${ico("heart")}<b>좋아요한 아이템</b>`, li.map(irow)) + sec(`${ico("heart")}<b>좋아하는 주민</b>`, lv.map(vrow));
       return;
     }
-    const iv = kSearch(TRADE_ITEMS, it => [it.ko, it.en], qv), vv = kSearch(VIL, v => [v.ko, v.en, v.ja], qv), LIM = 60;
+    const iv = kSearch(POOL, it => [it.ko, it.en], qv), vv = only ? [] : kSearch(VIL, v => [v.ko, v.en, v.ja], qv), LIM = 60;
     out.innerHTML = (iv.length || vv.length) ? sec(`${ico("face")}<b>주민</b>`, vv.slice(0, 20).map(vrow)) + sec(`${ico("box")}<b>아이템</b>`, iv.slice(0, LIM).map(irow))
       + (iv.length > LIM ? `<p class="sub">${fmt(iv.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`;
   }
@@ -3689,12 +3735,280 @@ function openTradePick(chosen, done){
     const [k, id] = b.dataset.pk.split(":"), i = has(k, id);
     if(i >= 0){ chosen.splice(i, 1); b.setAttribute("aria-pressed", "false"); }
     else {
-      if(chosen.length >= 20){ toast("한 글에는 20개까지 넣을 수 있어요"); return; }
+      if(chosen.length >= MAX){ toast(`한 글에는 ${MAX}개까지 넣을 수 있어요`); return; }
       chosen.push(k === "i" ? {k, id: +id, n: 1} : {k, id}); b.setAttribute("aria-pressed", "true");
     }
     sub();
   });
   paint();
+}
+/* ---------- 자랑 (own server) ----------
+   Shows = {id, kind: dream|area|fashion, title, body, code, imgs:[{f, t, w, h}] (full and 16:9 list picture keys), items:[{k:"i", id, c?}],
+   likes, cmts, views, created, updated, author}. Anyone can look; posting, 추천 and comments need sign-in. */
+const KIND = {dream:["꿈번지", "moon"], area:["구역", "island"], fashion:["패션", "bag"]};
+const SHOW_ITEMS = ITEMS.filter(it => !["리액션", "DIY 레시피", "메시지 카드"].includes(CATS[it.lc][0]));   // things you can place or wear
+const imgUrl = k => "/api/img/" + k;
+const showTitle = x => x.title || (x.kind === "dream" ? `${islandText(x.author.island)} 꿈번지` : `${x.author.name}님의 ${KIND[x.kind][0]}`);
+const showNames = x => [x.title, x.author.name, x.author.island, x.body, x.code, ...x.items.map(y => { const it = BY_ID.get(y.id); return it ? it.ko : ""; })];
+const shCat = () => [0, 1, 2, 10, 11, 12].includes(ui.cat) ? ui.cat : 0;   // order (0 new, 1 추천, 2 조회) + 10 for 내 글만
+const SH = (() => {
+  let list = [], ready = false, at = 0, err = "", busy = null, key = "", more = false, store = true, likes = new Set(), likesFor = "";
+  const subs = new Set(), emit = () => subs.forEach(f => { try{ f(); }catch(e){} });
+  const want = () => { const c = shCat(); return {kind: ui.fo === "all" ? "" : ui.fo, sort: ["new", "hot", "view"][c % 10] || "new", mine: c >= 10}; };
+  function load(force){
+    if(!AUTH.on) return Promise.resolve();
+    const w = want(), k = JSON.stringify(w) + (AUTH.me ? AUTH.me.id : "");
+    if(busy) return busy;
+    if(!force && k === key && ready && Date.now() - at < 30000) return Promise.resolve();
+    if(w.mine && !AUTH.me){ list = []; key = k; ready = true; emit(); return Promise.resolve(); }
+    busy = (async () => {
+      try{
+        const j = await AUTH.api(`shows?kind=${w.kind}&sort=${w.sort}${w.mine ? "&mine=1" : ""}`);
+        list = j.shows; more = j.more; store = j.store !== false; at = Date.now(); err = ""; key = k;
+      }catch(e){ err = e.message || "network"; }
+      const me = AUTH.me ? AUTH.me.id : "";
+      if(me && likesFor !== me){ try{ likes = new Set((await AUTH.api("shows/likes")).ids); likesFor = me; }catch(e){} }
+      if(!me){ likes = new Set(); likesFor = ""; }
+      ready = true; busy = null; emit();
+    })();
+    return busy;
+  }
+  function put(x){ const i = list.findIndex(y => y.id === x.id); if(i >= 0) list[i] = x; else list.unshift(x); emit(); }
+  function drop(id){ list = list.filter(y => y.id !== id); emit(); }
+  AUTH.sub(() => { likesFor = ""; if(ready) load(true); });
+  document.addEventListener("visibilitychange", () => { if(!document.hidden && ui.tab === "dream" && SRV) load(); });
+  return {load, put, drop, find: id => list.find(y => y.id === id), liked: id => likes.has(id), setLiked(id, on){ on ? likes.add(id) : likes.delete(id); }, likedCount: () => likes.size,
+    get list(){ return list; }, get ready(){ return ready; }, get err(){ return err; }, get more(){ return more; }, get store(){ return store; },
+    sub: f => { subs.add(f); return () => subs.delete(f); }};
+})();
+SH.sub(() => { if(SRV && ui.tab === "dream" && !$("layer").firstChild) render(); });
+const statHTML = x => `<span class="${SH.liked(x.id) ? "on" : ""}"><svg aria-hidden="true"><use href="#i-heart"/></svg>${fmt(x.likes || 0)}</span><span><svg aria-hidden="true"><use href="#i-chat"/></svg>${fmt(x.cmts || 0)}</span><span><svg aria-hidden="true"><use href="#i-eye"/></svg>${fmt(x.views || 0)}</span><span class="dt2">${dateText(x.created)}</span>`;
+function showCardHTML(x){
+  const im = x.imgs[0], k = KIND[x.kind] || KIND.area;
+  return `<button class="dcard sh-card" type="button" data-show="${esc(x.id)}"><span class="dimg">${im ? `<img src="${esc(imgUrl(im.t))}" alt="" loading="lazy">` : `<svg aria-hidden="true"><use href="#i-${k[1]}"/></svg>`}${x.imgs.length > 1 ? `<span class="sh-n num">${ico("image")}${x.imgs.length}</span>` : ""}</span>
+    <span class="dct"><span class="sh-top"><span class="sh-tag sh-${x.kind}">${k[0]}</span>${x.items.length ? `<span class="sh-it">아이템 ${fmt(x.items.length)}개</span>` : ""}</span><b>${esc(showTitle(x))}</b><span class="who sh-who"><span class="fr">${fruitPic(x.author.fruit)}</span>${esc(x.author.name)} · ${esc(islandText(x.author.island))}</span><span class="dstat num">${statHTML(x)}</span></span></button>`;
+}
+function renderShows(){
+  SH.load();
+  const grid = $("grid"); grid.className = "dgrid";
+  cycReset(); $("more").hidden = true;
+  let hello = true; try{ hello = !localStorage.getItem(KEY + ":showhello"); }catch(e){}
+  const intro = hello ? `<div class="plank" style="grid-column:1/-1; margin:0"><p>꿈번지, 섬 구역, 패션을 사진으로 자랑하는 곳이에요. 쓰인 아이템을 골라 두면 친구들이 바로 찾아볼 수 있어요. 보기는 누구나, 올리기·추천·댓글은 로그인하고 해요.</p><button class="x" type="button" id="show-hello-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button></div>` : "";
+  const c = shCat(), sort = c % 10, mine = c >= 10;
+  let L = SH.list; if(ui.liked) L = L.filter(x => SH.liked(x.id));
+  const kn = ui.fo === "all" ? "자랑" : KIND[ui.fo][0];
+  let body;
+  if(!SH.ready) body = `<div class="empty"><b>자랑 글을 불러오는 중이에요</b>잠시만 기다려 주세요.</div>`;
+  else if(SH.err && !SH.list.length) body = `<div class="empty"><b>자랑 글을 불러오지 못했어요</b>인터넷 연결을 확인하고 위쪽 새로 보기를 눌러 주세요.</div>`;
+  else if(mine && !AUTH.me) body = `<div class="empty"><b>로그인하면 내 글이 보여요</b>내가 올린 자랑 글을 여기서 모아 봐요.${signinBtns}</div>`;
+  else if(!L.length) body = ui.liked ? `<div class="empty"><b>추천한 ${kn} 글이 없어요</b>마음에 드는 글에서 추천을 눌러 보세요.</div>`
+    : `<div class="empty"><b>${mine ? `아직 올린 ${kn} 글이 없어요` : `아직 ${kn} 글이 없어요`}</b>위쪽 + 버튼을 눌러 첫 글을 올려 보세요.</div>`;
+  else body = L.map(showCardHTML).join("");
+  const bar = SH.ready ? `<div class="tr-bar"><span class="sh-sort" role="group" aria-label="순서">${["최신순", "추천순", "조회순"].map((t, i) => `<button type="button" data-sort="${i}" aria-pressed="${sort === i}">${t}</button>`).join("")}</span><button class="pill sm ${mine ? "leaf" : "ghost"}" type="button" id="sh-mine" aria-pressed="${mine}">${ico(mine ? "check" : "face")}내 글만</button><button class="pill ghost sm" type="button" id="sh-re">${ico("refresh")}새로 보기</button></div>` : "";
+  grid.innerHTML = intro + bar + body + (SH.more ? `<p class="sub" style="grid-column:1/-1; text-align:center">최근 60개까지 보여요. 찾기로 더 찾아보세요.</p>` : "");
+  const on = (sel, f) => grid.querySelectorAll(sel).forEach(b => b.addEventListener("click", f));
+  on("#show-hello-x", () => { try{ localStorage.setItem(KEY + ":showhello", "1"); }catch(e){} render(); });
+  on("#sh-re", e => { e.currentTarget.disabled = true; SH.load(true); });
+  on("#sh-mine", () => { ui.cat = sort + (mine ? 0 : 10); saveView(); render(); });
+  on("[data-sort]", e => { ui.cat = +e.currentTarget.dataset.sort + (mine ? 10 : 0); saveView(); render(); });
+  on("[data-signin]", e => openSignin(e.currentTarget.dataset.signin));
+  renderHead();
+}
+function renderShowHead(){
+  setPick("자랑", "", "", SH.ready ? `${fmt(SH.list.length)}개` : "");
+  setBadge(0); setTabs(null);
+}
+const SHOW_ERR = {
+  kind: "어떤 자랑인지 골라 주세요.", code: "꿈번지는 숫자 12자리예요. 게임의 꿈번지를 그대로 넣어 주세요.",
+  need_img: "구역과 패션은 사진을 한 장 이상 넣어 주세요.", no_store: "사진 저장소가 아직 준비되지 않았어요. 잠시 뒤에 다시 해 주세요.",
+  imgs: "사진을 올리지 못했어요. 다시 골라 주세요.", too_big: "사진이 너무 커요. 다른 사진을 골라 주세요.", not_img: "사진 파일만 올릴 수 있어요.",
+  items: "아이템은 40개까지 고를 수 있어요.", empty: "댓글 내용을 적어 주세요.", slow_down: "오늘은 너무 많이 올렸어요. 내일 다시 해 주세요.",
+  not_yours: "내가 올린 글만 고칠 수 있어요.", no_show: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.",
+};
+const showErr = e => SHOW_ERR[e && e.message] || authErr(e);
+const viewedShows = new Set();
+function openShow(id, x0){
+  let x = SH.find(id) || x0; if(!x) return;
+  let cmts = null, loadErr = false, liked = SH.liked(id), at = 0;
+  if(!viewedShows.has(id)){ viewedShows.add(id); AUTH.api("shows/" + encodeURIComponent(id) + "/view", {method: "POST", body: "{}"}).catch(() => {}); }
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="sh-t"></h3><p class="sub" id="sh-s"></p></div>${XBTN}</div><div class="bd-in" id="sh-body"></div>`, () => { stop(); if(SRV && ui.tab === "dream") render(); });
+  const body = s.el.querySelector("#sh-body"), me = () => AUTH.me;
+  const mine = () => !!me() && me().id === x.author.id;
+  const canDel = c => !!me() && (me().admin || me().id === c.author.id || mine());
+  function cmtsHTML(){
+    if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
+    if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
+    return cmts.map(c => `<div class="cmt"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === x.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+  }
+  function picHTML2(){
+    if(!x.imgs.length) return x.kind === "dream" ? "" : `<div class="dbig"><svg class="fi" style="width:44px;height:44px;opacity:.5" aria-hidden="true"><use href="#i-image"/></svg></div>`;
+    const im = x.imgs[Math.min(at, x.imgs.length - 1)], n = x.imgs.length;
+    return `<div class="sh-photo"><div class="dbig tall"><img id="sh-img" src="${esc(imgUrl(im.f))}" alt="${esc(showTitle(x))} 사진 ${at + 1}"${im.w && im.h ? ` width="${im.w}" height="${im.h}"` : ""}></div>
+      ${n > 1 ? `<div class="sh-nav"><button class="pill ghost sm" type="button" data-go="-1" aria-label="앞 사진">${ico("down")}<span>앞</span></button><span class="num">${at + 1} / ${n}</span><button class="pill ghost sm" type="button" data-go="1" aria-label="다음 사진"><span>다음</span>${ico("down")}</button></div>` : ""}</div>`;
+  }
+  function itemRow(y){
+    const it = BY_ID.get(y.id); if(!it) return "";
+    const nf = frameCount(it), c = Number.isInteger(y.c) && y.c < it.vs.length ? y.c : -1;
+    return `<button class="srow tr-row" type="button" data-oi="${it.id}" data-oc="${c}">${framePic(it, nf > 1 && c >= 0 && c < nf ? c : 0, 44)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc([CATS[it.lc][0], c >= 0 ? it.vs[c] : ""].filter(Boolean).join(" · "))}</span></span><span class="tr-go">자세히</span></button>`;
+  }
+  function draw(){
+    s.el.querySelector("#sh-t").textContent = showTitle(x);
+    s.el.querySelector("#sh-s").textContent = `${KIND[x.kind][0]} · ${x.author.name} · ${ago(x.created)}`;
+    const typed = body.querySelector("#shc-text"), keep = typed ? typed.value : "";
+    body.innerHTML = `
+      ${picHTML2()}
+      <div class="dstat num" id="sh-stat">${statHTML({...x, id: x.id})}</div>
+      <button class="likebar" type="button" id="sh-like" aria-pressed="${liked}"><span class="hb"><svg aria-hidden="true"><use href="#i-heart"/></svg></span><span>${liked ? "추천했어요" : me() ? "마음에 들면 추천해 주세요" : "로그인하면 추천할 수 있어요"}</span><span class="n num">${fmt(x.likes || 0)}</span></button>
+      ${x.kind === "dream" && x.code ? `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b><span>꿈에서 이 번호를 넣으면 놀러 갈 수 있어요</span></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>` : ""}
+      ${x.body ? `<div class="dtext">${esc(x.body)}</div>` : ""}
+      ${x.items.length ? `<div class="shd">${ico("box")}<b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div>` : ""}
+      <div class="who tr-auth"><span class="fr">${fruitPic(x.author.fruit)}</span><div class="wt"><b>${esc(x.author.name)}</b><span>${esc(islandText(x.author.island))} · ${ago(x.created)}에 올림${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div></div>
+      ${mine() ? `<div class="acts2"><button class="pill ghost" type="button" id="sh-edit">고치기</button><button class="pill danger" type="button" id="sh-del">지우기</button></div>`
+        : me() && me().admin ? `<div class="acts2"><button class="pill danger" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
+      <div id="sh-msg"></div>
+      <div class="shd tr-cmh">${ico("chat")}<b id="sh-cn">댓글 ${fmt(x.cmts || 0)}</b></div>
+      <div class="cmts" id="sh-cl">${cmtsHTML()}</div>
+      ${me() ? `<label class="fld"><span>댓글 달기<i id="shc-cnt">0/300</i></span><textarea id="shc-text" maxlength="300" placeholder="느낌을 남겨 주세요"></textarea></label>
+        <div id="shc-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="shc-send">댓글 달기</button></div>`
+        : `<p class="note">댓글과 추천은 로그인하고 할 수 있어요.</p>${signinBtns}`}`;
+    const t2 = body.querySelector("#shc-text"); if(t2 && keep){ t2.value = keep; body.querySelector("#shc-cnt").textContent = `${keep.length}/300`; }
+  }
+  function drawCmts(){ const cl = body.querySelector("#sh-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#sh-cn"); if(cn) cn.textContent = `댓글 ${fmt(x.cmts || 0)}`; const st = body.querySelector("#sh-stat"); if(st) st.innerHTML = statHTML(x); }
+  const stop = AUTH.sub(draw);
+  draw();
+  AUTH.api("shows/" + encodeURIComponent(id)).then(j => { x = j.show; cmts = j.comments; liked = j.liked; SH.setLiked(x.id, liked); SH.put(x); draw(); })
+    .catch(e => { if(e.message === "no_show"){ SH.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
+  const msg = sel => body.querySelector(sel);
+  s.el.addEventListener("input", e => { if(e.target.id === "shc-text") body.querySelector("#shc-cnt").textContent = `${e.target.value.length}/300`; });
+  s.el.addEventListener("click", async e => {
+    const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
+    if(t.dataset.signin) return openSignin(t.dataset.signin);
+    if(t.dataset.copy) return copyText(t.dataset.copy);
+    if(t.dataset.go){ at = (at + +t.dataset.go + x.imgs.length) % x.imgs.length; const im = x.imgs[at], el = body.querySelector("#sh-img"); el.src = imgUrl(im.f); el.alt = `${showTitle(x)} 사진 ${at + 1}`; body.querySelector(".sh-nav .num").textContent = `${at + 1} / ${x.imgs.length}`; return; }
+    if(t.dataset.oi){ const it = BY_ID.get(+t.dataset.oi); if(it){ sheetOver = true; openDetail(it, +t.dataset.oc >= 0 && frameCount(it) > 1 ? +t.dataset.oc : undefined); } return; }
+    if(t.id === "sh-like"){
+      if(!me()) return openSignin("in");
+      t.disabled = true;
+      try{ const j = await AUTH.api("shows/" + x.id + "/like", {method: "POST", body: JSON.stringify({on: !liked})}); liked = j.liked; x = {...x, likes: j.likes}; SH.setLiked(x.id, liked); SH.put(x); draw(); }
+      catch(err){ toast(showErr(err)); t.disabled = false; }
+      return;
+    }
+    if(t.id === "sh-edit"){ s.close(); return openShowForm(x); }
+    if(t.id === "sh-del"){ msg("#sh-msg").innerHTML = `<div class="confirm"><p>이 글을 지울까요? 사진, 추천, 댓글도 함께 지워져요.</p><div class="acts2"><button class="pill danger" type="button" id="sh-yes">네, 지울게요</button><button class="pill ghost" type="button" id="sh-no">그만두기</button></div></div>`; return; }
+    if(t.id === "sh-no"){ msg("#sh-msg").innerHTML = ""; return; }
+    if(t.id === "sh-yes"){ t.disabled = true;
+      try{ await AUTH.api("shows/" + x.id, {method: "DELETE"}); SH.drop(x.id); s.close(); toast("글을 지웠어요"); }
+      catch(err){ t.disabled = false; msg("#sh-msg").innerHTML = `<p class="err">${showErr(err)}</p>`; }
+      return; }
+    if(t.id === "shc-send"){
+      const ta = body.querySelector("#shc-text"), text = ta.value.trim(), out = msg("#shc-msg");
+      if(!text){ out.innerHTML = `<p class="err">${SHOW_ERR.empty}</p>`; return; }
+      return busyRun(t, out, async () => {
+        const j = await AUTH.api("shows/" + x.id + "/comments", {method: "POST", body: JSON.stringify({body: text})});
+        (cmts = cmts || []).push(j.comment); x = {...x, cmts: (x.cmts || 0) + 1}; SH.put(x);
+        ta.value = ""; body.querySelector("#shc-cnt").textContent = "0/300"; drawCmts(); toast("댓글을 달았어요");
+      }, showErr);
+    }
+    if(t.dataset.delc){
+      const c = (cmts || []).find(y => y.id === t.dataset.delc); if(!c) return;
+      if(!t.dataset.armed){ t.dataset.armed = "1"; t.textContent = "한 번 더 누르면 지워요"; return; }
+      t.disabled = true;
+      try{ await AUTH.api("scmts/" + c.id, {method: "DELETE"}); cmts = cmts.filter(y => y.id !== c.id); x = {...x, cmts: Math.max(0, (x.cmts || 0) - 1)}; SH.put(x); drawCmts(); toast("댓글을 지웠어요"); }
+      catch(err){ t.disabled = false; toast(showErr(err)); }
+    }
+  });
+}
+// Posting: photos are shrunk here (full ≤ about 180 KB, 16:9 list picture ≤ about 45 KB), sent one by one, then the post.
+const dataBlob = u => fetch(u).then(r => r.blob());
+async function upImg(dataUrl){
+  const blob = await dataBlob(dataUrl);
+  let r; try{ r = await fetch("/api/img", {method: "POST", body: blob, credentials: "same-origin", headers: {"X-DN": "1", "Content-Type": blob.type}}); }
+  catch(e){ throw Object.assign(new Error("network"), {status: 0}); }
+  let j = null; try{ j = await r.json(); }catch(e){}
+  if(!r.ok) throw Object.assign(new Error((j && j.error) || "http"), {status: r.status});
+  return j.key;
+}
+function openShowForm(x){
+  if(!AUTH.on) return;
+  if(!AUTH.me){ toast("자랑 글은 로그인하고 올릴 수 있어요"); openSignin("in"); return; }
+  const edit = !!x;
+  const st = {kind: edit ? x.kind : (ui.fo !== "all" && KIND[ui.fo] ? ui.fo : "area"), items: edit ? x.items.map(y => ({...y})) : [],
+    pics: edit ? x.imgs.map(im => ({...im, prev: imgUrl(im.t)})) : []};   // a new picture: {full, thumb, w, h, prev}
+  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "자랑 글 고치기" : "자랑 올리기"}</h3><p class="sub">사진은 이 기기에서 작게 줄여서 올려요</p></div>${XBTN}</div>
+    <div class="fld"><span>무엇을 자랑할까요?</span><div class="tr-seg" role="radiogroup" aria-label="자랑 종류">${Object.keys(KIND).map(k => `<button type="button" role="radio" class="sh-${k}" data-kd="${k}">${KIND[k][0]}</button>`).join("")}</div></div>
+    <div class="fld"><span><b class="tr-fh">사진</b><i id="sf-pn"></i></span><div class="sh-pics" id="sf-pics"></div>
+      <label class="pill sun sh-add" id="sf-addl"><input type="file" accept="image/*" multiple id="sf-file" hidden>${ico("image")}<span>사진 고르기</span></label><div id="sf-pmsg"></div></div>
+    <label class="fld" id="sf-codef"><span><b class="tr-fh">꿈번지</b><i>숫자 12자리</i></span><input id="sf-code" inputmode="numeric" maxlength="17" placeholder="DA-0000-0000-0000" value="${esc(edit ? x.code : "")}"></label>
+    <label class="fld"><span><b class="tr-fh">제목</b><i id="sf-tn">0/30</i></span><input id="sf-title" maxlength="30" placeholder="예) 벚꽃 광장, 오늘의 코디" value="${esc(edit ? x.title : "")}"></label>
+    <label class="fld"><span><b class="tr-fh">소개</b><i id="sf-bn">0/500</i></span><textarea id="sf-body" maxlength="500" placeholder="어떻게 꾸몄는지, 어디에 있는지 적어 주세요"></textarea></label>
+    <div class="fld"><span><b class="tr-fh">쓰인 아이템</b><i id="sf-in"></i></span><div class="res" id="sf-items"></div>
+      <div class="acts2"><button class="pill sun" type="button" id="sf-add">${ico("plus")}아이템 고르기</button></div></div>
+    <div id="sf-msg"></div>
+    <div class="acts2"><button class="pill leaf big" type="button" id="sf-ok">${edit ? "고친 대로 올리기" : "올리기"}</button></div>`, () => { st.pics.forEach(p => p.blobUrl && URL.revokeObjectURL(p.blobUrl)); if(SRV && ui.tab === "dream") render(); });
+  const q = sel => sh.el.querySelector(sel);
+  if(edit){ q("#sf-body").value = x.body || ""; }
+  const counts = () => { q("#sf-tn").textContent = `${q("#sf-title").value.length}/30`; q("#sf-bn").textContent = `${q("#sf-body").value.length}/500`; };
+  function drawKind(){
+    sh.el.querySelectorAll("[data-kd]").forEach(b => b.setAttribute("aria-checked", b.dataset.kd === st.kind));
+    q("#sf-codef").hidden = st.kind !== "dream";
+    q("#sf-pn").textContent = `${st.pics.length}/4 · ${st.kind === "dream" ? "없어도 돼요" : "한 장 이상"}`;
+  }
+  function drawPics(){
+    q("#sf-pics").innerHTML = st.pics.map((p, i) => `<div class="sh-pic"><img src="${esc(p.prev)}" alt="고른 사진 ${i + 1}"><div class="sh-pa">${i ? `<button type="button" data-pfirst="${i}">맨 앞으로</button>` : `<span class="on">대표 사진</span>`}<button class="sh-rm" type="button" data-prm="${i}">빼기</button></div></div>`).join("");
+    q("#sf-addl").hidden = st.pics.length >= 4; drawKind();
+  }
+  function rowEdit(y, i){
+    const it = BY_ID.get(y.id); if(!it) return "";
+    const nf = frameCount(it);
+    const colors = it.vs.length ? `<select data-c="${i}" aria-label="${esc(it.ko)} 색"><option value="">색 상관없음</option>${it.vs.map((v, j) => `<option value="${j}"${y.c === j ? " selected" : ""}>${esc(v)}</option>`).join("")}</select>` : "";
+    return `<div class="srow tr-frow">${framePic(it, nf > 1 && Number.isInteger(y.c) && y.c < nf ? y.c : 0, 44)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])}</span>${colors ? `<span class="tr-fo">${colors}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(it.ko)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
+  }
+  function drawItems(){ q("#sf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">게임 속 이름으로 찾아서 골라요. 안 골라도 돼요.</p>`; q("#sf-in").textContent = `${st.items.length}/40`; }
+  counts(); drawPics(); drawItems();
+  sh.el.addEventListener("input", e => {
+    if(e.target.id === "sf-code"){ const el = e.target, f = dreamCode(el.value); if(el.value !== f && (el.value.replace(/\D/g, "").length || !el.value.trim())) el.value = f; }
+    counts();
+  });
+  sh.el.addEventListener("change", e => { const t = e.target; if(t.dataset.c != null){ const y = st.items[+t.dataset.c]; if(t.value === "") delete y.c; else y.c = +t.value; drawItems(); } });
+  q("#sf-file").addEventListener("change", async e => {
+    const files = [...(e.target.files || [])].slice(0, 4 - st.pics.length); e.target.value = ""; if(!files.length) return;
+    const pm = q("#sf-pmsg"); pm.innerHTML = `<p class="sub">사진을 줄이는 중이에요…</p>`;
+    for(const file of files){
+      try{
+        const im = await loadImage(file);
+        const full = encodeImage(im, 1280, 240000, false), thumb = encodeImage(im, 640, 60000, true);
+        if(!full || !thumb) throw new Error("big");
+        st.pics.push({full, thumb, w: Math.min(1280, im.naturalWidth), h: Math.round(im.naturalHeight * Math.min(1280, im.naturalWidth) / im.naturalWidth), prev: thumb});
+      }catch(err){ pm.innerHTML = `<p class="err">이 사진은 열지 못했어요. 다른 사진을 골라 주세요.</p>`; drawPics(); return; }
+    }
+    pm.innerHTML = ""; q("#sf-msg").innerHTML = ""; drawPics();
+  });
+  sh.el.addEventListener("click", e => {
+    const t = e.target.closest("button"); if(!t) return;
+    if(t.dataset.kd){ st.kind = t.dataset.kd; q("#sf-msg").innerHTML = ""; drawKind(); return; }
+    if(t.dataset.prm != null){ st.pics.splice(+t.dataset.prm, 1); drawPics(); return; }
+    if(t.dataset.pfirst != null){ const [pk] = st.pics.splice(+t.dataset.pfirst, 1); st.pics.unshift(pk); drawPics(); return; }
+    if(t.dataset.rm != null){ st.items.splice(+t.dataset.rm, 1); drawItems(); return; }
+    if(t.id === "sf-add") return openTradePick(st.items, drawItems, {items: SHOW_ITEMS, max: 40});
+    if(t.id === "sf-ok") return busyRun(t, q("#sf-msg"), async () => {
+      const bad = m => { throw Object.assign(new Error(m), {status: 400}); };
+      const code = q("#sf-code").value.replace(/\D/g, "");
+      if(st.kind === "dream" && code.length !== 12) bad("code");
+      if(st.kind !== "dream" && !st.pics.length) bad("need_img");
+      const imgs = [];
+      for(let i = 0; i < st.pics.length; i++){
+        const p = st.pics[i];
+        if(p.f){ imgs.push({f: p.f, t: p.t, w: p.w, h: p.h}); continue; }
+        q("#sf-msg").innerHTML = `<p class="sub">사진 ${i + 1}/${st.pics.length} 올리는 중이에요…</p>`;
+        const f = await upImg(p.full), tk = await upImg(p.thumb);
+        Object.assign(p, {f, t: tk}); imgs.push({f, t: tk, w: p.w, h: p.h});
+      }
+      q("#sf-msg").innerHTML = "";
+      const j = await AUTH.api(edit ? "shows/" + x.id : "shows", {method: "POST", body: JSON.stringify({kind: st.kind, title: q("#sf-title").value, body: q("#sf-body").value, code, imgs, items: st.items})});
+      SH.put(j.show); sh.close();
+      toast(edit ? "고친 대로 올렸어요" : "자랑 글을 올렸어요");
+    }, showErr);
+  });
 }
 function syncLine(){
   const st = SYNC.state;
