@@ -6547,7 +6547,7 @@ function openPhoto(){
     if(!list.length){ res.innerHTML = `<p class="err">아이템 이름을 찾지 못했어요. 목록의 이름이 크게 보이게 찍었는지 확인해 주세요.</p>`; return; }
     const fresh = list.filter(r => !own.has(r.it.id)).length;
     res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${fresh < list.length ? ` (그중 ${fmt(list.length-fresh)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.</p>
-      <div class="res">${list.map(r => { const done = own.has(r.it.id); return `<label class="ri${done?" done":""}"><input type="checkbox" data-id="${r.it.id}" ${done?"disabled":""} ${!done && r.score>=0.8?"checked":""}>${picHTML(r.it)}<span class="tx"><b>${esc(r.it.ko)}</b><span>${esc(CATS[r.it.lc][0])} · 읽은 글자: ${esc(r.raw.trim().slice(0,30))}</span></span><span class="sc">${done ? "등록됨" : (r.score>=0.8 ? "확실" : "애매")}</span></label>`; }).join("")}</div>
+      <div class="res">${list.map(r => { const done = own.has(r.it.id); return `<label class="ri${done?" done":""}"><input type="checkbox" data-id="${r.it.id}" ${done?"disabled":""} ${!done && r.score>=0.8?"checked":""}>${picHTML(r.it)}<span class="tx"><b>${esc(r.it.ko)}</b><span>${esc(CATS[r.it.lc][0])} · 읽은 글자: ${esc(r.raw.replace(/\s+/g, " ").trim().slice(0,30))}</span></span><span class="sc">${done ? "등록됨" : (r.score>=0.8 ? "확실" : "애매")}</span></label>`; }).join("")}</div>
       <div class="acts2"><button class="pill leaf" type="button" id="ph-ok">선택한 아이템 등록</button></div>`;
     res.querySelector("#ph-ok").addEventListener("click", () => {
       let n=0; res.querySelectorAll("input[type=checkbox]:checked:not(:disabled)").forEach(x => { own.add(+x.dataset.id); n++; });
