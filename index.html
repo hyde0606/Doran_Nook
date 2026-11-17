@@ -705,6 +705,59 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .fm-c .ch b{grid-column:1; grid-row:1; min-width:0; overflow-wrap:anywhere} .fm-c .ch .tr-go{grid-column:2; grid-row:1; align-self:center} .fm-c .ch > span:not(.tr-go){grid-column:1 / -1; grid-row:2}
 @media (hover:hover){ .fm-c:hover{box-shadow:inset 0 0 0 2px var(--card-line)} }
 .cmt.hl{animation:cmthl 2.8s ease-out}
+/* ===== v41 ===== */
+.ib{position:relative}
+.ib[hidden]{display:none}
+.ib .bdg{position:absolute; top:-5px; right:-7px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:var(--berry); color:#fff; font-style:normal; font-size:12px; font-weight:700; line-height:20px; text-align:center; box-shadow:0 0 0 2px var(--cream); pointer-events:none}
+.ib .bdg[hidden]{display:none}
+/* with the bell there are three round buttons: on small phones they and the logo get a little smaller, and the picker
+   drops its magnifier, so the category name still fits */
+@media (max-width:340px){
+  html.nt-on .row1, html.nt-on .icons{gap:4px}
+  html.nt-on .ib, html.nt-on .logo{width:32px; height:32px}
+  html.nt-on .ib svg{width:18px; height:18px}
+  html.nt-on .pick{padding:0 10px 0 17px; gap:6px}
+  html.nt-on .pick .ps{display:none}
+  html.nt-on .pick b{font-size:15px}
+}
+/* 댓글 and 답글 */
+.cth{display:grid; gap:6px}
+.cmt p{overflow-wrap:anywhere}
+.reps{display:grid; gap:6px; margin-left:18px; padding-left:10px; border-left:3px solid var(--card-line)}
+.cmt.rep{background:var(--paper2)}
+.cmt.gone p{color:var(--muted); font-size:14px}
+.cto{font-family:var(--f-display); font-weight:400; color:var(--h-ink)}
+.crep{justify-self:start; display:inline-flex; align-items:center; gap:5px; min-height:34px; margin:4px 0 -4px -8px; padding:4px 10px; border:0; border-radius:999px; background:transparent; color:var(--muted); font:inherit; font-size:13.5px; cursor:pointer}
+.crep .fi{width:17px; height:17px}
+.crep[aria-expanded="true"]{background:var(--paper2); color:var(--ink)}
+@media (hover:hover){ .crep:hover{background:var(--paper2); color:var(--ink)} }
+.rbox{background:var(--chip); border-radius:14px; padding:10px 12px; box-shadow:inset 0 0 0 2px var(--sun)}
+.rbox .fld{margin:0}
+.rbox textarea{min-height:72px}
+/* 알림 */
+.nlist{display:grid; gap:8px}
+.nrow{position:relative; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px; align-items:start; width:100%; text-align:left; border:0; border-radius:14px; padding:12px 14px; background:var(--chip); color:var(--ink); font:inherit; cursor:pointer}
+.nrow .fr{margin-top:2px}
+.nrow .tx{display:grid; gap:3px; min-width:0}
+.nrow .tx > b{font-family:var(--f-display); font-weight:400; font-size:15.5px; line-height:1.35; overflow-wrap:anywhere; padding-right:14px}
+.nrow .tx > b em{font-style:normal; color:var(--h-ink)}
+.nrow .nw{font-size:13px; color:var(--muted); overflow-wrap:anywhere}
+.nrow .nb{font-size:14px; overflow-wrap:anywhere}
+.nrow .nt{font-size:12.5px; color:var(--muted)}
+.nrow.new{box-shadow:inset 0 0 0 2px var(--sun)}
+.nrow .dot{position:absolute; top:14px; right:14px; width:10px; height:10px; border-radius:50%; background:var(--berry)}
+@media (hover:hover){ .nrow:hover{box-shadow:inset 0 0 0 2px var(--card-line)} .nrow.new:hover{box-shadow:inset 0 0 0 2px var(--sun)} }
+/* 거래 글: 직접 적기, 맞교환 아이템 */
+.tr-frow .tr-own{width:100%; min-width:0; font:inherit; font-family:var(--f-display); font-size:15.5px; padding:6px 10px; border-radius:10px; border:2px solid var(--card-line); background:var(--paper); color:var(--ink)}
+.tr-swi{display:grid; gap:8px}
+.tr-swl{display:flex; flex-wrap:wrap; gap:6px}
+.tr-swl:empty{display:none}
+.tr-sw1{display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:4px 4px 4px 6px; border-radius:12px; background:var(--paper2)}
+.tr-sw1 b{font-family:var(--f-display); font-weight:400; font-size:14.5px; overflow-wrap:anywhere; min-width:0}
+.tr-sw1 button{flex:none; width:30px; height:30px; display:grid; place-items:center; border:0; border-radius:50%; background:transparent; color:var(--muted)}
+.tr-sw1 button svg{width:16px; height:16px}
+.tr-si{display:inline-flex; align-items:center; gap:4px; margin-right:8px; vertical-align:middle}
+.tr-si .pic{flex:none}
 @keyframes cmthl{0%, 50%{box-shadow:0 0 0 3px var(--sun)} 100%{box-shadow:0 0 0 3px transparent}}
 @media (prefers-reduced-motion: reduce){ .cmt.hl{animation:none; box-shadow:0 0 0 3px var(--sun)} }
 .cmt p{white-space:pre-wrap; font-size:14.5px; line-height:1.5; overflow-wrap:anywhere}
@@ -1353,6 +1406,8 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M18.5 14.6A7.6 7.6 0 0 1 9.4 5.5a7.6 7.6 0 1 0 9.1 9.1z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M17 3.2l.75 1.7 1.7.75-1.7.75-.75 1.7-.75-1.7-1.7-.75 1.7-.75z" fill="currentColor"/></symbol>
   <symbol id="i-cake" viewBox="0 0 24 24"><path d="M5 20h14v-7H5z M5 16c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0 M12 13V9.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M12 8c-.9-.9-.9-2 0-3.3.9 1.3.9 2.4 0 3.3z" fill="currentColor"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 17.5V6l10-2v11.5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/><circle cx="16.5" cy="15.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2.1"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.2H4.4z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M10 20.6a2.2 2.2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M5 19l1-4.6L15.6 4.9a2.1 2.1 0 0 1 3 3L9.1 17.5z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M13.6 6.9l3 3" fill="none" stroke="currentColor" stroke-width="2.1"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4.5 5.5h15v10.5h-8l-4.5 3.8V16h-2.5z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
   <symbol id="i-island" viewBox="0 0 24 24"><path d="M2.5 20c3.5-2.6 15.5-2.6 19 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M11.5 18.5c0-3.8.6-6.6 2.2-8.7" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M13.7 9.8c-1.2-2.6-4.4-3.4-6.7-1.9 M13.7 9.8c.9-2.7 4.2-3.6 6.5-2.2 M13.7 9.8c-2.9.1-5 2-5.6 4.2 M13.7 9.8c2.7.4 4.6 2.4 4.9 4.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -1385,6 +1440,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
       <span class="total num desk" id="p-total"></span>
       <button class="pick" id="btn-pick" type="button" aria-haspopup="dialog" aria-label="카테고리 고르기와 검색" title="카테고리 고르기와 검색"><svg class="ps" aria-hidden="true"><use href="#i-search"/></svg><span class="pt"><b id="pick-name">가구</b><span class="k" id="pick-kind">카탈로그</span><span class="c num" id="pick-cnt"></span></span><svg class="pd" aria-hidden="true"><use href="#i-down"/></svg></button>
       <div class="icons">
+        <button class="ib" id="btn-bell" type="button" aria-label="알림" title="알림" hidden><svg><use href="#i-bell"/></svg><i class="bdg num" hidden></i></button>
         <button class="ib" id="btn-photo" type="button" aria-label="사진으로 체크" title="사진으로 체크"><svg><use href="#i-cam"/></svg></button>
         <button class="ib" id="btn-backup" type="button" aria-label="기록 옮기기" title="기록 옮기기"><svg><use href="#i-box"/></svg></button>
       </div>
@@ -3550,24 +3606,26 @@ const tradable = it => CATS[it.lc][1] !== "more";   // 리액션, 건축물·리
 const TRADE_ITEMS = ITEMS.filter(tradable);
 const kSearch = (L, names, q) => { const m = KS.matcher(q), hits = []; L.forEach(x => { let best = -1; names(x).forEach(n => { if(!n) return; const r = m(KS.norm(n), "", {}); if(r >= 0 && (best < 0 || r < best)) best = r; }); if(best >= 0) hits.push([best, x, names(x)[0] || ""]); }); return hits.sort((a, b) => a[0] - b[0] || a[2].length - b[2].length).map(h => h[1]); };   // shorter names first when equally good
 const itemPic = (id, t) => { const it = BY_ID.get(id); return it ? framePic(it, 0, t) : ""; };
-function tEntry(x, t){
+function tEntry(x, t, form){   // form: shown while writing (a service then says how it works)
   if(x.k === "i"){
     const it = BY_ID.get(x.id); if(!it) return {pic:`<span class="pic ph" style="--t:${t}px">?</span>`, name:"없어진 아이템", sub:""};
     const nf = frameCount(it), c = Number.isInteger(x.c) && x.c >= 0 && x.c < it.vs.length ? x.c : -1;
     return {pic: framePic(it, nf > 1 && c >= 0 && c < nf ? c : 0, t), name: it.ko, sub: [c >= 0 ? it.vs[c] : it.vs.length ? "색 상관없음" : "", `${fmt(x.n || 1)}개`].filter(Boolean).join(" · "), it};
   }
   if(x.k === "v"){ const v = VBY.get(x.id); return v ? {pic: vilPic(v, t), name: v.ko, sub: "주민 이사", v} : {pic:`<span class="pic ph" style="--t:${t}px">?</span>`, name:"없어진 주민", sub:""}; }
+  if(x.k === "t") return {pic: `<span class="pic ph tr-svc" style="--t:${t}px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span>`, name: x.id, sub: form ? "직접 적은 것" : ""};
   const sv = SERVICE[x.id] || ["부탁", ""], pc = SERVICE_PIC[x.id];
-  return {pic: typeof pc === "number" ? itemPic(pc, t) : `<span class="pic ph tr-svc" style="--t:${t}px"><svg aria-hidden="true"><use href="#i-${pc || "chat"}"/></svg></span>`, name: sv[0], sub: sv[1]};
+  return {pic: typeof pc === "number" ? itemPic(pc, t) : `<span class="pic ph tr-svc" style="--t:${t}px"><svg aria-hidden="true"><use href="#i-${pc || "chat"}"/></svg></span>`, name: sv[0], sub: form ? sv[1] : ""};
 }
 const tradeTitle = p => { const e = tEntry(p.items[0] || {k:"s", id:"help"}, 10); return p.items.length > 1 ? `${e.name} 외 ${p.items.length - 1}개` : e.name; };
-const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, p.author.island, p.body, p.pay.swap];
+const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...((p.pay && p.pay.swapItems) || []).map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, p.author.island, p.body, p.pay.swap];
 const tradeLiked = p => p.items.some(x => x.k === "i" ? like.has(x.id) : x.k === "v" ? vlike.has(x.id) : false);
 function payParts(pay){
   const a = [];
   if(pay.mile) a.push(`<span class="tr-pp">${itemPic(5851, 26)}<span>마일 여행권 <b class="num">${fmt(pay.mile)}</b>장</span></span>`);
   if(pay.bells) a.push(`<span class="tr-pp">${itemPic(7731, 26)}<span><b class="num">${fmt(pay.bells)}</b>벨</span></span>`);
-  if(pay.swap) a.push(`<span class="tr-pp">${ico("refresh")}<span>맞교환: ${esc(pay.swap)}</span></span>`);
+  const si = (pay.swapItems || []).map(x => tEntry(x, 22));
+  if(pay.swap || si.length) a.push(`<span class="tr-pp">${ico("refresh")}<span>맞교환: ${si.map(e => `<span class="tr-si">${e.pic}${esc(e.name)}</span>`).join("")}${pay.swap ? esc(pay.swap) : ""}</span></span>`);
   if(pay.nego) a.push(`<span class="tr-pp">${ico("chat")}<span>다른 제안도 받아요</span></span>`);
   return a.join("");
 }
@@ -3582,7 +3640,8 @@ function tradeCardHTML(p){
   </button>`;
 }
 const TRADE_ERR = {
-  items: "거래할 아이템이나 주민을 하나 이상 골라 주세요.",
+  items: "거래할 아이템이나 주민을 하나 이상 고르거나, 목록에 없으면 직접 적어 주세요.",
+  no_parent: "답글을 달려던 댓글이 지워졌어요.",
   pay: "주고받을 것을 하나 이상 넣어 주세요. (마일 여행권, 벨, 맞교환, 다른 제안 중에서)",
   cash: "현금이나 상품권 거래로 보이는 말이 있어서 올릴 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.",
   type: "글 종류를 골라 주세요.", empty: "댓글 내용을 적어 주세요.",
@@ -3691,6 +3750,63 @@ function focusCmt(body, opt){
   if(!el){ toast("지워진 댓글이에요"); return; }
   requestAnimationFrame(() => { el.scrollIntoView({block: "center", behavior: "smooth"}); el.classList.add("hl"); });
 }
+// v41: 댓글 with 답글. Replies hang under their top comment (one level); a reply to a reply says whom it answers (@이름).
+// One reply box is open at a time, and what was typed in it survives redraws.
+function cmtBox(o){
+  let rep = null, text = "";
+  function threads(){
+    const L = o.list(), ids = new Set(L.map(c => c.id)), top = [], kids = new Map();
+    L.forEach(c => { if(c.parent){ if(!kids.has(c.parent)) kids.set(c.parent, []); kids.get(c.parent).push(c); } else top.push(c); });
+    kids.forEach((list, pid) => { if(!ids.has(pid)) top.push({id: pid, gone: true, created: list[0].created}); });   // its top comment was deleted
+    return top.sort((a, b) => a.created - b.created).map(c => ({c, reps: kids.get(c.id) || []}));
+  }
+  const cashMsg = w => `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요.</p>`;
+  function one(c, topAuthor){
+    if(c.gone) return `<div class="cmt gone" data-cid="${esc(c.id)}"><p>지워진 댓글이에요.</p></div>`;
+    const to = c.parent && c.to && c.to.id !== topAuthor ? `<b class="cto">@${esc(c.to.name || "친구")}</b> ` : "";
+    return `<div class="cmt${c.parent ? " rep" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
+  }
+  const box = () => `<div class="rbox"><label class="fld"><span>${esc(rep.name)} 님에게 답글<i id="rp-cnt">${text.length}/300</i></span><textarea id="rp-text" maxlength="300" placeholder="답글을 적어 주세요">${esc(text)}</textarea></label><div id="rp-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="rp-send">답글 달기</button><button class="pill ghost" type="button" id="rp-no">그만두기</button></div></div>`;
+  return {
+    html(){
+      if(rep && !o.me()) rep = null;
+      return threads().map(({c, reps}) => {
+        const ta = c.gone ? "" : c.author.id, open = !!rep && rep.top === c.id;
+        return `<div class="cth">${one(c, ta)}${reps.length || open ? `<div class="reps">${reps.map(r => one(r, ta)).join("")}${open ? box() : ""}</div>` : ""}</div>`;
+      }).join("");
+    },
+    owns: t => !!(t.dataset.rep || t.id === "rp-send" || t.id === "rp-no"),
+    async click(t){
+      const body = o.body();
+      if(t.dataset.rep){
+        const c = o.list().find(y => y.id === t.dataset.rep); if(!c) return;
+        if(rep && rep.id === c.id){ if(!text.trim()){ rep = null; o.redraw(); } else body.querySelector("#rp-text").focus(); return; }   // 답글 again folds an empty box
+        rep = {id: c.id, name: c.author.name, top: c.parent || c.id}; text = ""; o.redraw();
+        const ta = body.querySelector("#rp-text");
+        if(ta){ ta.focus({preventScroll: true}); ta.closest(".rbox").scrollIntoView({block: "nearest", behavior: REDUCED ? "auto" : "smooth"}); }
+        return;
+      }
+      if(t.id === "rp-no"){ rep = null; text = ""; o.redraw(); return; }
+      if(t.id === "rp-send"){
+        const out = body.querySelector("#rp-msg"), v = text.trim();
+        if(!v){ out.innerHTML = `<p class="err">답글 내용을 적어 주세요.</p>`; return; }
+        const w = o.cash ? cashWord(v) : ""; if(w){ out.innerHTML = cashMsg(w); return; }
+        return busyRun(t, out, async () => {
+          const j = await AUTH.api(o.url(), {method: "POST", body: JSON.stringify({body: v, reply: rep.id})});
+          rep = null; text = ""; o.added(j.comment);
+          toast("답글을 달았어요"); focusCmt(body, {cmt: j.comment.id});
+        }, e => { if(e && e.message === "no_parent"){ rep = null; text = ""; setTimeout(o.reload, 0); } return o.err(e); });
+      }
+    },
+    input(e){
+      if(e.target.id !== "rp-text") return false;
+      text = e.target.value;
+      const c = o.body().querySelector("#rp-cnt"); if(c) c.textContent = `${text.length}/300`;
+      if(o.cash){ const w = cashWord(text), m = o.body().querySelector("#rp-msg"); if(m) m.innerHTML = w ? cashMsg(w) : ""; }
+      return true;
+    },
+  };
+}
 function openTrade(id, p0, opt){
   let p = TS.find(id) || p0; if(!p) return;
   let cmts = null, loadErr = false;
@@ -3698,10 +3814,13 @@ function openTrade(id, p0, opt){
   const body = s.el.querySelector("#tr-body"), me = () => AUTH.me;
   const mine = () => !!me() && me().id === p.author.id;
   const canDel = c => !!me() && (me().admin || me().id === c.author.id || mine());
+  const cb = cmtBox({list: () => cmts || [], owner: () => p.author.id, canDel, me, body: () => body, url: () => "posts/" + p.id + "/comments", cash: true, err: tradeErr,
+    added(c){ (cmts = cmts || []).push(c); p = {...p, cmts: (p.cmts || 0) + 1}; TS.put(p); drawCmts(); }, redraw: () => drawCmts(),
+    reload: () => AUTH.api("posts/" + encodeURIComponent(p.id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); drawCmts(); }).catch(() => {})});
   function cmtsHTML(){
     if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
     if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
-    return cmts.map(c => `<div class="cmt" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === p.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+    return cb.html();
   }
   function head(){
     s.el.querySelector("#tr-t").textContent = tradeTitle(p);
@@ -3720,7 +3839,7 @@ function openTrade(id, p0, opt){
       ${p.body ? `<div class="dtext">${esc(p.body)}</div>` : ""}
       <div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div>
       ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">고치기</button><button class="pill danger" type="button" id="tr-del">지우기</button></div>`
-        : me() && me().admin ? `<div class="acts2"><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
+        : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="tr-edit">관리자로 고치기</button><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
       <div id="tr-msg"></div>
       <div class="shd tr-cmh">${ico("chat")}<b id="tr-cn">댓글 ${fmt(p.cmts || 0)}</b></div>
       <div class="cmts" id="tr-cl">${cmtsHTML()}</div>
@@ -3736,12 +3855,14 @@ function openTrade(id, p0, opt){
     .catch(e => { if(e.message === "no_post"){ TS.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
   s.el.addEventListener("input", e => {
+    if(cb.input(e)) return;
     if(e.target.id !== "trc-text") return;
     body.querySelector("#trc-cnt").textContent = `${e.target.value.length}/300`;
     const w = cashWord(e.target.value); msg("#trc-msg").innerHTML = w ? `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요.</p>` : "";
   });
   s.el.addEventListener("click", async e => {
     const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
+    if(cb.owns(t)) return cb.click(t);
     if(t.dataset.signin) return openSignin(t.dataset.signin);
     if(t.dataset.ti){ const [k, xid, c] = t.dataset.ti.split(":"); sheetOver = true;
       if(k === "i"){ const it = BY_ID.get(+xid); if(it) openDetail(it, c !== "" && frameCount(it) > 1 ? +c : undefined); }
@@ -3788,7 +3909,9 @@ function openTradeForm(p, preset){
   const st = edit ? {type: p.type, items: p.items.map(x => ({...x}))}
     : {type: (preset && preset.type) || (["want", "sell", "free"].includes(ui.fo) && ui.tab === "trade" ? ui.fo : "want"), items: preset && preset.items ? preset.items.map(x => ({...x})) : []};
   const pay = edit ? p.pay || {} : {};
-  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "거래 글 고치기" : "거래 글 쓰기"}</h3><p class="sub">게임 속 벨, 마일 여행권, 아이템으로만 거래해요</p></div>${XBTN}</div>
+  st.swap = edit ? (pay.swapItems || []).map(x => ({...x})) : [];
+  const asAdmin = edit && AUTH.me.id !== p.author.id;
+  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "거래 글 고치기" : "거래 글 쓰기"}</h3><p class="sub">${asAdmin ? `${esc(p.author.name)} 님의 글을 관리자로 고쳐요` : "게임 속 벨, 마일 여행권, 아이템으로만 거래해요"}</p></div>${XBTN}</div>
     <div class="fld"><span>어떤 글인가요?</span><div class="tr-seg" role="radiogroup" aria-label="글 종류">${["want", "sell", "free"].map(t => `<button type="button" role="radio" class="tr-${t}" data-ty="${t}">${TRADE_T[t][0]}</button>`).join("")}</div></div>
     <div class="fld"><span><b class="tr-fh" id="tf-ih"></b><i id="tf-in"></i></span><div class="res" id="tf-items"></div>
       <div class="acts2"><button class="pill sun" type="button" id="tf-add">${ico("plus")}아이템·주민 고르기</button></div></div>
@@ -3796,6 +3919,7 @@ function openTradeForm(p, preset){
       <label class="tr-payrow">${itemPic(5851, 34)}<span class="tr-lb">마일 여행권</span><input id="tf-mile" type="number" inputmode="numeric" min="1" max="999" placeholder="0" value="${pay.mile || ""}"><span class="tr-u">장</span></label>
       <label class="tr-payrow">${itemPic(7731, 34)}<span class="tr-lb">벨</span><input id="tf-bells" type="number" inputmode="numeric" min="1" max="999999999" placeholder="0" value="${pay.bells || ""}"><span class="tr-u">벨</span></label>
       <label class="tr-payrow tr-swp">${ico("refresh")}<span class="tr-lb">맞교환</span><input id="tf-swap" maxlength="100" placeholder="예) 체리 10개" value="${esc(pay.swap || "")}"></label>
+      <div class="tr-swi"><div class="tr-swl" id="tf-swl"></div><button class="pill ghost" type="button" id="tf-swadd">${ico("plus")}맞교환할 아이템 고르기</button></div>
       <label class="toggle"><input type="checkbox" id="tf-nego"${pay.nego ? " checked" : ""}>다른 제안도 받아요</label>
     </div>
     <label class="fld"><span><b class="tr-fh">하고 싶은 말</b><i id="tf-cnt">0/500</i></span><textarea id="tf-body" maxlength="500" placeholder="언제 비행장을 여는지, 어떻게 주고받을지 적어 주세요"></textarea></label>
@@ -3805,14 +3929,17 @@ function openTradeForm(p, preset){
   const q = sel => sh.el.querySelector(sel);
   if(edit){ q("#tf-body").value = p.body || ""; q("#tf-cnt").textContent = `${(p.body || "").length}/500`; }
   function rowEdit(x, i){
-    const e = tEntry(x, 44), it = e.it;
+    const e = tEntry(x, 44, true), it = e.it;
     const colors = it && it.vs.length ? `<select data-c="${i}" aria-label="${esc(e.name)} 색"><option value="">색 상관없음</option>${it.vs.map((v, j) => `<option value="${j}"${x.c === j ? " selected" : ""}>${esc(v)}</option>`).join("")}</select>` : "";
     const qty = x.k === "i" ? `<span class="tr-qty"><button class="tr-qb" type="button" data-q="${i}" data-d="-1" aria-label="하나 줄이기"><svg><use href="#i-minus"/></svg></button><input class="num" type="number" inputmode="numeric" min="1" max="999" value="${x.n || 1}" data-n="${i}" aria-label="${esc(e.name)} 개수"><button class="tr-qb" type="button" data-q="${i}" data-d="1" aria-label="하나 늘리기"><svg><use href="#i-plus"/></svg></button><span>개</span></span>` : "";
-    return `<div class="srow tr-frow">${e.pic}<span class="tx"><b>${esc(e.name)}</b>${x.k === "i" ? "" : `<span>${esc(e.sub)}</span>`}${colors || qty ? `<span class="tr-fo">${colors}${qty}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(e.name)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
+    return `<div class="srow tr-frow">${e.pic}<span class="tx">${x.k === "t" ? `<input class="tr-own" data-tt="${i}" maxlength="30" value="${esc(x.id)}" aria-label="직접 적은 것" placeholder="이름을 적어 주세요">` : `<b>${esc(e.name)}</b>`}${x.k === "i" ? "" : `<span>${esc(e.sub)}</span>`}${colors || qty ? `<span class="tr-fo">${colors}${qty}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(e.name)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
   }
   function drawItems(){
-    q("#tf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">아직 고른 게 없어요. 아래 버튼으로 골라 주세요.</p>`;
+    q("#tf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">아직 고른 게 없어요. 아래 버튼으로 고르고, 목록에 없으면 거기서 직접 적어 주세요.</p>`;
     q("#tf-in").textContent = `${st.items.length}/20`;
+  }
+  function drawSwap(){
+    q("#tf-swl").innerHTML = st.swap.map((x, i) => { const e = tEntry(x, 26); return `<span class="tr-sw1">${e.pic}<b>${esc(e.name)}</b><button type="button" data-swrm="${i}" aria-label="${esc(e.name)} 빼기"><svg><use href="#i-x"/></svg></button></span>`; }).join("");
   }
   function drawType(){
     sh.el.querySelectorAll("[data-ty]").forEach(b => b.setAttribute("aria-checked", b.dataset.ty === st.type));
@@ -3821,9 +3948,10 @@ function openTradeForm(p, preset){
     q("#tf-pay").hidden = st.type === "free";
   }
   const check = () => { const w = cashWord(q("#tf-body").value, q("#tf-swap").value); q("#tf-msg").innerHTML = w ? `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.</p>` : ""; return !w; };
-  drawType(); drawItems();
+  drawType(); drawItems(); drawSwap();
   sh.el.addEventListener("input", e => {
     const t = e.target;
+    if(t.dataset.tt != null){ const x = st.items[+t.dataset.tt]; if(x) x.id = t.value.slice(0, 30); return; }
     if(t.id === "tf-body") q("#tf-cnt").textContent = `${t.value.length}/500`;
     if(t.id === "tf-body" || t.id === "tf-swap") check();
     if(t.dataset.n != null){ const n = Math.floor(+t.value); if(n >= 1) st.items[+t.dataset.n].n = Math.min(999, n); }
@@ -3838,8 +3966,11 @@ function openTradeForm(p, preset){
     if(t.dataset.ty){ st.type = t.dataset.ty; drawType(); return; }
     if(t.dataset.rm != null){ st.items.splice(+t.dataset.rm, 1); drawItems(); return; }
     if(t.dataset.q != null){ const x = st.items[+t.dataset.q]; x.n = Math.min(999, Math.max(1, (x.n || 1) + +t.dataset.d)); const inp = q(`[data-n="${t.dataset.q}"]`); if(inp) inp.value = x.n; return; }
-    if(t.id === "tf-add") return openTradePick(st.items, drawItems);
+    if(t.id === "tf-add") return openTradePick(st.items, drawItems, {own: true});
+    if(t.id === "tf-swadd") return openTradePick(st.swap, drawSwap, {items: TRADE_ITEMS, max: 10, title: "맞교환할 아이템 고르기"});
+    if(t.dataset.swrm != null){ st.swap.splice(+t.dataset.swrm, 1); drawSwap(); return; }
     if(t.id === "tf-ok") return busyRun(t, q("#tf-msg"), async () => {
+      st.items = st.items.map(x => x.k === "t" ? {...x, id: x.id.trim()} : x).filter(x => x.k !== "t" || x.id); drawItems();
       const out = {type: st.type, items: st.items, body: q("#tf-body").value, pay: {}};
       const bad = m => { throw Object.assign(new Error(m), {status: 400}); };
       if(!st.items.length) bad("items");
@@ -3848,9 +3979,10 @@ function openTradeForm(p, preset){
         if(mi){ const n = Math.floor(+mi); if(!(n >= 1 && n <= 999)) bad("range"); out.pay.mile = n; }
         if(be){ const n = Math.floor(+be); if(!(n >= 1 && n <= 999999999)) bad("range"); out.pay.bells = n; }
         if(sw) out.pay.swap = sw; if(q("#tf-nego").checked) out.pay.nego = true;
+        if(st.swap.length) out.pay.swapItems = st.swap.map(x => Number.isInteger(x.c) ? {k: "i", id: x.id, c: x.c} : {k: "i", id: x.id});
         if(!Object.keys(out.pay).length) bad("pay");
       }
-      if(cashWord(out.body, out.pay.swap)) bad("cash");
+      if(cashWord(out.body, out.pay.swap, ...st.items.filter(x => x.k === "t").map(x => x.id))) bad("cash");
       const j = await AUTH.api(edit ? "posts/" + p.id : "posts", {method: "POST", body: JSON.stringify(out)});
       TS.put(j.post); sh.close();
       toast(edit ? "고친 대로 올렸어요" : ui.tab === "trade" ? "글을 올렸어요" : "글을 올렸어요. 거래 탭에서 볼 수 있어요");
@@ -3860,7 +3992,8 @@ function openTradeForm(p, preset){
 function openTradePick(chosen, done, opt){
   const only = !!(opt && opt.items), POOL = (opt && opt.items) || TRADE_ITEMS, inPool = new Set(POOL), MAX = (opt && opt.max) || 20;
   sheetOver = true;
-  const s = openSheet(`<div class="hd"><div><h3>${only ? "아이템 고르기" : "아이템·주민 고르기"}</h3><p class="sub" id="tp-sub"></p></div>${XBTN}</div>
+  const own = !!(opt && opt.own);
+  const s = openSheet(`<div class="hd"><div><h3>${(opt && opt.title) || (only ? "아이템 고르기" : "아이템·주민 고르기")}</h3><p class="sub" id="tp-sub"></p></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="tp-q" placeholder="${only ? "아이템 이름" : "아이템이나 주민 이름"} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="bd-in" id="tp-res"></div>`, () => done());
   const inp = s.el.querySelector("#tp-q"), out = s.el.querySelector("#tp-res");
@@ -3868,7 +4001,7 @@ function openTradePick(chosen, done, opt){
   const ck = `<span class="ck"><svg><use href="#i-check"/></svg></span>`;
   const irow = it => `<button class="srow" type="button" data-pk="i:${it.id}" aria-pressed="${has("i", it.id) >= 0}">${framePic(it, 0, 42)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])}${it.vs.length ? ` · 색 ${it.vs.length}가지` : ""}</span></span>${ck}</button>`;
   const vrow = v => `<button class="srow" type="button" data-pk="v:${v.f}" aria-pressed="${has("v", v.f) >= 0}">${vilPic(v, 42)}<span class="tx"><b>${esc(v.ko)}</b><span>주민 이사</span></span>${ck}</button>`;
-  const srow = k => { const e = tEntry({k:"s", id:k}, 42); return `<button class="srow" type="button" data-pk="s:${k}" aria-pressed="${has("s", k) >= 0}">${e.pic}<span class="tx"><b>${esc(e.name)}</b><span>${esc(e.sub)}</span></span>${ck}</button>`; };
+  const srow = k => { const e = tEntry({k:"s", id:k}, 42, true); return `<button class="srow" type="button" data-pk="s:${k}" aria-pressed="${has("s", k) >= 0}">${e.pic}<span class="tx"><b>${esc(e.name)}</b><span>${esc(e.sub)}</span></span>${ck}</button>`; };
   const sec = (title, rows) => rows.length ? `<div class="shd">${title}</div><div class="res">${rows.join("")}</div>` : "";
   function sub(){ s.el.querySelector("#tp-sub").textContent = chosen.length ? `${chosen.length}개 골랐어요 · 다 고르면 닫아 주세요` : "누르면 담기고, 한 번 더 누르면 빠져요"; }
   function paint(){
@@ -3876,16 +4009,27 @@ function openTradePick(chosen, done, opt){
     if(!qv){
       const li = [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && inPool.has(it)).slice(0, 60), lv = only ? [] : VIL.filter(v => vlike.has(v.f)).slice(0, 30);
       const picked = only ? chosen.map(x => BY_ID.get(x.id)).filter(Boolean) : [];
-      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + (only ? sec(`${ico("check")}<b>고른 아이템</b>`, picked.map(irow)) : sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).map(srow)))
+      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + (only ? sec(`${ico("check")}<b>고른 아이템</b>`, picked.map(irow)) : sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).filter(k => k !== "help").map(srow)))
+        + (own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-ownhint="1"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>목록에 없으면 직접 적어요</b><span>위 검색창에 이름을 적으면 '직접 적어 넣기'가 나와요</span></span></button>`]) : "")
         + sec(`${ico("heart")}<b>좋아요한 아이템</b>`, li.map(irow)) + sec(`${ico("heart")}<b>좋아하는 주민</b>`, lv.map(vrow));
       return;
     }
     const iv = kSearch(POOL, it => [it.ko, it.en], qv), vv = only ? [] : kSearch(VIL, v => [v.ko, v.en, v.ja], qv), LIM = 60;
-    out.innerHTML = (iv.length || vv.length) ? sec(`${ico("face")}<b>주민</b>`, vv.slice(0, 20).map(vrow)) + sec(`${ico("box")}<b>아이템</b>`, iv.slice(0, LIM).map(irow))
-      + (iv.length > LIM ? `<p class="sub">${fmt(iv.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`;
+    const ownRow = own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-own="1" aria-pressed="${has("t", qv.slice(0, 30)) >= 0}"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>"${esc(qv.slice(0, 30))}" 직접 적어 넣기</b><span>목록에서 못 찾았을 때만 써 주세요</span></span>${ck}</button>`]) : "";
+    out.innerHTML = ((iv.length || vv.length) ? sec(`${ico("face")}<b>주민</b>`, vv.slice(0, 20).map(vrow)) + sec(`${ico("box")}<b>아이템</b>`, iv.slice(0, LIM).map(irow))
+      + (iv.length > LIM ? `<p class="sub">${fmt(iv.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`) + ownRow;
   }
   let tm = 0; inp.addEventListener("input", () => { clearTimeout(tm); tm = setTimeout(paint, 140); });
   s.el.addEventListener("click", e => {
+    if(e.target.closest("[data-ownhint]")){ inp.focus(); return; }
+    const ob = e.target.closest("[data-own]");
+    if(ob){
+      const name = inp.value.trim().slice(0, 30), i = has("t", name); if(!name) return;
+      if(i >= 0){ chosen.splice(i, 1); ob.setAttribute("aria-pressed", "false"); }
+      else { if(chosen.length >= MAX){ toast(`한 글에는 ${MAX}개까지 넣을 수 있어요`); return; } chosen.push({k: "t", id: name}); ob.setAttribute("aria-pressed", "true"); }
+      const under = s.ov.previousElementSibling; if(under && under._keep) under._keep();
+      sub(); return;
+    }
     const b = e.target.closest("[data-pk]"); if(!b) return;
     const [k, id] = b.dataset.pk.split(":"), i = has(k, id);
     if(i >= 0){ chosen.splice(i, 1); b.setAttribute("aria-pressed", "false"); }
@@ -3979,7 +4123,7 @@ const SHOW_ERR = {
   need_img: "구역과 패션은 사진을 한 장 이상 넣어 주세요.", no_store: "사진 저장소가 아직 준비되지 않았어요. 잠시 뒤에 다시 해 주세요.",
   imgs: "사진을 올리지 못했어요. 다시 골라 주세요.", too_big: "사진이 너무 커요. 다른 사진을 골라 주세요.", not_img: "사진 파일만 올릴 수 있어요.",
   items: "아이템은 40개까지 고를 수 있어요.", empty: "댓글 내용을 적어 주세요.", slow_down: "오늘은 너무 많이 올렸어요. 내일 다시 해 주세요.",
-  not_yours: "내가 올린 글만 고칠 수 있어요.", no_show: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.",
+  not_yours: "내가 올린 글만 고칠 수 있어요.", no_show: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.", no_parent: "답글을 달려던 댓글이 지워졌어요.",
 };
 const showErr = e => SHOW_ERR[e && e.message] || authErr(e);
 const viewedShows = new Set();
@@ -3991,10 +4135,13 @@ function openShow(id, x0, opt){
   const body = s.el.querySelector("#sh-body"), me = () => AUTH.me;
   const mine = () => !!me() && me().id === x.author.id;
   const canDel = c => !!me() && (me().admin || me().id === c.author.id || mine());
+  const cb = cmtBox({list: () => cmts || [], owner: () => x.author.id, canDel, me, body: () => body, url: () => "shows/" + x.id + "/comments", cash: false, err: showErr,
+    added(c){ (cmts = cmts || []).push(c); x = {...x, cmts: (x.cmts || 0) + 1}; SH.put(x); drawCmts(); }, redraw: () => drawCmts(),
+    reload: () => AUTH.api("shows/" + encodeURIComponent(x.id)).then(j => { x = j.show; cmts = j.comments; SH.put(x); drawCmts(); }).catch(() => {})});
   function cmtsHTML(){
     if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
     if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
-    return cmts.map(c => `<div class="cmt" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === x.author.id ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${esc(c.body)}</p></div>`).join("");
+    return cb.html();
   }
   function picHTML2(){
     if(!x.imgs.length) return x.kind === "dream" ? "" : `<div class="dbig"><svg class="fi" style="width:44px;height:44px;opacity:.5" aria-hidden="true"><use href="#i-image"/></svg></div>`;
@@ -4020,7 +4167,7 @@ function openShow(id, x0, opt){
       ${x.items.length ? `<div class="shd">${ico("box")}<b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div>` : ""}
       <div class="who tr-auth"><span class="fr">${fruitPic(x.author.fruit)}</span><div class="wt"><b>${esc(x.author.name)}</b><span>${esc(islandText(x.author.island))} · ${ago(x.created)}에 올림${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div></div>
       ${mine() ? `<div class="acts2"><button class="pill ghost" type="button" id="sh-edit">고치기</button><button class="pill danger" type="button" id="sh-del">지우기</button></div>`
-        : me() && me().admin ? `<div class="acts2"><button class="pill danger" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
+        : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="sh-edit">관리자로 고치기</button><button class="pill danger" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
       <div id="sh-msg"></div>
       <div class="shd tr-cmh">${ico("chat")}<b id="sh-cn">댓글 ${fmt(x.cmts || 0)}</b></div>
       <div class="cmts" id="sh-cl">${cmtsHTML()}</div>
@@ -4035,9 +4182,10 @@ function openShow(id, x0, opt){
   AUTH.api("shows/" + encodeURIComponent(id)).then(j => { x = j.show; cmts = j.comments; liked = j.liked; SH.setLiked(x.id, liked); SH.put(x); draw(); focusCmt(body, opt); })
     .catch(e => { if(e.message === "no_show"){ SH.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
-  s.el.addEventListener("input", e => { if(e.target.id === "shc-text") body.querySelector("#shc-cnt").textContent = `${e.target.value.length}/300`; });
+  s.el.addEventListener("input", e => { if(cb.input(e)) return; if(e.target.id === "shc-text") body.querySelector("#shc-cnt").textContent = `${e.target.value.length}/300`; });
   s.el.addEventListener("click", async e => {
     const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
+    if(cb.owns(t)) return cb.click(t);
     if(t.dataset.signin) return openSignin(t.dataset.signin);
     if(t.dataset.copy) return copyText(t.dataset.copy);
     if(t.dataset.go){ at = (at + +t.dataset.go + x.imgs.length) % x.imgs.length; const im = x.imgs[at], el = body.querySelector("#sh-img"); el.src = imgUrl(im.f); el.alt = `${showTitle(x)} 사진 ${at + 1}`; body.querySelector(".sh-nav .num").textContent = `${at + 1} / ${x.imgs.length}`; return; }
@@ -4074,6 +4222,54 @@ function openShow(id, x0, opt){
     }
   });
 }
+// v41: 알림 — comments on my posts and replies to my comments. The bell shows how many are new; the page asks the server
+// when it opens, when it comes back on screen, and every minute while it is on screen. Opening the list marks them read.
+const NT_TEXT = {reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요"};
+const NT = (() => {
+  const btn = $("btn-bell"), bdg = btn.querySelector(".bdg"), base = document.title;
+  let unread = 0;
+  function show(n){
+    unread = n; const t = n > 99 ? "99+" : String(n);
+    bdg.hidden = !n; bdg.textContent = t;
+    btn.setAttribute("aria-label", n ? `알림 ${t}개` : "알림"); btn.title = n ? `새 알림 ${t}개` : "알림";
+    document.title = (n ? `(${t}) ` : "") + base;
+    try{ if(navigator.setAppBadge){ if(n) navigator.setAppBadge(n); else navigator.clearAppBadge(); } }catch(e){}
+  }
+  async function poll(){
+    if(!AUTH.on || !AUTH.me){ show(0); return; }
+    try{ const j = await AUTH.api("notifs?count=1"); show(j.unread || 0); }catch(e){}
+  }
+  AUTH.sub(me => { btn.hidden = !me; document.documentElement.classList.toggle("nt-on", !!me); poll(); });
+  setInterval(() => { if(document.visibilityState === "visible") poll(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") poll(); });
+  btn.addEventListener("click", () => openNotifs());
+  return {poll, show, get unread(){ return unread; }};
+})();
+function openNotifs(){
+  if(!AUTH.me){ openSignin("in"); return; }
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>알림</h3><p class="sub">내 글에 달린 댓글과 내 댓글에 달린 답글이에요</p></div>${XBTN}</div><div class="bd-in" id="nt-body"><p class="sub">알림을 불러오는 중이에요…</p></div>`);
+  const body = s.el.querySelector("#nt-body");
+  let list = [];
+  const where = n => n.post ? (n.on === "trade" ? `거래 · ${tradeTitle(n.post)}` : `자랑 · ${showTitle(n.post)}`) : "지워진 글";
+  const row = (n, i) => `<button class="nrow${n.seen ? "" : " new"}" type="button" data-ni="${i}"><span class="fr">${fruitPic(n.actor.fruit)}</span><span class="tx"><b><em>${esc(n.actor.name || "친구")}</em> 님이 ${NT_TEXT[n.kind] || "댓글을 달았어요"}</b><span class="nw">${esc(where(n))}</span><span class="nb">“${esc(n.body)}”</span><span class="nt">${ago(n.created)}</span></span>${n.seen ? "" : `<i class="dot" title="새 알림"></i>`}</button>`;
+  AUTH.api("notifs").then(j => {
+    list = j.notifs;
+    body.innerHTML = list.length ? `<div class="nlist">${list.map(row).join("")}</div><p class="note">알림은 60일 동안 남아요.</p>`
+      : `<div class="empty"><b>아직 알림이 없어요</b>내 글에 댓글이 달리거나 내 댓글에 답글이 달리면 여기에 모여요.</div>`;
+    NT.show(0);
+    if(list.some(n => !n.seen)) AUTH.api("notifs/read", {method: "POST", body: "{}"}).catch(() => {});
+  }).catch(e => { body.innerHTML = `<p class="sub">알림을 불러오지 못했어요. ${esc(authErr(e))}</p>`; });
+  body.addEventListener("click", async e => {
+    const b = e.target.closest("[data-ni]"); if(!b || b.disabled) return;
+    const n = list[+b.dataset.ni]; if(!n) return;
+    b.disabled = true;
+    try{
+      if(n.on === "trade"){ const r = await AUTH.api("posts/" + encodeURIComponent(n.ref)); sheetOver = true; openTrade(r.post.id, r.post, {cmt: n.cmt}); }
+      else { const r = await AUTH.api("shows/" + encodeURIComponent(n.ref)); sheetOver = true; openShow(r.show.id, r.show, {cmt: n.cmt}); }
+    }catch(err){ toast(err.message === "no_post" || err.message === "no_show" ? "지워진 글이에요" : authErr(err)); }
+    b.disabled = false;
+  });
+}
 // Posting: photos are shrunk here (full ≤ about 180 KB, 16:9 list picture ≤ about 45 KB), sent one by one, then the post.
 const dataBlob = u => fetch(u).then(r => r.blob());
 async function upImg(dataUrl){
@@ -4090,7 +4286,7 @@ function openShowForm(x){
   const edit = !!x;
   const st = {kind: edit ? x.kind : (ui.fo !== "all" && KIND[ui.fo] ? ui.fo : "area"), items: edit ? x.items.map(y => ({...y})) : [],
     pics: edit ? x.imgs.map(im => ({...im, prev: imgUrl(im.t)})) : []};   // a new picture: {full, thumb, w, h, prev}
-  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "자랑 글 고치기" : "자랑 올리기"}</h3><p class="sub">사진은 이 기기에서 작게 줄여서 올려요</p></div>${XBTN}</div>
+  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "자랑 글 고치기" : "자랑 올리기"}</h3><p class="sub">${edit && AUTH.me.id !== x.author.id ? `${esc(x.author.name)} 님의 글을 관리자로 고쳐요` : "사진은 이 기기에서 작게 줄여서 올려요"}</p></div>${XBTN}</div>
     <div class="fld"><span>무엇을 자랑할까요?</span><div class="tr-seg" role="radiogroup" aria-label="자랑 종류">${Object.keys(KIND).map(k => `<button type="button" role="radio" class="sh-${k}" data-kd="${k}">${KIND[k][0]}</button>`).join("")}</div></div>
     <div class="fld"><span><b class="tr-fh">사진</b><i id="sf-pn"></i></span><div class="sh-pics" id="sf-pics"></div>
       <label class="pill sun sh-add" id="sf-addl"><input type="file" accept="image/*" multiple id="sf-file" hidden>${ico("image")}<span>사진 고르기</span></label><div id="sf-pmsg"></div></div>

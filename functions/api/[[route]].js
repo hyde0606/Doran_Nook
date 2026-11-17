@@ -3,6 +3,7 @@
 // Needs one D1 database bound to this Pages project as DB. Tables are made on the first request.
 // Photos need one R2 bucket bound as IMG; without it 자랑 still works for 꿈번지 without photos.
 // No e-mail and no outside sign-in: a forgotten password is reset by the admin (the first account made).
+// v41: replies to comments (one level deep) and 알림 for a comment on my post or a reply to my comment.
 
 const DAY = 86400000;
 const SESSION_DAYS = 90;
@@ -41,12 +42,23 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS show_likes_user ON show_likes(user_id)`,
   `CREATE TABLE IF NOT EXISTS show_cmts (id TEXT PRIMARY KEY, show_id TEXT NOT NULL, user_id TEXT NOT NULL, body TEXT NOT NULL, created INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS show_cmts_show ON show_cmts(show_id, created)`,
+  `CREATE TABLE IF NOT EXISTS notifs (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, on_t TEXT NOT NULL, ref TEXT NOT NULL, cmt TEXT NOT NULL, actor TEXT NOT NULL, body TEXT NOT NULL DEFAULT '', created INTEGER NOT NULL, seen INTEGER NOT NULL DEFAULT 0)`,
+  `CREATE INDEX IF NOT EXISTS notifs_user ON notifs(user_id, created)`,
   `CREATE TABLE IF NOT EXISTS visits (user_id TEXT NOT NULL, day TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 1, dev TEXT NOT NULL DEFAULT '', PRIMARY KEY (user_id, day))`,
 ];
 let schemaReady = null;
 function setup(db){
-  if(!schemaReady) schemaReady = db.batch(SCHEMA.map(q => db.prepare(q))).catch(e => { schemaReady = null; throw e; });
+  if(!schemaReady) schemaReady = db.batch(SCHEMA.map(q => db.prepare(q))).then(() => addCols(db)).catch(e => { schemaReady = null; throw e; });
   return schemaReady;
+}
+// Columns added after a table was first made (CREATE TABLE IF NOT EXISTS leaves an old table as it was).
+async function addCols(db){
+  for(const t of ["comments", "show_cmts"]){
+    const have = new Set((await db.prepare(`PRAGMA table_info(${t})`).all()).results.map(x => x.name));
+    for(const [c, def] of [["parent", "TEXT NOT NULL DEFAULT ''"], ["to_user", "TEXT NOT NULL DEFAULT ''"]]){
+      if(!have.has(c)) try{ await db.prepare(`ALTER TABLE ${t} ADD COLUMN ${c} ${def}`).run(); }catch(e){ if(!/duplicate column/i.test(String(e && e.message))) throw e; }
+    }
+  }
 }
 
 /* ---------- small helpers ---------- */
@@ -124,6 +136,7 @@ function cleanItems(arr){
     if(x.k === "i"){ const id = intIn(x.id, 0, 9999999); if(id === null) return null; o = { k: "i", id, n: intIn(x.n, 1, 999) || 1 }; const c = intIn(x.c, 0, 63); if(c !== null) o.c = c; }
     else if(x.k === "v"){ const id = String(x.id || ""); if(!/^[A-Za-z0-9_.-]{1,32}$/.test(id)) return null; o = { k: "v", id, m: x.m === "photo" ? "photo" : "move" }; }
     else if(x.k === "s"){ if(!SERVICES.includes(x.id)) return null; o = { k: "s", id: x.id }; }
+    else if(x.k === "t"){ const t = cleanText(x.id).slice(0, 30); if(!t) return null; o = { k: "t", id: t }; }   // written by hand: not in the catalog
     else return null;
     const key = o.k + ":" + o.id + ":" + (o.c ?? "") + ":" + (o.m || "");
     if(seen.has(key)) continue; seen.add(key); out.push(o);
@@ -135,9 +148,41 @@ function cleanPay(p, type){
   p = p && typeof p === "object" ? p : {};
   const o = {}, mile = intIn(p.mile, 1, 999), bells = intIn(p.bells, 1, 999999999), swap = cleanText(p.swap).slice(0, 100);
   if(mile) o.mile = mile; if(bells) o.bells = bells; if(swap) o.swap = swap; if(p.nego) o.nego = true;
+  if(Array.isArray(p.swapItems) && p.swapItems.length){   // 맞교환 picked from the catalog
+    const si = [], seen = new Set();
+    for(const x of p.swapItems.slice(0, 10)){ const id = intIn(x && x.id, 0, 9999999); if(id === null) return null; const c = intIn(x.c, 0, 63), k = id + ":" + (c ?? ""); if(seen.has(k)) continue; seen.add(k); si.push(c !== null ? { k: "i", id, c } : { k: "i", id }); }
+    if(si.length) o.swapItems = si;
+  }
   return Object.keys(o).length ? o : null;
 }
 const author = r => ({ id: r.user_id, name: r.a_name || "", island: r.a_island || "", fruit: r.a_fruit || "" });
+// Comments with whom a reply answers. Replies to a deleted comment stay; the page shows them under "지워진 댓글".
+const cmtSql = (table, key) => `SELECT c.id, c.body, c.created, c.user_id, c.parent, c.to_user, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit, t.name AS t_name
+  FROM ${table} c JOIN users u ON u.id = c.user_id LEFT JOIN users t ON t.id = c.to_user WHERE c.${key} = ? AND u.banned = 0 ORDER BY c.created LIMIT 400`;
+const cmtOut = x => ({ id: x.id, body: x.body, created: x.created, author: author(x), parent: x.parent || "", to: x.to_user ? { id: x.to_user, name: x.t_name || "" } : null });
+// A reply names the comment it answers; it joins that comment's group (its top comment) and tells that comment's author.
+async function replyTarget(db, table, key, ref, rid){
+  if(!rid) return { parent: "", to: "" };
+  const r = await db.prepare(`SELECT id, parent, user_id FROM ${table} WHERE id = ? AND ${key} = ?`).bind(String(rid).slice(0, 30), ref).first();
+  return r ? { parent: r.parent || r.id, to: r.user_id } : null;
+}
+// 알림: the person answered gets "reply"; the post's author gets "cmt" (a new comment) or "cmtr" (a reply between others).
+// Nobody is told about their own comment, and nobody gets two for one comment. Kept 60 days.
+function notifyQs(db, n){
+  const rows = [];
+  if(n.to && n.to !== n.actor) rows.push([n.to, "reply"]);
+  if(n.owner !== n.actor && n.owner !== n.to) rows.push([n.owner, n.parent ? "cmtr" : "cmt"]);
+  return rows.flatMap(([uid, kind]) => [
+    db.prepare(`INSERT INTO notifs (id, user_id, kind, on_t, ref, cmt, actor, body, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(rand(9), uid, kind, n.on, n.ref, n.cmt, n.actor, n.body.slice(0, 80), n.now),
+    db.prepare(`DELETE FROM notifs WHERE user_id = ? AND created < ?`).bind(uid, n.now - 60 * DAY),
+  ]);
+}
+const NOTIF_SQL = `SELECT n.*, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit, p.type AS p_type, p.items AS p_items, s.kind AS s_kind, s.title AS s_title, su.island AS s_island, su.name AS s_name
+  FROM notifs n LEFT JOIN users u ON u.id = n.actor LEFT JOIN posts p ON n.on_t = 'trade' AND p.id = n.ref LEFT JOIN shows s ON n.on_t = 'show' AND s.id = n.ref LEFT JOIN users su ON su.id = s.user_id
+  WHERE n.user_id = ? AND (u.banned IS NULL OR u.banned = 0) ORDER BY n.created DESC LIMIT 60`;
+const notifOut = x => ({ id: x.id, kind: x.kind, on: x.on_t, ref: x.ref, cmt: x.cmt, body: x.body, created: x.created, seen: !!x.seen,
+  actor: { id: x.actor, name: x.a_name || "", island: x.a_island || "", fruit: x.a_fruit || "" },
+  post: x.on_t === "trade" ? (x.p_type ? { type: x.p_type, items: JSON.parse(x.p_items) } : null) : (x.s_kind ? { kind: x.s_kind, title: x.s_title || "", author: { name: x.s_name || "", island: x.s_island || "" } } : null) });
 const postOut = r => ({ id: r.id, type: r.type, items: JSON.parse(r.items), pay: JSON.parse(r.pay), body: r.body, status: r.status, cmts: r.cmts, created: r.created, updated: r.updated, author: author(r) });
 const POST_SQL = `SELECT p.*, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM posts p JOIN users u ON u.id = p.user_id WHERE u.banned = 0`;
 async function postInput(b){
@@ -145,7 +190,7 @@ async function postInput(b){
   const items = cleanItems(b.items); if(!items) return { err: "items" };
   const pay = cleanPay(b.pay, type); if(!pay) return { err: "pay" };
   const body = cleanBody(b.body, 500);
-  if(hasCash(body, pay.swap)) return { err: "cash" };
+  if(hasCash(body, pay.swap, ...items.filter(x => x.k === "t").map(x => x.id))) return { err: "cash" };
   return { type, items, pay, body };
 }
 /* ---------- visits: one row per person per day (Korean time), for the admin's friend list ---------- */
@@ -169,7 +214,7 @@ const SHOW_SQL = `SELECT s.*, u.name AS a_name, u.island AS a_island, u.fruit AS
 const showOut = r => ({ id: r.id, kind: r.kind, title: r.title, body: r.body, code: r.code, imgs: JSON.parse(r.imgs), items: JSON.parse(r.items),
   likes: r.likes, cmts: r.cmts, views: r.views, created: r.created, updated: r.updated, author: author(r) });
 const imgKeys = imgs => imgs.flatMap(x => [x.f, x.t]).filter(Boolean);
-async function showInput(b, env, u){
+async function showInput(b, env, u, owner){   // owner: whose post is being edited (the admin may keep that person's photos)
   const kind = KINDS.includes(b.kind) ? b.kind : null; if(!kind) return { err: "kind" };
   const title = cleanText(b.title).slice(0, 30), text = cleanBody(b.body, 500);
   const digits = String(b.code || "").replace(/\D/g, "");
@@ -183,7 +228,7 @@ async function showInput(b, env, u){
   }
   if(imgs.length){
     if(!env.IMG) return { err: "no_store" };
-    for(const k of imgKeys(imgs)){ const o = await env.IMG.head(k); if(!o || (o.customMetadata || {}).u !== u.id) return { err: "imgs" }; }
+    for(const k of imgKeys(imgs)){ const o = await env.IMG.head(k), by = o && (o.customMetadata || {}).u; if(!o || (by !== u.id && by !== owner)) return { err: "imgs" }; }
   }
   if(kind !== "dream" && !imgs.length) return { err: env.IMG ? "need_img" : "no_store" };
   if(!Array.isArray(b.items) || b.items.length > 40) return { err: "items" };
@@ -246,8 +291,8 @@ export async function onRequest(ctx){
     if(m === "GET" && (pm = /^posts\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
       const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(pm[1]).first();
       if(!r) return fail("no_post", 404);
-      const c = await db.prepare(`SELECT c.id, c.body, c.created, c.user_id, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM comments c JOIN users u ON u.id = c.user_id WHERE c.post_id = ? AND u.banned = 0 ORDER BY c.created LIMIT 300`).bind(pm[1]).all();
-      return json({ post: postOut(r), comments: c.results.map(x => ({ id: x.id, body: x.body, created: x.created, author: author(x) })) });
+      const c = await db.prepare(cmtSql("comments", "post_id")).bind(pm[1]).all();
+      return json({ post: postOut(r), comments: c.results.map(cmtOut) });
     }
     if(m === "GET" && (pm = /^img\/(i\/[A-Za-z0-9_-]{12,24}\.(webp|jpg))$/.exec(path))){
       if(!env.IMG) return fail("no_store", 404);
@@ -272,10 +317,17 @@ export async function onRequest(ctx){
     if(m === "GET" && (pm = /^shows\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
       const r = await db.prepare(SHOW_SQL + ` AND s.id = ?`).bind(pm[1]).first();
       if(!r) return fail("no_show", 404);
-      const c = await db.prepare(`SELECT c.id, c.body, c.created, c.user_id, u.name AS a_name, u.island AS a_island, u.fruit AS a_fruit FROM show_cmts c JOIN users u ON u.id = c.user_id WHERE c.show_id = ? AND u.banned = 0 ORDER BY c.created LIMIT 300`).bind(pm[1]).all();
+      const c = await db.prepare(cmtSql("show_cmts", "show_id")).bind(pm[1]).all();
       const me = await currentUser(req, env, url);
       const liked = me ? !!(await db.prepare(`SELECT 1 AS x FROM show_likes WHERE show_id = ? AND user_id = ?`).bind(pm[1], me.id).first()) : false;
-      return json({ show: showOut(r), comments: c.results.map(x => ({ id: x.id, body: x.body, created: x.created, author: author(x) })), liked });
+      return json({ show: showOut(r), comments: c.results.map(cmtOut), liked });
+    }
+    if(m === "GET" && path === "notifs"){
+      const me = await currentUser(req, env, url); if(!me) return fail("signin", 401);
+      const n = (await db.prepare(`SELECT COUNT(*) AS n FROM notifs WHERE user_id = ? AND seen = 0`).bind(me.id).first()).n;
+      if(url.searchParams.get("count") === "1") return json({ unread: n });
+      const r = await db.prepare(NOTIF_SQL).bind(me.id).all();
+      return json({ notifs: r.results.map(notifOut), unread: n });
     }
     if(m !== "GET" && !sameSite(req, url)) return fail("origin", 403);
     const ip = req.headers.get("CF-Connecting-IP") || "local";
@@ -355,6 +407,7 @@ export async function onRequest(ctx){
       await db.batch([
         db.prepare(`DELETE FROM sync WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM visits WHERE user_id = ?`).bind(u.id),
+        db.prepare(`DELETE FROM notifs WHERE user_id = ? OR actor = ? OR (on_t = 'trade' AND ref IN (SELECT id FROM posts WHERE user_id = ?)) OR (on_t = 'show' AND ref IN (SELECT id FROM shows WHERE user_id = ?))`).bind(u.id, u.id, u.id, u.id),
         db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.user_id = ?))`).bind(u.id),
         db.prepare(`DELETE FROM comments WHERE user_id = ? OR post_id IN (SELECT id FROM posts WHERE user_id = ?)`).bind(u.id, u.id),
         db.prepare(`DELETE FROM posts WHERE user_id = ?`).bind(u.id),
@@ -396,21 +449,25 @@ export async function onRequest(ctx){
         const b = await body(req), text = cleanBody(b.body, 300);
         if(!text) return fail("empty");
         if(hasCash(text)) return fail("cash");
+        const rt = await replyTarget(db, "comments", "post_id", p.id, b.reply); if(!rt) return fail("no_parent", 404);
         if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
         const id = rand(9);
         await db.batch([
-          db.prepare(`INSERT INTO comments (id, post_id, user_id, body, created) VALUES (?, ?, ?, ?, ?)`).bind(id, p.id, u.id, text, now),
+          db.prepare(`INSERT INTO comments (id, post_id, user_id, body, created, parent, to_user) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, p.id, u.id, text, now, rt.parent, rt.to),
           db.prepare(`UPDATE posts SET cmts = cmts + 1 WHERE id = ?`).bind(p.id),
+          ...notifyQs(db, { actor: u.id, owner: p.user_id, to: rt.to, parent: rt.parent, on: "trade", ref: p.id, cmt: id, body: text, now }),
         ]);
-        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit } } });
+        const tn = rt.to ? await db.prepare(`SELECT name FROM users WHERE id = ?`).bind(rt.to).first() : null;
+        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit }, parent: rt.parent, to: rt.to ? { id: rt.to, name: (tn && tn.name) || "" } : null } });
       }
       if(m === "DELETE"){
         if(!own && !admin) return fail("not_yours", 403);
-        await db.batch([db.prepare(`DELETE FROM comments WHERE post_id = ?`).bind(p.id), db.prepare(`DELETE FROM posts WHERE id = ?`).bind(p.id)]);
+        await db.batch([db.prepare(`DELETE FROM comments WHERE post_id = ?`).bind(p.id), db.prepare(`DELETE FROM posts WHERE id = ?`).bind(p.id),
+          db.prepare(`DELETE FROM notifs WHERE on_t = 'trade' AND ref = ?`).bind(p.id)]);
         return json({ ok: true });
       }
       if(m === "POST"){
-        if(!own) return fail("not_yours", 403);
+        if(!own && !admin) return fail("not_yours", 403);   // v41: the admin may edit too
         const b = await body(req);
         if(b.status && !b.items){
           if(!["open", "done"].includes(b.status)) return fail("status");
@@ -423,6 +480,12 @@ export async function onRequest(ctx){
         return json({ post: postOut(r) });
       }
     }
+    if(m === "POST" && path === "notifs/read"){
+      const b = await body(req), ids = Array.isArray(b.ids) ? b.ids.slice(0, 100).map(String) : null;
+      if(ids && ids.length) await db.prepare(`UPDATE notifs SET seen = 1 WHERE user_id = ? AND id IN (${ids.map(() => "?").join(",")})`).bind(u.id, ...ids).run();
+      else await db.prepare(`UPDATE notifs SET seen = 1 WHERE user_id = ? AND seen = 0`).bind(u.id).run();
+      return json({ ok: true });
+    }
     if(m === "DELETE" && (pm = /^comments\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
       const c = await db.prepare(`SELECT * FROM comments WHERE id = ?`).bind(pm[1]).first();
       if(!c) return fail("no_comment", 404);
@@ -430,7 +493,8 @@ export async function onRequest(ctx){
         const p = await db.prepare(`SELECT user_id FROM posts WHERE id = ?`).bind(c.post_id).first();
         if(!p || p.user_id !== u.id) return fail("not_yours", 403);   // the post's author may tidy comments on their own post
       }
-      await db.batch([db.prepare(`DELETE FROM comments WHERE id = ?`).bind(c.id), db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.post_id)]);
+      await db.batch([db.prepare(`DELETE FROM comments WHERE id = ?`).bind(c.id), db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.post_id),
+        db.prepare(`DELETE FROM notifs WHERE cmt = ?`).bind(c.id)]);
       return json({ ok: true });
     }
 
@@ -467,28 +531,32 @@ export async function onRequest(ctx){
       }
       if(pm[2] === "/comments"){
         if(m !== "POST") return fail("not_found", 404);
-        const text = cleanBody((await body(req)).body, 300);
+        const b = await body(req), text = cleanBody(b.body, 300);
         if(!text) return fail("empty");
+        const rt = await replyTarget(db, "show_cmts", "show_id", x.id, b.reply); if(!rt) return fail("no_parent", 404);
         if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
         const id = rand(9);
         await db.batch([
-          db.prepare(`INSERT INTO show_cmts (id, show_id, user_id, body, created) VALUES (?, ?, ?, ?, ?)`).bind(id, x.id, u.id, text, now),
+          db.prepare(`INSERT INTO show_cmts (id, show_id, user_id, body, created, parent, to_user) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, x.id, u.id, text, now, rt.parent, rt.to),
           db.prepare(`UPDATE shows SET cmts = cmts + 1 WHERE id = ?`).bind(x.id),
+          ...notifyQs(db, { actor: u.id, owner: x.user_id, to: rt.to, parent: rt.parent, on: "show", ref: x.id, cmt: id, body: text, now }),
         ]);
-        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit } } });
+        const tn = rt.to ? await db.prepare(`SELECT name FROM users WHERE id = ?`).bind(rt.to).first() : null;
+        return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit }, parent: rt.parent, to: rt.to ? { id: rt.to, name: (tn && tn.name) || "" } : null } });
       }
       if(m === "DELETE"){
         if(!own && !admin) return fail("not_yours", 403);
         await db.batch([
           db.prepare(`DELETE FROM show_cmts WHERE show_id = ?`).bind(x.id), db.prepare(`DELETE FROM show_likes WHERE show_id = ?`).bind(x.id),
+          db.prepare(`DELETE FROM notifs WHERE on_t = 'show' AND ref = ?`).bind(x.id),
           db.prepare(`DELETE FROM shows WHERE id = ?`).bind(x.id),
         ]);
         const keys = imgKeys(JSON.parse(x.imgs)); if(env.IMG && keys.length) await env.IMG.delete(keys);
         return json({ ok: true });
       }
       if(m === "POST"){
-        if(!own) return fail("not_yours", 403);
-        const v = await showInput(await body(req), env, u); if(v.err) return fail(v.err);
+        if(!own && !admin) return fail("not_yours", 403);   // v41: the admin may edit too
+        const v = await showInput(await body(req), env, u, x.user_id); if(v.err) return fail(v.err);
         await db.prepare(`UPDATE shows SET kind = ?, title = ?, body = ?, code = ?, imgs = ?, items = ?, updated = ? WHERE id = ?`)
           .bind(v.kind, v.title, v.body, v.code, JSON.stringify(v.imgs), JSON.stringify(v.items), now, x.id).run();
         const keep = new Set(imgKeys(v.imgs)), drop = imgKeys(JSON.parse(x.imgs)).filter(k => !keep.has(k));
@@ -501,7 +569,8 @@ export async function onRequest(ctx){
       const c = await db.prepare(`SELECT c.*, s.user_id AS owner FROM show_cmts c JOIN shows s ON s.id = c.show_id WHERE c.id = ?`).bind(pm[1]).first();
       if(!c) return fail("no_comment", 404);
       if(c.user_id !== u.id && c.owner !== u.id && u.role !== "admin") return fail("not_yours", 403);
-      await db.batch([db.prepare(`DELETE FROM show_cmts WHERE id = ?`).bind(c.id), db.prepare(`UPDATE shows SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.show_id)]);
+      await db.batch([db.prepare(`DELETE FROM show_cmts WHERE id = ?`).bind(c.id), db.prepare(`UPDATE shows SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.show_id),
+        db.prepare(`DELETE FROM notifs WHERE cmt = ?`).bind(c.id)]);
       return json({ ok: true });
     }
 
