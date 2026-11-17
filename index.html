@@ -23,6 +23,9 @@
 <meta name="theme-color" content="#7dbd57">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="도란도란">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>html,body{margin:0;padding:0}</style>
 <script>window.DN_SERVER = 1;</script>
 </head>
@@ -747,6 +750,41 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .nrow.new{box-shadow:inset 0 0 0 2px var(--sun)}
 .nrow .dot{position:absolute; top:14px; right:14px; width:10px; height:10px; border-radius:50%; background:var(--berry)}
 @media (hover:hover){ .nrow:hover{box-shadow:inset 0 0 0 2px var(--card-line)} .nrow.new:hover{box-shadow:inset 0 0 0 2px var(--sun)} }
+/* v42: 거래 글 보기 — 구해요 / 드려요 / 내용 / 작성자 */
+.tr-sec{display:grid; gap:8px; min-width:0; border-radius:16px; padding:10px 12px 12px}
+.tr-sec.tk{background:var(--plum-soft)}
+.tr-sec.gv{background:color-mix(in srgb, var(--sun) 24%, transparent)}
+.tr-sec.fr{background:var(--sprout)}
+.tr-sec.tx{background:var(--chip)}
+.tr-sec.by{background:transparent; box-shadow:inset 0 0 0 2px var(--card-line)}
+.tr-sh{display:flex; align-items:center; flex-wrap:wrap; gap:4px 8px; min-width:0}
+.tr-sh .lb{font-family:var(--f-display); font-size:15.5px; line-height:1.2; border-radius:9px; padding:4px 11px; white-space:nowrap}
+.tr-sec.tk .lb{background:var(--plum); color:var(--paper)}
+.tr-sec.gv .lb{background:var(--sun); color:#4a3a1c}
+.tr-sec.fr .lb{background:var(--leaf); color:var(--leaf-ink)}
+.tr-sec.tx .lb,.tr-sec.by .lb{background:var(--soil); color:var(--cream)}
+.tr-sh .sm{font-family:var(--f-text); font-size:13.5px; color:var(--muted)}
+.tr-sec .dtext{background:transparent; padding:0 2px; font-family:var(--f-text)}
+.tr-sec .tr-pay.tr-big{background:transparent; padding:0 2px}
+/* v42: 휴대폰 알림 카드 */
+.nt-wrap{display:grid; gap:12px}
+.pucard{display:grid; gap:8px; padding:12px 14px; border-radius:14px; background:var(--sprout); color:var(--ink)}
+.pucard[hidden]{display:none}
+.pu-hd{display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px}
+.pu-hd .pu-ic{flex:none; width:22px; height:22px; color:var(--leaf)}
+.pu-hd h4{margin:0; font-family:var(--f-display); font-weight:400; font-size:17px; color:var(--h-ink); line-height:1.2}
+.pu-st{margin-left:auto; flex:none; padding:3px 10px; border-radius:999px; font-family:var(--f-display); font-size:13px; background:var(--chip); color:var(--muted)}
+.pu-st.on{background:var(--leaf); color:var(--leaf-ink)}
+.pu-st.bad{background:var(--berry-soft); color:var(--berry)}
+.pucard p{margin:0; font-family:var(--f-text); font-size:14px; line-height:1.55; overflow-wrap:anywhere}
+.pucard .pu-sm{font-size:13px; color:var(--muted)}
+.pu-steps{margin:0; padding:0; list-style:none; display:grid; gap:6px; counter-reset:pu}
+.pu-steps li{display:grid; grid-template-columns:24px minmax(0, 1fr); gap:8px; align-items:start; font-family:var(--f-text); font-size:14px; line-height:1.5; overflow-wrap:anywhere}
+.pu-steps li::before{counter-increment:pu; content:counter(pu); width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--leaf); color:var(--leaf-ink); font-family:var(--f-display); font-size:13.5px}
+.pu-steps .ico{display:inline-grid; place-items:center; width:22px; height:22px; margin:0 2px; vertical-align:-5px; border-radius:6px; background:var(--paper); color:#2f7ff0}
+.pu-steps .ico svg{width:16px; height:16px}
+.pucard .acts2 .pill{flex:1 1 auto}
+.pucard .msg:empty{display:none}
 /* 거래 글: 직접 적기, 맞교환 아이템 */
 .tr-frow .tr-own{width:100%; min-width:0; font:inherit; font-family:var(--f-display); font-size:15.5px; padding:6px 10px; border-radius:10px; border:2px solid var(--card-line); background:var(--paper); color:var(--ink)}
 .tr-swi{display:grid; gap:8px}
@@ -3599,7 +3637,8 @@ const ago = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 
 const CASH_RE = /(계좌|입금|송금|현금|현거래|현질|(?<![가-힣])토스(?![터트])|카카오\s*페이|카페이|네이버\s*페이|페이코|문상|문화\s*상품권|컬[쳐처]\s*랜드|해피\s*머니|기프티콘|기프트\s*카드|상품권|페이팔|paypal|venmo|₩|krw|\d[\d,.\s]*(만|천)?\s*원(?!하|해|할|함|했|합|래|룸|피스|목|석|숭이|두|형|예|반|통|뿔|탁|더|소|심|시|승|\s*포인트)|만\s*원(?!하|해|할|함|했|합))/i;   // the same words the server refuses
 const TRADE_MINE = 1;   // mem.trade.cat: -1 = everyone's open posts, 1 = only mine (open and finished)
 const TRADE_T = {want:["구해요"], sell:["팔아요"], free:["나눔"]};
-const PAY_HEAD = {want:"드릴 것", sell:"받고 싶은 것", free:"나눔"};
+const PAY_HEAD = {want:"드려요", sell:"받고 싶어요", free:"나눔"};
+const ITEM_HEAD = {want:"구해요", sell:"팔아요", free:"나눔해요"};
 const SERVICE = {turnip:["무 팔러 가기", "섬에 들어가서 무를 팔아요"], shop:["상점 구경", "섬 가게에 가서 물건을 사요"], catalog:["만지작", "만져 보고 카탈로그에 등록해요"], help:["그 밖의 부탁", "글에 적어 주세요"]};
 const SERVICE_PIC = {turnip:7734, shop:"bag", catalog:"hand", help:"chat"};
 const tradable = it => CATS[it.lc][1] !== "more";   // 리액션, 건축물·리폼 can't change hands
@@ -3834,10 +3873,10 @@ function openTrade(id, p0, opt){
     head();
     const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
     body.innerHTML = `
-      <div class="res">${p.items.map(row).join("")}</div>
-      <div class="tr-paybox"><div class="shd">${p.type === "free" ? ico("leaf") : itemPic(7731, 26)}<b>${PAY_HEAD[p.type]}</b></div><div class="tr-pay tr-big">${payHTML(p)}</div></div>
-      ${p.body ? `<div class="dtext">${esc(p.body)}</div>` : ""}
-      <div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div>
+      <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span>${p.type === "free" ? `<span class="sm">대가 없이 나눠 드려요</span>` : ""}</div><div class="res">${p.items.map(row).join("")}</div></section>
+      ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
+      ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
+      <section class="tr-sec by"><div class="tr-sh"><span class="lb">작성자</span></div><div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div></section>
       ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">고치기</button><button class="pill danger" type="button" id="tr-del">지우기</button></div>`
         : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="tr-edit">관리자로 고치기</button><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
       <div id="tr-msg"></div>
@@ -3943,7 +3982,7 @@ function openTradeForm(p, preset){
   }
   function drawType(){
     sh.el.querySelectorAll("[data-ty]").forEach(b => b.setAttribute("aria-checked", b.dataset.ty === st.type));
-    q("#tf-ih").textContent = {want:"구하는 것", sell:"파는 것", free:"나눠 줄 것"}[st.type];
+    q("#tf-ih").textContent = ITEM_HEAD[st.type];
     q("#tf-ph").textContent = PAY_HEAD[st.type];
     q("#tf-pay").hidden = st.type === "free";
   }
@@ -4247,8 +4286,9 @@ const NT = (() => {
 })();
 function openNotifs(){
   if(!AUTH.me){ openSignin("in"); return; }
-  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>알림</h3><p class="sub">내 글에 달린 댓글과 내 댓글에 달린 답글이에요</p></div>${XBTN}</div><div class="bd-in" id="nt-body"><p class="sub">알림을 불러오는 중이에요…</p></div>`);
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>알림</h3><p class="sub">내 글에 달린 댓글과 내 댓글에 달린 답글이에요</p></div>${XBTN}</div><div class="bd-in nt-wrap"><section class="pucard" id="nt-push" hidden></section><div id="nt-body"><p class="sub">알림을 불러오는 중이에요…</p></div></div>`);
   const body = s.el.querySelector("#nt-body");
+  PUSH.card(s.el.querySelector("#nt-push"));
   let list = [];
   const where = n => n.post ? (n.on === "trade" ? `거래 · ${tradeTitle(n.post)}` : `자랑 · ${showTitle(n.post)}`) : "지워진 글";
   const row = (n, i) => `<button class="nrow${n.seen ? "" : " new"}" type="button" data-ni="${i}"><span class="fr">${fruitPic(n.actor.fruit)}</span><span class="tx"><b><em>${esc(n.actor.name || "친구")}</em> 님이 ${NT_TEXT[n.kind] || "댓글을 달았어요"}</b><span class="nw">${esc(where(n))}</span><span class="nb">“${esc(n.body)}”</span><span class="nt">${ago(n.created)}</span></span>${n.seen ? "" : `<i class="dot" title="새 알림"></i>`}</button>`;
@@ -4263,13 +4303,142 @@ function openNotifs(){
     const b = e.target.closest("[data-ni]"); if(!b || b.disabled) return;
     const n = list[+b.dataset.ni]; if(!n) return;
     b.disabled = true;
-    try{
-      if(n.on === "trade"){ const r = await AUTH.api("posts/" + encodeURIComponent(n.ref)); sheetOver = true; openTrade(r.post.id, r.post, {cmt: n.cmt}); }
-      else { const r = await AUTH.api("shows/" + encodeURIComponent(n.ref)); sheetOver = true; openShow(r.show.id, r.show, {cmt: n.cmt}); }
-    }catch(err){ toast(err.message === "no_post" || err.message === "no_show" ? "지워진 글이에요" : authErr(err)); }
+    await openNotifTarget(n, true);
     b.disabled = false;
   });
 }
+// One notice → that post, scrolled to that comment (from the list, or from a notice the phone showed).
+async function openNotifTarget(n, over){
+  if(n.id && n.id !== "test") AUTH.api("notifs/read", {method: "POST", body: JSON.stringify({ids: [n.id]})}).then(() => NT.poll()).catch(() => {});
+  try{
+    if(n.on === "trade"){ const r = await AUTH.api("posts/" + encodeURIComponent(n.ref)); sheetOver = over; openTrade(r.post.id, r.post, {cmt: n.cmt}); }
+    else { const r = await AUTH.api("shows/" + encodeURIComponent(n.ref)); sheetOver = over; openShow(r.show.id, r.show, {cmt: n.cmt}); }
+  }catch(err){ toast(err.message === "no_post" || err.message === "no_show" ? "지워진 글이에요" : authErr(err)); }
+}
+function openNotifQ(q){
+  const m = /^(trade|show)\.([A-Za-z0-9_-]{6,24})\.([A-Za-z0-9_-]{6,30})\.([A-Za-z0-9_-]{4,30})$/.exec(String(q || ""));
+  if(!m) return;
+  const go = () => {
+    if(!AUTH.me){ toast("로그인하면 그 알림의 글을 볼 수 있어요"); openSignin("in"); return; }
+    openNotifTarget({on: m[1], ref: m[2], cmt: m[3], id: m[4]}, $("layer").children.length > 0);
+  };
+  if(AUTH.ready) go(); else { const off = AUTH.sub(() => { if(AUTH.ready){ off(); go(); } }); }
+}
+// v42: 휴대폰 알림 (Web Push). Android and PC browsers can subscribe straight away; an iPhone only from the home-screen
+// app (iOS 16.4+); in-app windows such as KakaoTalk's cannot at all, so the card says which case this device is in.
+// The server ties each subscription to the session that made it, so signing out stops this device's notices.
+const PUSH = (() => {
+  const ua = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const android = /Android/.test(ua);
+  const inapp = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps|everytimeApp|BAND\//i.test(ua);
+  const iosVer = (() => { const m = /OS (\d+)_(\d+)/.exec(ua) || /Version\/(\d+)\.(\d+)/.exec(ua); return m ? +m[1] + +m[2] / 100 : 0; })();
+  const can = AUTH.on && window.isSecureContext && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+  const LS = KEY + ":push";   // whose notices this browser was turned on for
+  let reg = null, vk = "", prepping = null, toldFor = "";
+  const ub = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); return Uint8Array.from(atob(s + "===".slice((s.length + 3) % 4)), c => c.charCodeAt(0)); };
+  const mine = () => { try{ return !!AUTH.me && localStorage.getItem(LS) === AUTH.me.id; }catch(e){ return false; } };
+  // The worker and the key are fetched before the tap, so the tap itself can ask for permission (iPhones insist on that).
+  function prep(){
+    if(!can) return Promise.resolve(null);
+    return prepping || (prepping = (async () => {
+      reg = await navigator.serviceWorker.register("/sw.js");
+      if(!vk) vk = (await AUTH.api("push/key")).key;
+      return reg;
+    })().catch(e => { prepping = null; throw e; }));
+  }
+  async function current(){ if(!can) return null; const r = reg || await navigator.serviceWorker.getRegistration("/"); return r ? r.pushManager.getSubscription() : null; }
+  async function tell(sub){
+    await AUTH.api("push/sub", {method: "POST", body: JSON.stringify(sub.toJSON())});
+    try{ localStorage.setItem(LS, AUTH.me.id); }catch(e){}
+    toldFor = AUTH.me.id;
+  }
+  function subscribeNow(){
+    const opt = {userVisibleOnly: true, applicationServerKey: ub(vk)};
+    return reg.pushManager.subscribe(opt).catch(async e => {   // subscribed before with another key: start again
+      if(!e || e.name !== "InvalidStateError") throw e;
+      const old = await reg.pushManager.getSubscription(); if(old) await old.unsubscribe();
+      return reg.pushManager.subscribe(opt);
+    });
+  }
+  // Runs straight from the tap: subscribe() is the first thing it waits for, and it asks for permission by itself.
+  async function turnOn(){
+    let sub;
+    if(reg && vk) sub = await subscribeNow();
+    else { const p = await Notification.requestPermission(); if(p !== "granted") throw new Error(p === "denied" ? "push_denied" : "push_later"); await prep(); sub = await subscribeNow(); }
+    await tell(sub);
+  }
+  async function turnOff(){
+    const sub = await current();
+    if(sub){ const ep = sub.endpoint; await sub.unsubscribe().catch(() => {}); await AUTH.api("push/unsub", {method: "POST", body: JSON.stringify({endpoint: ep})}).catch(() => {}); }
+    try{ localStorage.removeItem(LS); }catch(e){}
+    toldFor = "";
+  }
+  async function test(){
+    const sub = await current(); if(!sub) throw new Error("push_none");
+    await AUTH.api("push/test", {method: "POST", body: JSON.stringify({endpoint: sub.endpoint})});
+  }
+  async function state(){
+    if(!can) return inapp ? "inapp" : ios ? (iosVer && iosVer < 16.04 ? "iosold" : "ioshome") : "none";
+    if(Notification.permission === "denied") return "denied";
+    const sub = await current().catch(() => null);
+    return sub && Notification.permission === "granted" && mine() ? "on" : "off";
+  }
+  const SHARE = `<span class="ico" aria-label="공유"><svg><use href="#i-share"/></svg></span>`;
+  function html(st){
+    const head = (label, cls) => `<div class="pu-hd"><svg class="pu-ic" aria-hidden="true"><use href="#i-bell"/></svg><h4>휴대폰 알림</h4><span class="pu-st ${cls || ""}">${label}</span></div>`;
+    const msg = `<div class="msg" aria-live="polite"></div>`;
+    if(st === "on") return head("켜짐", "on") + `<p>이 기기로 댓글·답글 알림이 와요. 사이트를 닫아 두어도 와요.</p><div class="acts2"><button class="pill leaf sm" type="button" data-pu="test">시험 알림 보내기</button><button class="pill ghost sm" type="button" data-pu="off">이 기기에서 끄기</button></div>` + msg;
+    if(st === "off") return head("꺼짐") + `<p>켜 두면 사이트를 닫아 두어도 내 글에 댓글이, 내 댓글에 답글이 달릴 때 이 기기로 알려 드려요.</p><div class="acts2"><button class="pill leaf" type="button" data-pu="on">이 기기에서 알림 켜기</button></div><p class="pu-sm">누르면 알림을 허용할지 물어봐요. '허용'을 눌러 주세요.</p>` + msg;
+    if(st === "denied") return head("막힘", "bad") + `<p>이 기기에서 이 사이트의 알림이 막혀 있어요. ${ios ? "아이폰 설정 → 알림 → 도란도란에서 '알림 허용'을 켠 뒤 이 창을 다시 열어 주세요."
+      : android ? "주소창 왼쪽의 버튼 → 권한(또는 사이트 설정) → 알림을 '허용'으로 바꾼 뒤 이 창을 다시 열어 주세요."
+      : "주소창 왼쪽의 사이트 정보(자물쇠) 버튼 → 알림을 '허용'으로 바꾼 뒤 이 창을 다시 열어 주세요."}</p>`;
+    if(st === "ioshome") return head("준비 필요") + `<p>아이폰은 이 사이트를 홈 화면에 추가해서 열어야 알림을 받을 수 있어요.</p>
+      <ol class="pu-steps"><li><span>화면 아래(또는 주소창 옆)의 공유 버튼${SHARE}을 눌러요.</span></li><li><span>'홈 화면에 추가'를 눌러요. 안 보이면 목록을 아래로 내려 보세요.</span></li><li><span>홈 화면에 생긴 '도란도란' 아이콘으로 열고, 로그인한 뒤 여기서 알림을 켜요.</span></li></ol>
+      <p class="pu-sm">홈 화면 앱은 Safari와 따로 열려서 처음 한 번은 다시 로그인해야 해요. 로그인하면 체크 기록도 그대로 따라와요. iOS 16.4 이상에서 돼요.</p>`;
+    if(st === "iosold") return head("안 됨", "bad") + `<p>아이폰은 iOS 16.4 이상에서만 사이트 알림을 받을 수 있어요. 설정 → 일반 → 소프트웨어 업데이트에서 올린 뒤 다시 해 주세요.</p>`;
+    if(st === "inapp") return head("준비 필요") + `<p>카카오톡 같은 앱 안에서 연 창에서는 알림을 받을 수 없어요. ${ios
+      ? "메뉴에서 'Safari로 열기'를 누른 뒤, 홈 화면에 추가해서 열어 주세요."
+      : "오른쪽 위 메뉴에서 '다른 브라우저로 열기'를 눌러 크롬이나 삼성 인터넷으로 연 뒤 켜 주세요."}</p>`;
+    return head("안 됨", "bad") + `<p>이 브라우저에서는 휴대폰 알림을 받을 수 없어요. 크롬이나 삼성 인터넷${ios ? "" : "(아이폰은 Safari)"}으로 열어 주세요.</p>`;
+  }
+  async function card(el){
+    if(!AUTH.on || !el) return;
+    const draw = async () => { const st = await state(); el.innerHTML = html(st); el.hidden = false; if(st === "off") prep().catch(() => {}); };
+    await draw();
+    el.addEventListener("click", e => {
+      const b = e.target.closest("[data-pu]"); if(!b) return;
+      const m = el.querySelector(".msg") || document.createElement("div"), k = b.dataset.pu;
+      if(k === "on") busyRun(b, m, async () => { await turnOn(); toast("이 기기에서 알림을 켰어요"); await draw(); }, e2 => PUSH_ERR[e2 && e2.message] || (e2 && e2.name === "NotAllowedError" ? (Notification.permission === "denied" ? PUSH_ERR.push_denied : PUSH_ERR.push_later) : authErr(e2)))
+        .then(() => { if(Notification.permission === "denied") draw(); });
+      else if(k === "off") busyRun(b, m, async () => { await turnOff(); toast("이 기기에서 알림을 껐어요"); await draw(); });
+      else if(k === "test") busyRun(b, m, async () => { await test(); toast("시험 알림을 보냈어요. 잠시 뒤에 떠요"); }, e2 => PUSH_ERR[e2 && e2.message] ? PUSH_ERR[e2.message] + (e2.data && e2.data.why ? ` (${esc(e2.data.why)})` : "") : authErr(e2));
+    });
+  }
+  // Signed in again on a device that was turned on for this same person: hand the subscription to the new session.
+  AUTH.sub(async me => {
+    if(!me){ toldFor = ""; return; }
+    if(!can || toldFor === me.id || Notification.permission !== "granted" || !mine()) return;
+    try{ const sub = await current(); if(sub) await tell(sub); }catch(e){}
+  });
+  if(can) navigator.serviceWorker.addEventListener("message", e => {
+    const d = e.data || {};
+    if(d.dn === "notif-new") NT.poll();
+    else if(d.dn === "notif-open" && d.q) openNotifQ(d.q);
+  });
+  // Opened by tapping a notice (no page was open): /?nt=…
+  const q0 = new URLSearchParams(location.search).get("nt");
+  if(q0){ try{ history.replaceState(history.state, "", location.pathname + location.hash); }catch(e){} openNotifQ(q0); }
+  return {card, state, get can(){ return can; }};
+})();
+const PUSH_ERR = {
+  push_denied: "알림을 허용하지 않아서 켜지 못했어요. 아래 안내대로 허용해 주세요.",
+  push_later: "알림을 허용해야 켜져요. 다시 눌러서 '허용'을 골라 주세요.",
+  push_bad: "이 브라우저의 알림 주소를 받을 수 없었어요. 크롬이나 삼성 인터넷(아이폰은 홈 화면 앱)으로 해 주세요.",
+  push_none: "이 기기는 아직 알림이 켜져 있지 않아요. 끈 뒤 다시 켜 주세요.",
+  push_gone: "알림 주소가 만료됐어요. 끈 뒤 다시 켜 주세요.",
+  push_fail: "알림 서버가 시험 알림을 받지 않았어요. 잠시 뒤에 다시 해 주세요.",
+};
 // Posting: photos are shrunk here (full ≤ about 180 KB, 16:9 list picture ≤ about 45 KB), sent one by one, then the post.
 const dataBlob = u => fetch(u).then(r => r.blob());
 async function upImg(dataUrl){

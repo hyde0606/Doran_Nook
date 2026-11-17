@@ -44,6 +44,9 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS show_cmts_show ON show_cmts(show_id, created)`,
   `CREATE TABLE IF NOT EXISTS notifs (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, on_t TEXT NOT NULL, ref TEXT NOT NULL, cmt TEXT NOT NULL, actor TEXT NOT NULL, body TEXT NOT NULL DEFAULT '', created INTEGER NOT NULL, seen INTEGER NOT NULL DEFAULT 0)`,
   `CREATE INDEX IF NOT EXISTS notifs_user ON notifs(user_id, created)`,
+  `CREATE TABLE IF NOT EXISTS push_subs (endpoint TEXT PRIMARY KEY, user_id TEXT NOT NULL, s_hash TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL, created INTEGER NOT NULL, ok INTEGER NOT NULL DEFAULT 0, err TEXT NOT NULL DEFAULT '')`,
+  `CREATE INDEX IF NOT EXISTS push_subs_user ON push_subs(user_id)`,
+  `CREATE TABLE IF NOT EXISTS conf (k TEXT PRIMARY KEY, v TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS visits (user_id TEXT NOT NULL, day TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 1, dev TEXT NOT NULL DEFAULT '', PRIMARY KEY (user_id, day))`,
 ];
 let schemaReady = null;
@@ -172,8 +175,9 @@ function notifyQs(db, n){
   const rows = [];
   if(n.to && n.to !== n.actor) rows.push([n.to, "reply"]);
   if(n.owner !== n.actor && n.owner !== n.to) rows.push([n.owner, n.parent ? "cmtr" : "cmt"]);
-  return rows.flatMap(([uid, kind]) => [
-    db.prepare(`INSERT INTO notifs (id, user_id, kind, on_t, ref, cmt, actor, body, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(rand(9), uid, kind, n.on, n.ref, n.cmt, n.actor, n.body.slice(0, 80), n.now),
+  n.rows = rows.map(([uid, kind]) => [uid, kind, rand(9)]);
+  return n.rows.flatMap(([uid, kind, id]) => [
+    db.prepare(`INSERT INTO notifs (id, user_id, kind, on_t, ref, cmt, actor, body, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, uid, kind, n.on, n.ref, n.cmt, n.actor, n.body.slice(0, 80), n.now),
     db.prepare(`DELETE FROM notifs WHERE user_id = ? AND created < ?`).bind(uid, n.now - 60 * DAY),
   ]);
 }
@@ -265,6 +269,81 @@ async function newSession(env, url, userId){
   return sessionCookie(url, tok, SESSION_DAYS * 86400);
 }
 
+/* ---------- v42: 휴대폰 알림 (Web Push: RFC 8030 sending, RFC 8291 encryption, RFC 8292 VAPID) ----------
+   The server makes its own VAPID key pair the first time it is needed and keeps it in D1 (conf), so no secret has to be
+   pasted anywhere. Each device's subscription is tied to the session that turned it on: signing out, a password change that
+   signs other devices out, or the session running out stops that device's notifications. */
+const PUSH_HOSTS = /(^|\.)(googleapis\.com|push\.apple\.com|push\.services\.mozilla\.com|notify\.windows\.com)$/;
+const NT_TEXT = { reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요" };
+const TYPE_NAME = { want: "구해요", sell: "팔아요", free: "나눔" }, KIND_NAME = { dream: "꿈번지", area: "구역", fashion: "패션" };
+let vapid = null;
+async function vapidKeys(db){
+  if(vapid) return vapid;
+  const read = () => db.prepare(`SELECT v FROM conf WHERE k = 'vapid'`).first();
+  let r = await read();
+  if(!r){
+    const kp = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+    const v = JSON.stringify({ jwk: await crypto.subtle.exportKey("jwk", kp.privateKey), pub: b64u(await crypto.subtle.exportKey("raw", kp.publicKey)) });
+    await db.prepare(`INSERT OR IGNORE INTO conf (k, v) VALUES ('vapid', ?)`).bind(v).run();   // two first requests at once: one wins
+    r = await read();
+  }
+  const v = JSON.parse(r.v);
+  vapid = { pub: v.pub, key: await crypto.subtle.importKey("jwk", v.jwk, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]) };
+  return vapid;
+}
+const cat = (...a) => { const o = new Uint8Array(a.reduce((n, x) => n + x.length, 0)); let i = 0; for(const x of a){ o.set(x, i); i += x.length; } return o; };
+async function hmac(key, data){
+  const k = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", k, data));
+}
+// aes128gcm: only the device that subscribed can read what is sent (the push service sees nothing but its size).
+async function pushBody(sub, text){
+  const ua = ub64u(sub.p256dh), secret = ub64u(sub.auth), one = new Uint8Array([1]);
+  const uaKey = await crypto.subtle.importKey("raw", ua, { name: "ECDH", namedCurve: "P-256" }, false, []);
+  const as = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
+  const asPub = new Uint8Array(await crypto.subtle.exportKey("raw", as.publicKey));
+  const shared = new Uint8Array(await crypto.subtle.deriveBits({ name: "ECDH", public: uaKey }, as.privateKey, 256));
+  const ikm = await hmac(await hmac(secret, shared), cat(enc.encode("WebPush: info\0"), ua, asPub, one));
+  const salt = crypto.getRandomValues(new Uint8Array(16)), prk = await hmac(salt, ikm);
+  const cek = (await hmac(prk, cat(enc.encode("Content-Encoding: aes128gcm\0"), one))).slice(0, 16);
+  const nonce = (await hmac(prk, cat(enc.encode("Content-Encoding: nonce\0"), one))).slice(0, 12);
+  const key = await crypto.subtle.importKey("raw", cek, "AES-GCM", false, ["encrypt"]);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, key, cat(enc.encode(text), new Uint8Array([2]))));
+  const head = new Uint8Array(21); head.set(salt); new DataView(head.buffer).setUint32(16, 4096); head[20] = asPub.length;
+  return cat(head, asPub, ct);
+}
+async function vapidAuth(db, endpoint, subject){
+  const v = await vapidKeys(db), part = o => b64u(enc.encode(JSON.stringify(o)));
+  const t = part({ typ: "JWT", alg: "ES256" }) + "." + part({ aud: new URL(endpoint).origin, exp: Math.floor(Date.now() / 1000) + 3600, sub: subject });
+  return `vapid t=${t}.${b64u(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, v.key, enc.encode(t)))}, k=${v.pub}`;
+}
+// One device. A subscription the push service no longer knows (404/410) is forgotten; other refusals are kept for 시험 알림.
+async function pushSend(db, url, s, data){
+  let status = 0, err = "";
+  try{
+    const r = await fetch(s.endpoint, { method: "POST", body: await pushBody(s, JSON.stringify(data).slice(0, 3000)), headers: {
+      Authorization: await vapidAuth(db, s.endpoint, url.origin), "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", TTL: "259200", Urgency: "normal" } });
+    status = r.status; if(!r.ok) err = (status + " " + (await r.text().catch(() => ""))).slice(0, 160);
+  }catch(e){ err = "network " + String((e && e.message) || e).slice(0, 120); }
+  if(status === 404 || status === 410) await db.prepare(`DELETE FROM push_subs WHERE endpoint = ?`).bind(s.endpoint).run();
+  else await db.prepare(`UPDATE push_subs SET ok = ?, err = ? WHERE endpoint = ?`).bind(err ? s.ok : Date.now(), err, s.endpoint).run();
+  return { status, err };
+}
+async function pushTo(db, url, uid, data){
+  const subs = (await db.prepare(`SELECT p.* FROM push_subs p JOIN sessions s ON s.hash = p.s_hash WHERE p.user_id = ? AND s.expires > ?`).bind(uid, Date.now()).all()).results;
+  if(!subs.length) return [];
+  const n = (await db.prepare(`SELECT COUNT(*) AS n FROM notifs WHERE user_id = ? AND seen = 0`).bind(uid).first()).n;
+  return Promise.all(subs.map(s => pushSend(db, url, s, { ...data, n })));
+}
+// After a comment is saved: the same notices that went into 알림 go to each person's phones, without making the writer wait.
+function pushNotifs(ctx, db, url, n, actor, where){
+  if(!n || !n.rows || !n.rows.length) return;
+  const job = Promise.all(n.rows.map(([uid, kind, id]) => pushTo(db, url, uid, {
+    t: `${actor.name || "친구"} 님이 ${NT_TEXT[kind] || "댓글을 달았어요"}`, b: `${where}\n“${[...n.body].slice(0, 120).join("")}”`,
+    id, on: n.on, ref: n.ref, cmt: n.cmt, at: n.now }))).catch(() => {});
+  if(ctx.waitUntil) ctx.waitUntil(job);
+}
+
 /* ---------- routes ---------- */
 export async function onRequest(ctx){
   const { request: req, env } = ctx;
@@ -329,6 +408,7 @@ export async function onRequest(ctx){
       const r = await db.prepare(NOTIF_SQL).bind(me.id).all();
       return json({ notifs: r.results.map(notifOut), unread: n });
     }
+    if(m === "GET" && path === "push/key") return json({ key: (await vapidKeys(db)).pub });
     if(m !== "GET" && !sameSite(req, url)) return fail("origin", 403);
     const ip = req.headers.get("CF-Connecting-IP") || "local";
     if(m === "POST" && (pm = /^shows\/([A-Za-z0-9_-]{6,24})\/view$/.exec(path))){   // counted once a day for each connection
@@ -373,13 +453,45 @@ export async function onRequest(ctx){
 
     if(m === "POST" && path === "logout"){
       const tok = readCookie(req, cookieName(url));
-      if(tok) await db.prepare(`DELETE FROM sessions WHERE hash = ?`).bind(await sha256(tok)).run();
+      if(tok){ const h = await sha256(tok); await db.batch([db.prepare(`DELETE FROM sessions WHERE hash = ?`).bind(h), db.prepare(`DELETE FROM push_subs WHERE s_hash = ?`).bind(h)]); }
       return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(url, "", 0) });
     }
 
     // Everything below needs a signed-in person.
     const u = await currentUser(req, env, url);
     if(!u) return fail("signin", 401);
+
+    // v42: this device's push subscription (turn on / off / send a test)
+    if(m === "POST" && path === "push/sub"){
+      const b = await body(req), ep = String(b.endpoint || ""), k = b.keys || {};
+      let host = "";
+      try{ const e = new URL(ep); host = e.protocol === "https:" ? e.hostname : env.PUSH_TEST && e.hostname === "127.0.0.1" ? "local" : ""; }catch(e){}
+      const okKey = (v, n, first) => { try{ const a = ub64u(String(v || "")); return a.length === n && (first === undefined || a[0] === first); }catch(e){ return false; } };
+      if(ep.length > 1000 || !(host === "local" || PUSH_HOSTS.test(host)) || !okKey(k.p256dh, 65, 4) || !okKey(k.auth, 16)) return fail("push_bad");
+      if(await overLimit(db, "ps:" + u.id, 60, 3600000)) return fail("slow_down", 429);
+      const qs = [];
+      if(b.old && b.old !== ep) qs.push(db.prepare(`DELETE FROM push_subs WHERE endpoint = ? AND user_id = ?`).bind(String(b.old).slice(0, 1000), u.id));
+      qs.push(db.prepare(`INSERT INTO push_subs (endpoint, user_id, s_hash, p256dh, auth, created) VALUES (?, ?, ?, ?, ?, ?)
+          ON CONFLICT(endpoint) DO UPDATE SET user_id = excluded.user_id, s_hash = excluded.s_hash, p256dh = excluded.p256dh, auth = excluded.auth, created = excluded.created, err = ''`)
+        .bind(ep, u.id, u.s_hash, k.p256dh, k.auth, Date.now()));
+      qs.push(db.prepare(`DELETE FROM push_subs WHERE user_id = ?1 AND endpoint NOT IN (SELECT endpoint FROM push_subs WHERE user_id = ?1 ORDER BY created DESC LIMIT 10)`).bind(u.id));
+      await db.batch(qs);
+      return json({ ok: true });
+    }
+    if(m === "POST" && path === "push/unsub"){
+      const b = await body(req);
+      await db.prepare(`DELETE FROM push_subs WHERE endpoint = ? AND user_id = ?`).bind(String(b.endpoint || "").slice(0, 1000), u.id).run();
+      return json({ ok: true });
+    }
+    if(m === "POST" && path === "push/test"){
+      const b = await body(req);
+      const s = await db.prepare(`SELECT * FROM push_subs WHERE endpoint = ? AND user_id = ?`).bind(String(b.endpoint || "").slice(0, 1000), u.id).first();
+      if(!s) return fail("push_none", 404);
+      if(await overLimit(db, "pt:" + u.id, 10, 3600000)) return fail("slow_down", 429);
+      const n = (await db.prepare(`SELECT COUNT(*) AS n FROM notifs WHERE user_id = ? AND seen = 0`).bind(u.id).first()).n;
+      const r = await pushSend(db, url, s, { t: "도란도란 동물의숲", b: "알림이 잘 와요! 이제 내 글에 댓글이, 내 댓글에 답글이 달리면 이 기기로 알려 드려요.", id: "test", at: Date.now(), n });
+      return r.err ? fail(r.status === 404 || r.status === 410 ? "push_gone" : "push_fail", 502, { why: r.err }) : json({ ok: true });
+    }
 
     if(m === "POST" && path === "me"){
       const b = await body(req), name = cleanText(b.name), island = cleanText(b.island), fruit = FRUITS.includes(b.fruit) ? b.fruit : "";
@@ -407,6 +519,7 @@ export async function onRequest(ctx){
       await db.batch([
         db.prepare(`DELETE FROM sync WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM visits WHERE user_id = ?`).bind(u.id),
+        db.prepare(`DELETE FROM push_subs WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM notifs WHERE user_id = ? OR actor = ? OR (on_t = 'trade' AND ref IN (SELECT id FROM posts WHERE user_id = ?)) OR (on_t = 'show' AND ref IN (SELECT id FROM shows WHERE user_id = ?))`).bind(u.id, u.id, u.id, u.id),
         db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.user_id = ?))`).bind(u.id),
         db.prepare(`DELETE FROM comments WHERE user_id = ? OR post_id IN (SELECT id FROM posts WHERE user_id = ?)`).bind(u.id, u.id),
@@ -451,12 +564,13 @@ export async function onRequest(ctx){
         if(hasCash(text)) return fail("cash");
         const rt = await replyTarget(db, "comments", "post_id", p.id, b.reply); if(!rt) return fail("no_parent", 404);
         if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
-        const id = rand(9);
+        const id = rand(9), nn = { actor: u.id, owner: p.user_id, to: rt.to, parent: rt.parent, on: "trade", ref: p.id, cmt: id, body: text, now };
         await db.batch([
           db.prepare(`INSERT INTO comments (id, post_id, user_id, body, created, parent, to_user) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, p.id, u.id, text, now, rt.parent, rt.to),
           db.prepare(`UPDATE posts SET cmts = cmts + 1 WHERE id = ?`).bind(p.id),
-          ...notifyQs(db, { actor: u.id, owner: p.user_id, to: rt.to, parent: rt.parent, on: "trade", ref: p.id, cmt: id, body: text, now }),
+          ...notifyQs(db, nn),
         ]);
+        pushNotifs(ctx, db, url, nn, u, "거래 · " + (TYPE_NAME[p.type] || "글"));
         const tn = rt.to ? await db.prepare(`SELECT name FROM users WHERE id = ?`).bind(rt.to).first() : null;
         return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit }, parent: rt.parent, to: rt.to ? { id: rt.to, name: (tn && tn.name) || "" } : null } });
       }
@@ -535,12 +649,13 @@ export async function onRequest(ctx){
         if(!text) return fail("empty");
         const rt = await replyTarget(db, "show_cmts", "show_id", x.id, b.reply); if(!rt) return fail("no_parent", 404);
         if(await overLimit(db, "cm:" + u.id, 200, DAY)) return fail("slow_down", 429);
-        const id = rand(9);
+        const id = rand(9), nn = { actor: u.id, owner: x.user_id, to: rt.to, parent: rt.parent, on: "show", ref: x.id, cmt: id, body: text, now };
         await db.batch([
           db.prepare(`INSERT INTO show_cmts (id, show_id, user_id, body, created, parent, to_user) VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(id, x.id, u.id, text, now, rt.parent, rt.to),
           db.prepare(`UPDATE shows SET cmts = cmts + 1 WHERE id = ?`).bind(x.id),
-          ...notifyQs(db, { actor: u.id, owner: x.user_id, to: rt.to, parent: rt.parent, on: "show", ref: x.id, cmt: id, body: text, now }),
+          ...notifyQs(db, nn),
         ]);
+        pushNotifs(ctx, db, url, nn, u, "자랑 · " + (x.title || KIND_NAME[x.kind] || "글"));
         const tn = rt.to ? await db.prepare(`SELECT name FROM users WHERE id = ?`).bind(rt.to).first() : null;
         return json({ comment: { id, body: text, created: now, author: { id: u.id, name: u.name, island: u.island, fruit: u.fruit }, parent: rt.parent, to: rt.to ? { id: rt.to, name: (tn && tn.name) || "" } : null } });
       }

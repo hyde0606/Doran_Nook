@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "도란도란 동물의숲",
+  "short_name": "도란도란",
+  "description": "모여봐요 동물의 숲 카탈로그·박물관·주민 체크와 섬 꾸미기를 한곳에서",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#2f8a3c",
+  "theme_color": "#7dbd57",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-mask-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
