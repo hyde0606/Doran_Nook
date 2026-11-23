@@ -346,6 +346,17 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .ri .tx span{font-size:12px; color:var(--muted); overflow-wrap:anywhere}
 .ri .sc{font-size:12px; color:var(--muted); flex:none}
 .ri.done{opacity:.6}
+.rw{display:grid; gap:6px; padding:6px 8px; border-radius:12px; background:var(--paper2)}
+.rw .ri{padding:0; background:none}
+.rw.done{opacity:.6}
+.rw .vp{display:flex; flex-wrap:wrap; gap:6px; padding-left:30px}
+.rw .vp button{border:2px solid transparent; border-radius:10px; padding:2px; background:var(--paper); cursor:pointer; position:relative; line-height:0}
+.rw .vp button .pic{--t:40px; display:block}
+.rw .vp button[aria-pressed=true]{border-color:var(--leaf); background:color-mix(in srgb, var(--leaf) 18%, var(--paper))}
+.rw .vp button[aria-pressed=true]::after{content:"✓"; position:absolute; right:-4px; top:-4px; width:16px; height:16px; border-radius:50%; background:var(--leaf); color:var(--leaf-ink); font-size:11px; line-height:16px; text-align:center}
+.rw .vp button.had{opacity:.55}
+.rw .ph-cn{padding-left:30px; font-size:12px; color:var(--muted)}
+.rw .ph-cn.unk{color:var(--warn, #c77d1a)}
 .ri.on{background:var(--sprout)}
 .toggle{display:flex; align-items:center; gap:8px; font-size:14px; background:var(--plum-soft); border-radius:12px; padding:8px 12px}
 .toggle input{width:18px; height:18px; accent-color:var(--plum)}
@@ -6923,6 +6934,110 @@ async function ppRead(pp, bmp, s0, l){
 }
 const ocrT = {seg: 0, pp: 0, whole: 0, sheet: 0, again: 0, post: 0, match: 0, n: 0, lines: 0, ppLines: 0, sheetLines: 0, againLines: 0};   // where the time goes (ms)
 let ocrCut = 0;   // names cut off at the edge of their panel in the photos of this run (told to the user with the results)
+/* ----- v43: which color each found name is. A name read on its own line points at the picture next to it (left of it,
+   as in the game's catalog, or above it, as in tile lists); that picture is compared with this item's color pictures.
+   A list that shows one row per color (the game's catalog) gives each row's color. When no picture is clear, the
+   color stays unknown and the person picks it in the results. ----- */
+let ocrColor = [];   // this run: {id, v} — v = color index, -1 = the name was there but its color is not clear
+const CF = 32, cfC = document.createElement("canvas"); cfC.width = cfC.height = CF;
+const cfG = cfC.getContext("2d", {willReadFrequently: true});
+const sheetCache = new Map();
+function sheetData(url){
+  if(!sheetCache.has(url)) sheetCache.set(url, new Promise(res => { const im = new Image();
+    im.onload = () => { try{ const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext("2d", {willReadFrequently: true}); g.drawImage(im, 0, 0); res(c); }catch(e){ res(null); } };
+    im.onerror = () => res(null); im.src = url; }));
+  return sheetCache.get(url);
+}
+// a picture's look: color mix (4 levels per channel) and the mean color of a 4×4 grid over the picture's own box
+function colorFeat(d, fg){
+  let x0 = CF, y0 = CF, x1 = -1, y1 = -1, n = 0;
+  for(let y = 0; y < CF; y++) for(let x = 0; x < CF; x++) if(fg[y*CF+x]){ n++; if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+  if(n < CF * CF * 0.05 || x1 - x0 < 4 || y1 - y0 < 4) return null;
+  const hist = new Float32Array(64), cell = new Float32Array(16 * 4), bw = (x1 - x0 + 1) / 4, bh = (y1 - y0 + 1) / 4;
+  for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){ const i = y*CF+x; if(!fg[i]) continue; const k = i*4, r = d[k], g = d[k+1], b = d[k+2];
+    hist[(r >> 6) * 16 + (g >> 6) * 4 + (b >> 6)] += 1 / n;
+    const c = Math.min(3, Math.floor((y - y0) / bh)) * 4 + Math.min(3, Math.floor((x - x0) / bw)), o = c * 4;
+    cell[o] += r; cell[o+1] += g; cell[o+2] += b; cell[o+3]++; }
+  for(let c = 0; c < 16; c++){ const o = c * 4, m = cell[o+3]; if(m >= 2){ cell[o] /= m; cell[o+1] /= m; cell[o+2] /= m; } else cell[o+3] = 0; }
+  return {hist, cell, asp: (x1 - x0 + 1) / (y1 - y0 + 1)};
+}
+function featDist(a, b){
+  let h = 0; for(let i = 0; i < 64; i++) h += Math.min(a.hist[i], b.hist[i]);
+  let s = 0, k = 0, miss = 0;
+  for(let c = 0; c < 16; c++){ const o = c * 4, pa = a.cell[o+3] > 0, pb = b.cell[o+3] > 0;
+    if(pa && pb){ const dr = a.cell[o] - b.cell[o], dg = a.cell[o+1] - b.cell[o+1], db = a.cell[o+2] - b.cell[o+2]; s += Math.sqrt(dr*dr + dg*dg + db*db) / 441; k++; }
+    else if(pa || pb) miss++; }
+  if(k < 4) return 1;
+  return 0.5 * (1 - h) + 0.5 * (s / k) + 0.15 * miss / 16 + 0.1 * Math.min(1, Math.abs(Math.log(a.asp / b.asp)));
+}
+const varPix = new Map();   // item id -> [RGBA of each color's picture at CF×CF]
+async function itemPix(it){
+  if(varPix.has(it.id)) return varPix.get(it.id);
+  const out = [], T = FR ? FR.tile : 96;
+  for(let i = 0; i < it.vs.length; i++){
+    const idx = it.fs + i, k = Math.floor(idx / FPER), li = idx % FPER;
+    const c = await sheetData(`img/f${it.cat}-${k}.webp`); if(!c){ out.push(null); continue; }
+    cfG.clearRect(0, 0, CF, CF); cfG.imageSmoothingQuality = "high";
+    cfG.drawImage(c, (li % FCOLS) * T, Math.floor(li / FCOLS) * T, T, T, 0, 0, CF, CF);
+    out.push(cfG.getImageData(0, 0, CF, CF).data.slice());
+  }
+  varPix.set(it.id, out); return out;
+}
+const farFrom = (bgs, r, g, b) => bgs.every(c => Math.max(Math.abs(r - c[0]), Math.abs(g - c[1]), Math.abs(b - c[2])) > 30);
+// one square of the photo: its panel colors (the main colors of its border) and what differs from them
+function cropAt(bmp, x, y, s){
+  const BW = bmp.width, BH = bmp.height, ax = Math.max(0, x), ay = Math.max(0, y), bx = Math.min(BW, x + s), by = Math.min(BH, y + s);
+  if((bx - ax) * (by - ay) < s * s * 0.7 || s < 8) return null;
+  cfG.clearRect(0, 0, CF, CF); cfG.imageSmoothingQuality = "high";
+  cfG.drawImage(bmp, x, y, s, s, 0, 0, CF, CF);
+  const d = cfG.getImageData(0, 0, CF, CF).data, bins = new Map(); let n = 0;
+  for(let i = 0; i < CF; i++) for(const [q, r] of [[i, 0], [i, CF-1], [0, i], [CF-1, i]]){ const k = (r*CF+q)*4; if(d[k+3] < 200) continue; n++;
+    const key = (d[k] >> 4) * 256 + (d[k+1] >> 4) * 16 + (d[k+2] >> 4); let e = bins.get(key); if(!e){ e = [0, 0, 0, 0]; bins.set(key, e); } e[0] += d[k]; e[1] += d[k+1]; e[2] += d[k+2]; e[3]++; }
+  if(n < CF) return null;
+  // the border must be mostly a few flat colors (panel, row stripes), or this square is not around a lone picture
+  const top = [...bins.values()].sort((p, q) => q[3] - p[3]).filter(e => e[3] >= n * 0.12).slice(0, 3);
+  if(top.reduce((t, e) => t + e[3], 0) < n * 0.6) return null;
+  const bgs = top.map(e => [e[0] / e[3], e[1] / e[3], e[2] / e[3]]), fg = new Uint8Array(CF * CF);
+  for(let j = 0; j < CF * CF; j++){ const k = j*4; fg[j] = d[k+3] > 200 && farFrom(bgs, d[k], d[k+1], d[k+2]) ? 1 : 0; }
+  const f = colorFeat(d, fg); return f && {f, bgs};
+}
+// box = the name's letters in the photo's own pixels
+async function guessColor(it, bmp, box){
+  const vp = await itemPix(it); if(vp.filter(Boolean).length < 2) return {v: -1};
+  const h = Math.max(6, box.y1 - box.y0), cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2, rects = [];
+  for(const S of [1.6, 2.2, 3, 4]) for(const g of [0.3, 0.9]) rects.push([box.x0 - g * h - S * h, cy - S * h / 2, S * h]);
+  // the line finder sometimes takes the picture in with the name (they touch): then the picture is at the box's own left end
+  for(const S of [1.3, 1.6, 2]) rects.push([box.x0 - 0.15 * h, cy - S * h / 2, S * h]);
+  for(const S of [2.5, 3.5, 5, 6.5, 8, 9.5]) for(const g of [0.3, 1.2, 2.2, 3.2]) rects.push([cx - S * h / 2, box.y0 - g * h - S * h, S * h]);
+  let best = null;
+  for(const [x, y, s] of rects){ const c = cropAt(bmp, Math.round(x), Math.round(y), Math.round(s)); if(!c) continue;
+    // each color's picture seen the same way: the parts that look like the panel do not count on either side
+    // (laid on the panel color first, so thin parts blend with the panel as they do in the photo)
+    const B = c.bgs[0], e = new Uint8ClampedArray(CF * CF * 4);
+    const ds = vp.map(d => { if(!d) return 9; const fg = new Uint8Array(CF * CF);
+      for(let j = 0; j < CF * CF; j++){ const k = j*4, a = d[k+3] / 255;
+        e[k] = d[k] * a + B[0] * (1 - a); e[k+1] = d[k+1] * a + B[1] * (1 - a); e[k+2] = d[k+2] * a + B[2] * (1 - a); e[k+3] = 255;
+        fg[j] = d[k+3] > 60 && farFrom(c.bgs, e[k], e[k+1], e[k+2]) ? 1 : 0; }
+      const v = colorFeat(e, fg); return v ? featDist(c.f, v) : 9; });
+    const order = ds.map((d, i) => i).sort((a, b) => ds[a] - ds[b]);
+    const r = {v: order[0], d: ds[order[0]], d2: ds[order[1]], rect: [Math.round(x), Math.round(y), Math.round(s)]};
+    if(!best || r.d < best.d) best = r;
+    if(best.d < 0.12 && best.d2 - best.d > 0.12) break; }   // clear already: the other squares cannot do better
+  if(!best || best.d > 0.36 || best.d2 - best.d < 0.035) return {v: -1, best};
+  return {v: best.v, best};
+}
+async function ocrColors(bmp, s0, all, ptxt, ttxt, joins, prog){
+  const used = new Set(), jobs = [];
+  for(const J of joins){ const m = bestMatch(J.t); if(!m || m.score < 0.9) continue; const a = all[J.i], b = all[J.j]; used.add(J.i); used.add(J.j);
+    jobs.push({it: m.it, box: {x0: Math.min(a.rx0, b.rx0), y0: Math.min(a.ry0, b.ry0), x1: Math.max(a.rx1, b.rx1), y1: Math.max(a.ry1, b.ry1)}}); }
+  all.forEach((l, i) => { if(used.has(i)) return; let best = null;
+    [ptxt[i], ttxt[i]].forEach(t => { const m = t && bestMatch(t); if(m && m.score >= 0.8 && (!best || m.score > best.score)) best = m; });
+    if(best) jobs.push({it: best.it, box: {x0: l.rx0, y0: l.ry0, x1: l.rx1, y1: l.ry1}}); });
+  const todo = jobs.filter(J => J.it.vs.length >= 2 && J.it.fs >= 0); let k = 0;
+  for(const J of todo){ if(prog) prog(k++ / todo.length); if(k % 8 === 0) await new Promise(r => setTimeout(r, 0));
+    const b = J.box, r = await guessColor(J.it, bmp, {x0: b.x0 / s0, y0: b.y0 / s0, x1: (b.x1 + 1) / s0, y1: (b.y1 + 1) / s0});
+    ocrColor.push({id: J.it.id, v: r.v}); }
+}
 async function ocrLines(w, src, opt){
   const bmp = src instanceof HTMLCanvasElement ? src : await createImageBitmap(src);
   const out = [], P = opt && opt.prog || (() => {});
@@ -6939,7 +7054,7 @@ async function ocrLines(w, src, opt){
   await w.setParameters({tessedit_pageseg_mode: "3"});
   const whole = w.recognize(await prepImage(bmp)).then(r => (r.data.text || "").split(/\n+/), () => []);
   // 1. the second reader goes over every line that can be a name: a line it reads surely Tesseract need not read again
-  const ptxt = all.map(() => ""), ttxt = all.map(() => ""), done = all.map(() => false);
+  const ptxt = all.map(() => ""), ttxt = all.map(() => ""), done = all.map(() => false), joins = [];
   if(pp){
     const skip = l => l.n < 2 && l.rx1 - l.rx0 < l.h * 1.3;   // one box about as wide as tall: a piece of a picture
     const nRead = Math.max(1, all.filter(l => !skip(l)).length);
@@ -6952,7 +7067,7 @@ async function ocrLines(w, src, opt){
         if(gap < -2 || gap > Math.max(a.h, b.h) * 1.6) continue;
         if(Math.min(a.ry1, b.ry1) - Math.max(a.ry0, b.ry0) < Math.min(a.h, b.h) * 0.5) continue;
         const joined = ptxt[i] + " " + ptxt[j], m = bestMatch(joined); out.push(joined);
-        if(m && m.score >= 0.9) done[i] = done[j] = true; } }
+        if(m && m.score >= 0.9){ done[i] = done[j] = true; joins.push({i, j, t: joined}); } } }
     ptxt.forEach((t, i) => { if(!t || done[i]) return; out.push(t); const m = bestMatch(t); if(m && m.score >= 0.9) done[i] = true; });
   }
   lap("pp"); ocrT.lines += all.length;
@@ -6986,13 +7101,13 @@ async function ocrLines(w, src, opt){
     if(again) await w.setParameters({tessedit_pageseg_mode: "6"}); lap("again"); ocrT.againLines += again;
   }
   out.push(...tess);
-  P(W.sh1); if(pp) await warmMatch(tess, f => P(W.sh1 + (1 - W.sh1) * 0.85 * f));
+  P(W.sh1); if(pp) await warmMatch(tess, f => P(W.sh1 + (1 - W.sh1) * 0.5 * f));
   // both readers took something in this picture for the same name, each not quite sure (풍선캠 and 풍선명 for 풍선껌):
   // together they are, and the name itself goes in
   // (the same reading from both is no proof: then the text really says that, and it may be a name we do not have)
   if(pp){ const tset = new Set(tess.map(t => clean(t || ""))), tf = new Map(matchLines(tess.filter(t => t && t.trim())).map(x => [x.it.id, x.score]));
     ptxt.forEach(t => { const x = t && bestMatch(t); if(x && x.score >= 0.75 && x.score < 0.8 && (tf.get(x.it.id) || 0) >= 0.75 && !tset.has(clean(t))) out.push(x.it.ko); }); }
-  P(W.sh1 + (1 - W.sh1) * 0.88); await new Promise(r => setTimeout(r, 0));
+  P(W.sh1 + (1 - W.sh1) * 0.55); await new Promise(r => setTimeout(r, 0));
   // rows cut off by a border, next to lines that are names: told to the person with the results (a row cut at the
   // bottom of one screenshot often goes on at the top of the next, so the larger of the two counts is used)
   if(!(opt && opt.video)){
@@ -7002,11 +7117,12 @@ async function ocrLines(w, src, opt){
     all.forEach((l, i) => { if(sure[i]){ if(l.cutD) down++; if(l.cutU) up++; } else if(l.touch && l.n >= 2 && near(l, l.touch)){ if(l.touch > 0) down++; else up++; } });
     ocrCut += Math.max(down, up); ocrT.cutDown = down; ocrT.cutUp = up;
   }
-  P(W.sh1 + (1 - W.sh1) * 0.96);
+  P(W.sh1 + (1 - W.sh1) * 0.6);
   // a name that wraps onto a second line in its tile (K.K.샤미센 연주 / 곡): also try the two lines joined
   all.forEach((a, i) => { const ta = [ptxt[i], ttxt[i]].filter(Boolean); if(!ta.length) return;
     all.forEach((b, j) => { if(j === i) return; const tb = [ptxt[j], ttxt[j]].filter(Boolean); if(!tb.length) return; const cx = (b.rx0 + b.rx1) / 2;
       if(b.ry0 > a.ry1 - 2 && b.ry0 - a.ry1 < a.h * 1.2 && cx > a.rx0 && cx < a.rx1 && b.rx1 - b.rx0 <= (a.rx1 - a.rx0) * 1.2) ta.forEach(x => tb.forEach(y => out.push(x + y))); }); });
+  try{ await ocrColors(bmp, seg.s0, all, ptxt, ttxt, joins, f => P(W.sh1 + (1 - W.sh1) * (0.6 + 0.4 * f))); }catch(e){}
   lap("post"); P(1);
   return out;
   } finally { ocrRec = null; }
@@ -7092,7 +7208,7 @@ function openPhoto(){
     if(!files.length) return;
     drop.hidden = true; stat.hidden = false; res.innerHTML = "";
     bar.style.transition = "none"; bar.style.width = "0%"; txt.textContent = ""; void bar.offsetWidth; bar.style.transition = "";   // a new run starts from empty, without sliding back
-    const lines = []; ocrCut = 0;
+    const lines = []; ocrCut = 0; ocrColor = [];
     let shown = 0;
     const show = (f, label, note) => { shown = Math.max(shown, Math.min(1, f)); bar.style.width = (shown * 100).toFixed(1) + "%";
       if(label) txt.textContent = `${label} · ${Math.floor(shown * 100)}%${note ? " " + note : ""}`; };
@@ -7142,16 +7258,37 @@ function openPhoto(){
       res.innerHTML = `<p class="err">${code==="rate_limited" ? "Claude 사용량이 잠시 꽉 찼어요. 조금 뒤에 다시 하거나, Claude로 읽기를 끄고 해 보세요." : code==="not_granted" ? "Claude 사용을 허용하지 않아서 읽지 못했어요. Claude로 읽기를 끄면 기기 안에서 읽어요." : e && e.message === "video" ? "영상을 열지 못했어요. 이 브라우저가 이 영상 형식을 못 여는 것 같아요. 찍은 기기의 브라우저에서 올리거나, 캡처 사진으로 올려 주세요." : "사진을 읽지 못했어요. 사진이 너무 흐리지 않은지 확인하고 다시 올려 주세요."}</p>`;
     }
   }
+  // v43: an item with colors lists its colors under its name. The colors whose picture was seen in the photo are
+  // picked; the person taps a color to pick or drop it. Colors already checked before stay on, dimmed.
   function showResults(list){
     stat.hidden = true; drop.hidden = false;
     if(!list.length){ res.innerHTML = `<p class="err">아이템 이름을 찾지 못했어요. 목록의 이름이 크게 보이게 찍었는지 확인해 주세요.</p>`; return; }
-    const fresh = list.filter(r => !own.has(r.it.id)).length;
-    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${fresh < list.length ? ` (그중 ${fmt(list.length-fresh)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.</p>${ocrCut ? `<p class="sub ph-cut">칸이나 화면 끝에서 글자가 잘려 못 읽은 이름이 ${fmt(ocrCut)}개쯤 있어요. 조금씩 겹치게 찍거나 화면 기록 영상으로 올리면 빠짐없이 읽어요.</p>` : ""}
-      <div class="res">${list.map(r => { const done = own.has(r.it.id); return `<label class="ri${done?" done":""}"><input type="checkbox" data-id="${r.it.id}" ${done?"disabled":""} ${!done && r.score>=0.8?"checked":""}>${picHTML(r.it)}<span class="tx"><b>${esc(r.it.ko)}</b><span>${esc(CATS[r.it.lc][0])} · 읽은 글자: ${esc(r.raw.replace(/\s+/g, " ").trim().slice(0,30))}</span></span><span class="sc">${done ? "등록됨" : (r.score>=0.8 ? "확실" : "애매")}</span></label>`; }).join("")}</div>
+    const seen = new Map(), miss = new Set(); ocrColor.forEach(c => { if(c.v >= 0) seen.set(c.id, (seen.get(c.id) || 0) | (1 << c.v)); else miss.add(c.id); });
+    const rows = list.map(r => { const it = r.it, nv = it.vs.length > 1 ? it.vs.length : 0, had = nv ? (vmask.get(it.id) || 0) : 0, got = nv ? (seen.get(it.id) || 0) : 0, add = got & ~had;
+      const done = own.has(it.id) && (!nv || ownState(it) === "done" || (got && !add));
+      return {r, it, nv, had, got, sel: add, done, on: !done && r.score >= 0.8 && (!own.has(it.id) || !!add)}; });
+    const nDone = rows.filter(x => x.done).length, anyColor = rows.some(x => x.nv && !x.done);
+    const vName = (it, i) => esc(it.vs[i] || `${i + 1}번`);
+    const colorNote = x => { if(!x.nv || x.done) return "";
+      const picked = []; for(let i = 0; i < x.nv; i++) if(x.got & (1 << i)) picked.push(vName(x.it, i));
+      return picked.length ? `<p class="ph-cn">사진에서 본 색: ${picked.join(", ")}${miss.has(x.it.id) ? ". 색을 못 알아본 줄도 있어요. 빠진 색은 눌러 주세요." : ""}</p>` : `<p class="ph-cn unk">사진에서 색을 알아보지 못했어요. 가진 색을 눌러 주세요.</p>`; };
+    const chips = (x, k) => { if(!x.nv || x.done) return ""; let h = "";
+      for(let i = 0; i < x.nv; i++){ const had = x.had & (1 << i), on = had || (x.sel & (1 << i));
+        h += `<button type="button" class="${had ? "had" : ""}" data-k="${k}" data-vi="${i}" aria-pressed="${!!on}" ${had ? "disabled" : ""} title="${vName(x.it, i)}${had ? " (이미 체크됨)" : ""}" aria-label="${vName(x.it, i)}${had ? ", 이미 체크됨" : ""}">${framePic(x.it, i, 40)}</button>`; }
+      return `<div class="vp">${h}</div>`; };
+    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${nDone ? ` (그중 ${fmt(nDone)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.${anyColor ? " 색이 있는 아이템은 사진 속 그림을 보고 색을 골라 뒀어요. 다르면 색 그림을 눌러 고쳐 주세요." : ""}</p>${ocrCut ? `<p class="sub ph-cut">칸이나 화면 끝에서 글자가 잘려 못 읽은 이름이 ${fmt(ocrCut)}개쯤 있어요. 조금씩 겹치게 찍거나 화면 기록 영상으로 올리면 빠짐없이 읽어요.</p>` : ""}
+      <div class="res">${rows.map((x, k) => `<div class="rw${x.done ? " done" : ""}"><label class="ri"><input type="checkbox" data-k="${k}" ${x.done ? "disabled" : ""} ${x.on ? "checked" : ""}>${picHTML(x.it)}<span class="tx"><b>${esc(x.it.ko)}</b><span>${esc(CATS[x.it.lc][0])} · 읽은 글자: ${esc(x.r.raw.replace(/\s+/g, " ").trim().slice(0,30))}</span></span><span class="sc">${x.done ? "등록됨" : own.has(x.it.id) ? "색 추가" : (x.r.score >= 0.8 ? "확실" : "애매")}</span></label>${colorNote(x)}${chips(x, k)}</div>`).join("")}</div>
       <div class="acts2"><button class="pill leaf" type="button" id="ph-ok">선택한 아이템 등록</button></div>`;
+    res.querySelector(".res").addEventListener("click", e => {
+      const b = e.target.closest(".vp button"); if(!b || b.disabled) return;
+      const x = rows[+b.dataset.k], bit = 1 << +b.dataset.vi; x.sel ^= bit; b.setAttribute("aria-pressed", String(!!(x.sel & bit)));
+      if(x.sel & bit){ const cb = res.querySelector(`input[data-k="${b.dataset.k}"]`); if(cb && !cb.disabled) cb.checked = true; }
+    });
     res.querySelector("#ph-ok").addEventListener("click", () => {
-      let n=0; res.querySelectorAll("input[type=checkbox]:checked:not(:disabled)").forEach(x => { own.add(+x.dataset.id); n++; });
-      save(); refreshAll(); s.close(); toast(n ? `${fmt(n)}개를 등록했어요` : "새로 등록한 아이템이 없어요");
+      let n = 0, nc = 0;
+      res.querySelectorAll("input[type=checkbox]:checked:not(:disabled)").forEach(cb => { const x = rows[+cb.dataset.k], id = x.it.id;
+        own.add(id); if(x.nv && x.sel){ vmask.set(id, (vmask.get(id) || 0) | x.sel); nc += popcount(x.sel); } n++; });
+      save(); refreshAll(); s.close(); toast(n ? `${fmt(n)}개를 등록했어요${nc ? ` (색 ${fmt(nc)}가지)` : ""}` : "새로 등록한 아이템이 없어요");
     });
   }
 }
