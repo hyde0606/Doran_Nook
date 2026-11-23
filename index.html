@@ -6959,7 +6959,15 @@ function colorFeat(d, fg){
     const c = Math.min(3, Math.floor((y - y0) / bh)) * 4 + Math.min(3, Math.floor((x - x0) / bw)), o = c * 4;
     cell[o] += r; cell[o+1] += g; cell[o+2] += b; cell[o+3]++; }
   for(let c = 0; c < 16; c++){ const o = c * 4, m = cell[o+3]; if(m >= 2){ cell[o] /= m; cell[o+1] /= m; cell[o+2] /= m; } else cell[o+3] = 0; }
-  return {hist, cell, asp: (x1 - x0 + 1) / (y1 - y0 + 1)};
+  // shape: how much of each 6×6 cell is picture, and the light/dark pattern inside (normalized), to tell the item's own
+  // picture from a stand-in icon (the game's lists show a leaf for every piece of furniture and a tinted outline for clothes)
+  const G = 6, gm = new Float32Array(G * G), gl = new Float32Array(G * G), gn = new Float32Array(G * G), gw = (x1 - x0 + 1) / G, gh = (y1 - y0 + 1) / G;
+  for(let y = y0; y <= y1; y++) for(let x = x0; x <= x1; x++){ const c = Math.min(G-1, Math.floor((y - y0) / gh)) * G + Math.min(G-1, Math.floor((x - x0) / gw)); gn[c]++;
+    const i = y*CF+x; if(fg[i]){ gm[c]++; const k = i*4; gl[c] += 0.299*d[k] + 0.587*d[k+1] + 0.114*d[k+2]; } }
+  let lm = 0, ln = 0; for(let c = 0; c < G*G; c++){ if(gm[c]){ gl[c] /= gm[c]; lm += gl[c]; ln++; } gm[c] = gn[c] ? gm[c] / gn[c] : 0; }
+  lm /= Math.max(1, ln); let sd = 0; for(let c = 0; c < G*G; c++) if(gm[c]) sd += (gl[c] - lm) ** 2; sd = Math.sqrt(sd / Math.max(1, ln)) || 1;
+  for(let c = 0; c < G*G; c++) gl[c] = gm[c] ? (gl[c] - lm) / sd : 0;
+  return {hist, cell, asp: (x1 - x0 + 1) / (y1 - y0 + 1), gm, gl};
 }
 function featDist(a, b){
   let h = 0; for(let i = 0; i < 64; i++) h += Math.min(a.hist[i], b.hist[i]);
@@ -6969,6 +6977,11 @@ function featDist(a, b){
     else if(pa || pb) miss++; }
   if(k < 4) return 1;
   return 0.5 * (1 - h) + 0.5 * (s / k) + 0.15 * miss / 16 + 0.1 * Math.min(1, Math.abs(Math.log(a.asp / b.asp)));
+}
+function shapeDist(a, b){
+  let m = 0, l = 0, k = 0;
+  for(let c = 0; c < 36; c++){ m += Math.abs(a.gm[c] - b.gm[c]); if(a.gm[c] > 0.15 && b.gm[c] > 0.15){ l += Math.abs(a.gl[c] - b.gl[c]); k++; } }
+  return {m: m / 36, l: k ? l / k : 2};
 }
 const varPix = new Map();   // item id -> [RGBA of each color's picture at CF×CF]
 async function itemPix(it){
@@ -7002,30 +7015,41 @@ function cropAt(bmp, x, y, s){
   const f = colorFeat(d, fg); return f && {f, bgs};
 }
 // box = the name's letters in the photo's own pixels
-async function guessColor(it, bmp, box){
-  const vp = await itemPix(it); if(vp.filter(Boolean).length < 2) return {v: -1};
+// the squares where a name's picture may be, relative to the name's letters
+function picRects(box){
   const h = Math.max(6, box.y1 - box.y0), cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2, rects = [];
   for(const S of [1.6, 2.2, 3, 4]) for(const g of [0.3, 0.9]) rects.push([box.x0 - g * h - S * h, cy - S * h / 2, S * h]);
   // the line finder sometimes takes the picture in with the name (they touch): then the picture is at the box's own left end
   for(const S of [1.3, 1.6, 2]) rects.push([box.x0 - 0.15 * h, cy - S * h / 2, S * h]);
   for(const S of [2.5, 3.5, 5, 6.5, 8, 9.5]) for(const g of [0.3, 1.2, 2.2, 3.2]) rects.push([cx - S * h / 2, box.y0 - g * h - S * h, S * h]);
+  return rects.map(([x, y, s]) => [Math.round(x), Math.round(y), Math.round(s)]);
+}
+async function guessColor(it, bmp, box){
+  const vp = await itemPix(it); if(vp.filter(Boolean).length < 2) return {v: -1};
+  const rects = picRects(box);
   let best = null;
-  for(const [x, y, s] of rects){ const c = cropAt(bmp, Math.round(x), Math.round(y), Math.round(s)); if(!c) continue;
+  for(let ri = 0; ri < rects.length; ri++){ const [x, y, s] = rects[ri]; const c = cropAt(bmp, x, y, s); if(!c) continue;
     // each color's picture seen the same way: the parts that look like the panel do not count on either side
     // (laid on the panel color first, so thin parts blend with the panel as they do in the photo)
-    const B = c.bgs[0], e = new Uint8ClampedArray(CF * CF * 4);
+    const B = c.bgs[0], e = new Uint8ClampedArray(CF * CF * 4), vfs = [];
     const ds = vp.map(d => { if(!d) return 9; const fg = new Uint8Array(CF * CF);
       for(let j = 0; j < CF * CF; j++){ const k = j*4, a = d[k+3] / 255;
         e[k] = d[k] * a + B[0] * (1 - a); e[k+1] = d[k+1] * a + B[1] * (1 - a); e[k+2] = d[k+2] * a + B[2] * (1 - a); e[k+3] = 255;
         fg[j] = d[k+3] > 60 && farFrom(c.bgs, e[k], e[k+1], e[k+2]) ? 1 : 0; }
-      const v = colorFeat(e, fg); return v ? featDist(c.f, v) : 9; });
+      const v = colorFeat(e, fg); vfs.push(v); return v ? featDist(c.f, v) : 9; });
     const order = ds.map((d, i) => i).sort((a, b) => ds[a] - ds[b]);
-    const r = {v: order[0], d: ds[order[0]], d2: ds[order[1]], rect: [Math.round(x), Math.round(y), Math.round(s)]};
+    const r = {v: order[0], d: ds[order[0]], d2: ds[order[1]], rect: [x, y, s], ri, cf: c.f, sh: vfs[order[0]] ? shapeDist(c.f, vfs[order[0]]) : null};
+    // the shape must be this item's own picture: a stand-in icon (the game's lists use a leaf for all furniture and a tinted
+    // outline for clothes) or a square around the wrong thing is not looked at for its color
+    if(!r.sh || r.sh.m > 0.32 || r.sh.l > 0.95) continue;
     if(!best || r.d < best.d) best = r;
     if(best.d < 0.12 && best.d2 - best.d > 0.12) break; }   // clear already: the other squares cannot do better
   if(!best || best.d > 0.36 || best.d2 - best.d < 0.035) return {v: -1, best};
   return {v: best.v, best};
 }
+// a picture that also sits in the same place beside other names is a stand-in icon of the list (the game shows a leaf for
+// every piece of furniture), not the item: it says nothing of the color
+const sameIcon = (a, b) => { if(!a || !b) return false; const sh = shapeDist(a, b); return sh.m < 0.1 && sh.l < 0.35 && featDist(a, b) < 0.12; };
 async function ocrColors(bmp, s0, all, ptxt, ttxt, joins, prog){
   const used = new Set(), jobs = [];
   for(const J of joins){ const m = bestMatch(J.t); if(!m || m.score < 0.9) continue; const a = all[J.i], b = all[J.j]; used.add(J.i); used.add(J.j);
@@ -7033,10 +7057,14 @@ async function ocrColors(bmp, s0, all, ptxt, ttxt, joins, prog){
   all.forEach((l, i) => { if(used.has(i)) return; let best = null;
     [ptxt[i], ttxt[i]].forEach(t => { const m = t && bestMatch(t); if(m && m.score >= 0.8 && (!best || m.score > best.score)) best = m; });
     if(best) jobs.push({it: best.it, box: {x0: l.rx0, y0: l.ry0, x1: l.rx1, y1: l.ry1}}); });
+  jobs.forEach(J => { const b = J.box; J.ob = {x0: b.x0 / s0, y0: b.y0 / s0, x1: (b.x1 + 1) / s0, y1: (b.y1 + 1) / s0}; });
   const todo = jobs.filter(J => J.it.vs.length >= 2 && J.it.fs >= 0); let k = 0;
   for(const J of todo){ if(prog) prog(k++ / todo.length); if(k % 8 === 0) await new Promise(r => setTimeout(r, 0));
-    const b = J.box, r = await guessColor(J.it, bmp, {x0: b.x0 / s0, y0: b.y0 / s0, x1: (b.x1 + 1) / s0, y1: (b.y1 + 1) / s0});
-    ocrColor.push({id: J.it.id, v: r.v}); }
+    const r = await guessColor(J.it, bmp, J.ob); let v = r.v;
+    if(v >= 0){ const cy = (J.ob.y0 + J.ob.y1) / 2;
+      const near = jobs.filter(o => o.it.id !== J.it.id).sort((a, b) => Math.abs((a.ob.y0 + a.ob.y1) / 2 - cy) - Math.abs((b.ob.y0 + b.ob.y1) / 2 - cy)).slice(0, 30);
+      for(const o of near){ const [x, y, s] = picRects(o.ob)[r.best.ri], c = cropAt(bmp, x, y, s); if(c && sameIcon(r.best.cf, c.f)){ v = -1; r.stand = o.it.ko; break; } } }
+    J.r = r; ocrColor.push({id: J.it.id, v}); }
 }
 async function ocrLines(w, src, opt){
   const bmp = src instanceof HTMLCanvasElement ? src : await createImageBitmap(src);
@@ -7268,15 +7296,17 @@ function openPhoto(){
       const done = own.has(it.id) && (!nv || ownState(it) === "done" || (got && !add));
       return {r, it, nv, had, got, sel: add, done, on: !done && r.score >= 0.8 && (!own.has(it.id) || !!add)}; });
     const nDone = rows.filter(x => x.done).length, anyColor = rows.some(x => x.nv && !x.done);
+    // most colors unknown: the list shows stand-in icons (the game's own lists do), so say so once at the top
+    const open = rows.filter(x => x.nv && !x.done), lost = open.filter(x => !x.got).length, iconHint = open.length >= 3 && lost >= open.length * 0.7;
     const vName = (it, i) => esc(it.vs[i] || `${i + 1}번`);
     const colorNote = x => { if(!x.nv || x.done) return "";
       const picked = []; for(let i = 0; i < x.nv; i++) if(x.got & (1 << i)) picked.push(vName(x.it, i));
-      return picked.length ? `<p class="ph-cn">사진에서 본 색: ${picked.join(", ")}${miss.has(x.it.id) ? ". 색을 못 알아본 줄도 있어요. 빠진 색은 눌러 주세요." : ""}</p>` : `<p class="ph-cn unk">사진에서 색을 알아보지 못했어요. 가진 색을 눌러 주세요.</p>`; };
+      return picked.length ? `<p class="ph-cn">사진에서 본 색: ${picked.join(", ")}${miss.has(x.it.id) ? ". 색을 못 알아본 줄도 있어요. 빠진 색은 눌러 주세요." : ""}</p>` : `<p class="ph-cn unk">${iconHint ? "" : "사진에서 색을 알아보지 못했어요. "}가진 색을 눌러 주세요.</p>`; };
     const chips = (x, k) => { if(!x.nv || x.done) return ""; let h = "";
       for(let i = 0; i < x.nv; i++){ const had = x.had & (1 << i), on = had || (x.sel & (1 << i));
         h += `<button type="button" class="${had ? "had" : ""}" data-k="${k}" data-vi="${i}" aria-pressed="${!!on}" ${had ? "disabled" : ""} title="${vName(x.it, i)}${had ? " (이미 체크됨)" : ""}" aria-label="${vName(x.it, i)}${had ? ", 이미 체크됨" : ""}">${framePic(x.it, i, 40)}</button>`; }
       return `<div class="vp">${h}</div>`; };
-    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${nDone ? ` (그중 ${fmt(nDone)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.${anyColor ? " 색이 있는 아이템은 사진 속 그림을 보고 색을 골라 뒀어요. 다르면 색 그림을 눌러 고쳐 주세요." : ""}</p>${ocrCut ? `<p class="sub ph-cut">칸이나 화면 끝에서 글자가 잘려 못 읽은 이름이 ${fmt(ocrCut)}개쯤 있어요. 조금씩 겹치게 찍거나 화면 기록 영상으로 올리면 빠짐없이 읽어요.</p>` : ""}
+    res.innerHTML = `<p><b>${fmt(list.length)}개</b>를 찾았어요${nDone ? ` (그중 ${fmt(nDone)}개는 이미 등록됨)` : ""}. 잘못 읽은 건 체크를 풀고 등록하세요.${anyColor && !iconHint ? " 색이 있는 아이템은 사진 속 그림을 보고 색을 골라 뒀어요. 다르면 색 그림을 눌러 고쳐 주세요." : ""}</p>${iconHint ? `<p class="sub ph-cut">이 목록은 아이템마다 같은 모양의 아이콘(게임 카탈로그의 잎 아이콘 같은)을 보여 줘서 색을 알 수 없어요. 가진 색을 눌러 주세요. 색을 고르지 않고 등록하면 '일부 보유'로 들어가요.</p>` : ""}${ocrCut ? `<p class="sub ph-cut">칸이나 화면 끝에서 글자가 잘려 못 읽은 이름이 ${fmt(ocrCut)}개쯤 있어요. 조금씩 겹치게 찍거나 화면 기록 영상으로 올리면 빠짐없이 읽어요.</p>` : ""}
       <div class="res">${rows.map((x, k) => `<div class="rw${x.done ? " done" : ""}"><label class="ri"><input type="checkbox" data-k="${k}" ${x.done ? "disabled" : ""} ${x.on ? "checked" : ""}>${picHTML(x.it)}<span class="tx"><b>${esc(x.it.ko)}</b><span>${esc(CATS[x.it.lc][0])} · 읽은 글자: ${esc(x.r.raw.replace(/\s+/g, " ").trim().slice(0,30))}</span></span><span class="sc">${x.done ? "등록됨" : own.has(x.it.id) ? "색 추가" : (x.r.score >= 0.8 ? "확실" : "애매")}</span></label>${colorNote(x)}${chips(x, k)}</div>`).join("")}</div>
       <div class="acts2"><button class="pill leaf" type="button" id="ph-ok">선택한 아이템 등록</button></div>`;
     res.querySelector(".res").addEventListener("click", e => {
