@@ -813,6 +813,11 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .fld{display:grid; gap:6px; min-width:0}
 .fld > span{font-size:13px; color:var(--muted); display:flex; gap:6px; align-items:baseline}
 .fld > span em{font-style:normal; color:var(--berry)}
+.isl-in{display:flex; gap:8px; align-items:stretch; min-width:0}
+.isl-in input{flex:1 1 auto; width:auto}
+.isl-suf{margin:0; align-items:stretch}
+.isl-suf button{min-width:44px; padding:0 12px; font-size:16px; font-family:var(--f-display)}
+.isl-pv{margin:0; font-size:12.5px}
 .fld > span i{font-style:normal; margin-left:auto; font-size:12px}
 .fld input,.fld textarea{width:100%; border:0; background:var(--paper2); color:var(--ink); border-radius:12px; padding:11px 12px; font:inherit; font-size:16px; outline:none; min-width:0}
 .fld textarea{min-height:110px; resize:vertical; word-break:keep-all; overflow-wrap:anywhere; line-height:1.5}
@@ -2764,7 +2769,22 @@ DS.subscribe(() => { if(ui.tab === "dream" && !$("layer").firstChild) render(); 
 
 const dreamCode = c => { const d = String(c || "").replace(/\D/g, "").slice(0, 12); return d ? "DA-" + d.replace(/(\d{4})(?=\d)/g, "$1-") : ""; };
 const dateText = ms => { if(!ms) return ""; const d = new Date(ms); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`; };
-const islandText = t => t ? (/섬$/.test(t) ? t : t + " 섬") : "";
+// v44: an island name ends in 섬 or 도 (the person picks). Kept as "<name>" for 섬, as before, and "<name> 도" for 도.
+const islandSplit = t => { t = String(t || "").trim(); const m = t.match(/^(.*\S)\s+도$/); return m ? {name: m[1], suf: "도"} : {name: t.replace(/\s*섬$/, ""), suf: "섬"}; };
+const islandText = t => !t ? "" : /\S\s+도$/.test(t) ? t.replace(/\s+도$/, "도") : /섬$/.test(t) ? t : t + " 섬";
+// the island name field: the name, then 섬 / 도, and how friends will see it
+function islandField(id, v){ const s = islandSplit(v);
+  return `<div class="fld isl-fld"><span>섬 이름</span><div class="isl-in"><input id="${id}" maxlength="10" aria-label="섬 이름" placeholder="예) 도란" value="${esc(s.name)}"><div class="hemi isl-suf" role="radiogroup" aria-label="섬 이름 끝"><button type="button" role="radio" data-suf="섬" aria-checked="${s.suf === "섬"}">섬</button><button type="button" role="radio" data-suf="도" aria-checked="${s.suf === "도"}">도</button></div></div><p class="sub isl-pv" id="${id}-pv"></p></div>`; }
+const roJosa = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; if(c < 0 || c > 11171) return "(으)로"; const j = c % 28; return j === 0 || j === 8 ? "로" : "으로"; };
+function islandWire(sh, id){
+  const inp = sh.el.querySelector("#" + id), pv = sh.el.querySelector("#" + id + "-pv"), box = inp.closest(".isl-fld");
+  const suf = () => (box.querySelector('[data-suf][aria-checked="true"]') || {}).dataset?.suf || "섬";
+  const val = () => { const n = inp.value.trim().replace(/\s+/g, " "); if(!n) return ""; return suf() === "도" ? n.replace(/\s+도$/, "") + " 도" : n.replace(/\s*섬$/, ""); };
+  const show = () => { const v = val(); pv.textContent = v ? `친구들에게 '${islandText(v)}'${roJosa(islandText(v))} 보여요` : "이름을 넣고 끝을 섬이나 도로 골라요"; };
+  box.addEventListener("click", e => { const b = e.target.closest("[data-suf]"); if(!b) return; box.querySelectorAll("[data-suf]").forEach(x => x.setAttribute("aria-checked", String(x === b))); show(); });
+  inp.addEventListener("input", show); show();
+  return val;
+}
 function dreamSorted(){
   let L = DS.list.slice();
   if(ui.liked) L = L.filter(x => DS.liked(x.id));
@@ -3668,7 +3688,7 @@ function tEntry(x, t, form){   // form: shown while writing (a service then says
   return {pic: typeof pc === "number" ? itemPic(pc, t) : `<span class="pic ph tr-svc" style="--t:${t}px"><svg aria-hidden="true"><use href="#i-${pc || "chat"}"/></svg></span>`, name: sv[0], sub: form ? sv[1] : ""};
 }
 const tradeTitle = p => { const e = tEntry(p.items[0] || {k:"s", id:"help"}, 10); return p.items.length > 1 ? `${e.name} 외 ${p.items.length - 1}개` : e.name; };
-const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...((p.pay && p.pay.swapItems) || []).map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, p.author.island, p.body, p.pay.swap];
+const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...((p.pay && p.pay.swapItems) || []).map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, islandText(p.author.island), p.body, p.pay.swap];
 const tradeLiked = p => p.items.some(x => x.k === "i" ? like.has(x.id) : x.k === "v" ? vlike.has(x.id) : false);
 function payParts(pay){
   const a = [];
@@ -4099,7 +4119,7 @@ const KIND = {dream:["꿈번지", "moon"], area:["구역", "island"], fashion:["
 const SHOW_ITEMS = ITEMS.filter(it => !["리액션", "DIY 레시피", "메시지 카드"].includes(CATS[it.lc][0]));   // things you can place or wear
 const imgUrl = k => "/api/img/" + k;
 const showTitle = x => x.title || (x.kind === "dream" ? `${islandText(x.author.island)} 꿈번지` : `${x.author.name}님의 ${KIND[x.kind][0]}`);
-const showNames = x => [x.title, x.author.name, x.author.island, x.body, x.code, ...x.items.map(y => { const it = BY_ID.get(y.id); return it ? it.ko : ""; })];
+const showNames = x => [x.title, x.author.name, islandText(x.author.island), x.body, x.code, ...x.items.map(y => { const it = BY_ID.get(y.id); return it ? it.ko : ""; })];
 const shCat = () => [0, 1, 2, 10, 11, 12].includes(ui.cat) ? ui.cat : 0;   // order (0 new, 1 추천, 2 조회) + 10 for 내 글만
 const SH = (() => {
   let list = [], ready = false, at = 0, err = "", busy = null, key = "", more = false, store = true, likes = new Set(), likesFor = "";
@@ -4556,7 +4576,7 @@ function acctHTML(){
       <p>로그인하면 폰과 PC의 체크 기록이 저절로 같아져요. 보기와 체크는 로그인 없이도 그대로 쓸 수 있어요.</p>
       <div class="acts2"><button class="pill leaf" type="button" id="ac-in">로그인</button><button class="pill sun" type="button" id="ac-up">처음이에요 (가입하기)</button></div></div>`;
   return `<div class="acct"><h4>내 계정</h4>
-      <div class="who"><span class="fr">${fruitPic(u.fruit)}</span><div class="wt"><b>${esc(u.name)}</b><span>${esc(u.island)} 섬 · 아이디 ${esc(u.login)}${u.admin ? " · 관리자" : ""}</span></div></div>
+      <div class="who"><span class="fr">${fruitPic(u.fruit)}</span><div class="wt"><b>${esc(u.name)}</b><span>${esc(islandText(u.island))} · 아이디 ${esc(u.login)}${u.admin ? " · 관리자" : ""}</span></div></div>
       ${u.mustChange ? `<p class="err">임시 비밀번호로 들어왔어요. 새 비밀번호로 바꿔 주세요.</p>` : ""}
       <div id="ac-sync">${syncLine()}</div>
       <div class="acts2"><button class="pill ghost" type="button" id="ac-prof">프로필 고치기</button><button class="pill ghost" type="button" id="ac-pw">비밀번호 바꾸기</button></div>
@@ -4596,15 +4616,15 @@ function openSignin(mode){
     <label class="fld"><span>아이디${up ? "<i>2~16자, 한글·영문 소문자·숫자·_</i>" : ""}</span><input id="si-id" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${up ? "예) dorandoran" : "아이디"}"></label>
     ${pwField("si-pw", up ? "비밀번호<i>8자 이상</i>" : "비밀번호", up ? "new-password" : "current-password", up ? "8자 이상" : "비밀번호")}
     ${up ? `<label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="si-name" maxlength="10" placeholder="예) 링크"></label>
-    <label class="fld"><span>섬 이름</span><input id="si-island" maxlength="10" placeholder="예) 도란"></label>${fruitPick("")}` : ""}
+    ${islandField("si-island", "")}${fruitPick("")}` : ""}
     <div id="si-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="si-ok">${up ? "가입하기" : "로그인"}</button><button class="pill ghost" type="button" id="si-sw">${up ? "이미 계정이 있어요" : "처음이에요 (가입하기)"}</button></div>
     <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
-  const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
+  const q = id => sh.el.querySelector(id), fruit = wireForm(sh), islandVal = up ? islandWire(sh, "si-island") : null;
   q("#si-sw").addEventListener("click", () => { sh.close(); setTimeout(() => openSignin(up ? "in" : "up"), 0); });
   const go = () => busyRun(q("#si-ok"), q("#si-msg"), async () => {
     const body = {login: q("#si-id").value.trim(), pw: q("#si-pw").value};
-    if(up) Object.assign(body, {name: q("#si-name").value.trim(), island: q("#si-island").value.trim().replace(/\s*섬$/, ""), fruit: fruit()});
+    if(up) Object.assign(body, {name: q("#si-name").value.trim(), island: islandVal(), fruit: fruit()});
     const j = await AUTH.api(up ? "signup" : "login", {method: "POST", body: JSON.stringify(body)});
     AUTH.setMe(j.user); sh.close();
     toast(up ? `${j.user.name}님, 반가워요! 기록을 맞추고 있어요` : `${j.user.name}님, 어서 오세요! 기록을 맞추고 있어요`);
@@ -4619,16 +4639,16 @@ function openProfile(){
   sheetOver = true;
   const sh = openSheet(`<div class="hd"><div><h3>프로필 고치기</h3><p class="sub">거래할 때 친구들에게 보여요</p></div>${XBTN}</div>
     <label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="pf-name" maxlength="10" value="${esc(u.name)}"></label>
-    <label class="fld"><span>섬 이름</span><input id="pf-island" maxlength="10" value="${esc(u.island)}"></label>
+    ${islandField("pf-island", u.island)}
     ${fruitPick(u.fruit)}
     <div id="pf-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="pf-ok">저장하기</button><button class="pill ghost" type="button" id="pf-no">그만두기</button></div>
     <div class="leave"><h4>계정 지우기</h4><p>계정과 서버에 맞춰 둔 기록이 지워져요. 이 기기의 체크 기록은 그대로 남아요.</p>
       <div class="acts2"><button class="pill danger" type="button" id="pf-del">계정 지우기</button></div><div id="pf-del-box"></div></div>`);
-  const q = id => sh.el.querySelector(id), fruit = wireForm(sh);
+  const q = id => sh.el.querySelector(id), fruit = wireForm(sh), islandVal = islandWire(sh, "pf-island");
   q("#pf-no").addEventListener("click", () => sh.close());
   q("#pf-ok").addEventListener("click", () => busyRun(q("#pf-ok"), q("#pf-msg"), async () => {
-    const j = await AUTH.api("me", {method: "POST", body: JSON.stringify({name: q("#pf-name").value.trim(), island: q("#pf-island").value.trim().replace(/\s*섬$/, ""), fruit: fruit()})});
+    const j = await AUTH.api("me", {method: "POST", body: JSON.stringify({name: q("#pf-name").value.trim(), island: islandVal(), fruit: fruit()})});
     AUTH.setMe(j.user); sh.close(); toast("프로필을 저장했어요");
   }));
   q("#pf-del").addEventListener("click", () => {

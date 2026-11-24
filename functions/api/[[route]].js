@@ -421,7 +421,7 @@ export async function onRequest(ctx){
       const login = cleanText(b.login).toLowerCase(), name = cleanText(b.name), island = cleanText(b.island), fruit = FRUITS.includes(b.fruit) ? b.fruit : "";
       if(!okLogin(login)) return fail("login_rule");
       if(!okPw(b.pw)) return fail("pw_rule");
-      if(!okName(name) || !okName(island)) return fail("name_rule");
+      if(!okName(name) || !okName(island.replace(/\s+도$/, ""))) return fail("name_rule");
       if(await overLimit(db, "su:" + ip, 5, 3600000)) return fail("slow_down", 429);
       const id = rand(9), now = Date.now();
       try{
@@ -495,7 +495,7 @@ export async function onRequest(ctx){
 
     if(m === "POST" && path === "me"){
       const b = await body(req), name = cleanText(b.name), island = cleanText(b.island), fruit = FRUITS.includes(b.fruit) ? b.fruit : "";
-      if(!okName(name) || !okName(island)) return fail("name_rule");
+      if(!okName(name) || !okName(island.replace(/\s+도$/, ""))) return fail("name_rule");
       await db.prepare(`UPDATE users SET name = ?, island = ?, fruit = ? WHERE id = ?`).bind(name, island, fruit, u.id).run();
       return json({ user: pub({ ...u, name, island, fruit }) });
     }
