@@ -734,6 +734,49 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
   html.nt-on .pick .ps{display:none}
   html.nt-on .pick b{font-size:15px}
 }
+
+/* v45 보기 창 */
+.pick .c .vf{display:inline-block; margin-left:6px; padding:0 7px; border-radius:8px; background:var(--sun); color:#4a3a1c; font-family:var(--f-display); font-size:11.5px; line-height:17px; vertical-align:1px}
+.pick .c .vf.vso{background:var(--paper2); color:var(--ink)}
+.pick .pd{width:16px; height:16px}
+@media (max-width:480px){ .pick .c .vf{font-size:11px; line-height:15px; padding:0 6px; margin-left:5px} }
+.vrib{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; background:var(--sheet); color:var(--ink); border-radius:14px; padding:10px 12px 10px 14px; margin-bottom:14px; box-shadow:0 3px 0 var(--grass-shadow)}
+.vrib[hidden]{display:none}
+.vrib .vrt{flex:1 1 220px; min-width:0; display:grid; gap:2px}
+.vrib .vrt b{font-family:var(--f-display); font-weight:400; font-size:16px; color:var(--h-ink)}
+.vrib .vrt span{font-size:13px; color:var(--muted); overflow-wrap:anywhere}
+.vrib .vrbs{display:flex; gap:8px; flex:0 0 auto; flex-wrap:wrap}
+.vrib .pill{flex:none}
+.vscope{margin-top:-6px}
+.vjump{position:sticky; top:-16px; z-index:3; display:flex; gap:8px; flex-wrap:wrap; margin:-6px calc(-1 * max(18px, env(safe-area-inset-left, 0px))) 0; padding:10px max(18px, env(safe-area-inset-left, 0px)); background:var(--paper); border-bottom:2px dashed var(--paper2)}
+.vjump[hidden]{display:none}
+.vjump button{border:0; background:var(--paper2); color:var(--ink); border-radius:999px; padding:6px 16px; font-family:var(--f-display); font-size:15px}
+.vjump button b{font-weight:400; color:var(--berry)}
+.vjump button[aria-current="true"]{background:var(--leaf); color:var(--leaf-ink)}
+.vjump button[aria-current="true"] b{color:inherit}
+.vwbody{display:grid; gap:18px}
+.vside{display:grid; gap:18px; align-content:start; min-width:0}
+.vsec{display:grid; gap:10px; min-width:0; scroll-margin-top:60px}
+.vwh{margin:0; font-family:var(--f-display); font-weight:400; font-size:20px; color:var(--h-ink)}
+.vcats{display:grid; gap:14px; min-width:0}
+.vsec .opt{padding:10px 0}
+.opt.vstack{display:grid; gap:8px; align-items:stretch}
+.vnote2{font-size:12.5px}
+.opt .tx .vpin{display:flex; align-items:center; gap:4px; margin-top:3px; font-size:12px; color:var(--leaf-deep, var(--leaf)); font-family:var(--f-display)}
+.opt .tx .vpin .fi{width:13px; height:13px}
+.vsrc{flex:none; max-width:min(52%, 260px); min-width:0; white-space:normal; text-align:left; line-height:1.3}
+.vsrc .fi{flex:none}
+.vreset{display:grid; gap:6px; justify-items:start}
+.vreset .pill{flex:none}
+.vchit{margin-bottom:6px}
+.tdrow.tflash{animation:tflash 1.8s ease}
+@keyframes tflash{0%,100%{box-shadow:none} 15%,70%{box-shadow:0 0 0 3px var(--sun)}}
+@media (min-width:900px){
+  .sheet.vsheet.vwide{width:min(1040px, calc(100vw - 48px))}
+  .vwide .vwbody{grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr); gap:28px; align-items:start}
+  .vwide .vjump{display:none}
+  .vsheet .vwbody > .vside:only-child{grid-column:1 / -1}
+}
 /* 댓글 and 답글 */
 .cth{display:grid; gap:6px}
 .cmt p{overflow-wrap:anywhere}
@@ -1492,7 +1535,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
       <button class="logo" id="btn-home" type="button" aria-label="처음 화면으로" title="처음 화면으로"><svg aria-hidden="true"><use href="#i-leaf"/></svg></button>
       <h1 class="desk">도란도란 동물의숲</h1>
       <span class="total num desk" id="p-total"></span>
-      <button class="pick" id="btn-pick" type="button" aria-haspopup="dialog" aria-label="카테고리 고르기와 검색" title="카테고리 고르기와 검색"><svg class="ps" aria-hidden="true"><use href="#i-search"/></svg><span class="pt"><b id="pick-name">가구</b><span class="k" id="pick-kind">카탈로그</span><span class="c num" id="pick-cnt"></span></span><svg class="pd" aria-hidden="true"><use href="#i-down"/></svg></button>
+      <button class="pick" id="btn-pick" type="button" aria-haspopup="dialog" aria-label="보기: 검색, 분류, 필터, 정렬" title="보기: 검색, 분류, 필터, 정렬"><svg class="ps" aria-hidden="true"><use href="#i-search"/></svg><span class="pt"><b id="pick-name">가구</b><span class="k" id="pick-kind">카탈로그</span><span class="c num" id="pick-cnt"></span></span><svg class="pd" aria-hidden="true"><use href="#i-down"/></svg></button>
       <div class="icons">
         <button class="ib" id="btn-bell" type="button" aria-label="알림" title="알림" hidden><svg><use href="#i-bell"/></svg><i class="bdg num" hidden></i></button>
         <button class="ib" id="btn-photo" type="button" aria-label="사진으로 체크" title="사진으로 체크"><svg><use href="#i-cam"/></svg></button>
@@ -1525,6 +1568,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
     <p>아이템을 누르면 <b>체크</b>돼요. 색이 여러 개면 <b>일부 보유</b>로 표시되고, <b>⋯</b>(자세히)에서 가진 색을 고를 수 있어요. 위쪽 탭으로 미보유, 보유(일부 보유와 완료), 일부 보유, 완료만 모아 볼 수 있어요. 기록은 이 기기에 저장돼요.</p>
     <button class="x" type="button" id="welcome-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button>
   </div>
+  <div class="vrib" id="vrib" role="status" hidden></div>
   <div class="stats num" id="p-stats"></div>
   <div class="grid" id="grid"></div>
   <div class="more" id="more" hidden><button class="pill soil" type="button" id="more-btn">더 보기</button></div>
@@ -1762,6 +1806,10 @@ try{ const v = JSON.parse(localStorage.getItem(UIKEY) || "null"); if(v){
   if(TABS.includes(v.tab) && (v.tab !== "trade" || window.DN_SERVER)) ui.tab = v.tab;
   // only the three "what to show" switches survive a reload; 3.0 신규, DIY, 리폼, 얻는 법, every sort and the museum and villager filters start fresh
   ui.buyable=!!v.buyable; ui.showNS=v.showNS!==false; ui.showNC=v.showNC!==false;
+  // v45: the 좋아요 card left the category list; it is the 좋아요만 switch now
+  ["item", "museum", "villager"].forEach(t => { if(mem[t].cat === -3){ mem[t].cat = -1; mem[t].liked = true; } });
+  // v45: like every other sort and 내 글만, the 자랑 order and both 내 글만 start fresh
+  mem.dream.cat = TAB_DEF.dream.cat; mem.trade.cat = TAB_DEF.trade.cat;
 } }catch(e){}
 Object.assign(ui, {cat:mem[ui.tab].cat, fo:mem[ui.tab].fo, liked:mem[ui.tab].liked});
 function saveView(){ mem[ui.tab] = {cat:ui.cat, fo:ui.fo, liked:ui.liked}; try{ localStorage.setItem(UIKEY, JSON.stringify({tab:ui.tab, mem, buyable:ui.buyable, showNS:ui.showNS, showNC:ui.showNC, new3:ui.new3, diy:ui.diy, remake:ui.remake, src:ui.src, sort:ui.sort, mmon:ui.mmon, msort:ui.msort, vpers:ui.vpers, vgen:ui.vgen, vbm:ui.vbm, vsort:ui.vsort})); }catch(e){} }
@@ -1968,7 +2016,8 @@ function setPick(name, kind, kindCls, cnt){
   $("pick-kind").textContent = kind; $("pick-kind").className = "k" + (kindCls ? " " + kindCls : ""); $("pick-kind").hidden = !kind;
   $("pick-cnt").innerHTML = cnt;
 }
-function renderHead(){
+function renderHead(){ renderHead0(); viewDecor(); }
+function renderHead0(){
   $("btn-like").setAttribute("aria-pressed", ui.liked);
   $("btn-like").title = $("btn-like").ariaLabel = ui.tab === "villager" ? "좋아하는 주민만 보기" : ui.tab === "dream" ? (SRV ? "추천한 글만 보기" : "좋아요한 꿈번지만 보기") : ui.tab === "trade" ? "좋아요한 아이템·주민이 들어간 글만 보기" : "좋아요만 보기";
   const fl = $("btn-filt"), dreamMode = ui.tab === "dream", todo = ui.tab === "todo", island = ui.tab === "island";
@@ -2378,32 +2427,245 @@ function vilCatBtn(i, cls){
 function catsHTML(){
   if(ui.tab === "villager"){
     const order = VSP.map((n, i) => i).sort((a, b) => COLL.compare(VSP[a], VSP[b]));
-    return `<div class="ctop" style="--n:2">${vilCatBtn(-1, "top")}${vilCatBtn(-3, "top")}</div>
+    return `<div class="ctop" style="--n:1">${vilCatBtn(-1, "top")}</div>
       <section class="kind"><h4>종족</h4><div class="cgrid">${order.map(vilCatBtn).join("")}</div></section>`;
   }
   if(ui.tab === "museum"){
     const grp = (label, cs) => `<div class="grp">${label}</div><div class="cgrid">${cs.map(catBtn).join("")}</div>`;
-    return `<div class="ctop" style="--n:2">${catBtn(-1, "top")}${catBtn(-3, "top")}</div>
+    return `<div class="ctop" style="--n:1">${catBtn(-1, "top")}</div>
       <section class="kind"><h4>박물관</h4><p>박물관에 기증할 수 있는 것들이에요. 체크하면 기증한 걸로 쳐요. 가짜 미술품은 기증할 수 없어서 아이템 탭의 '가짜 미술품'에 따로 모여 있어요.</p>${grp("도감", [28, 29, 30])}${grp("화석과 미술품", [22, 23])}</section>`;
   }
   const groups = (isCat, labels) => {
     const order = []; CATS.forEach((c,i) => { if(CAT_IS_CATALOG[i]===isCat && tabOfCat(i)==="item"){ const g=c[1]; let e=order.find(x=>x.g===g); if(!e){ e={g, list:[]}; order.push(e); } e.list.push(i); } });
     return order.map(e => `<div class="grp">${labels[e.g] || e.g}</div><div class="cgrid">${e.list.map(catBtn).join("")}</div>`).join("");
   };
-  return `<div class="ctop" style="--n:3">${catBtn(-1, "top")}${catBtn(-2, "top cat")}${catBtn(-3, "top")}</div>
+  return `<div class="ctop" style="--n:2">${catBtn(-1, "top")}${catBtn(-2, "top cat")}</div>
     <section class="kind cat"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-book"/></svg></span>카탈로그 <span class="k">다시 주문 가능</span></h4><p>너굴 쇼핑 카탈로그에 등록되는 종류예요. 비매품도 여기 들어 있어요.</p>${groups(true, GROUP_LABEL)}</section>
     <section class="kind nc"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-box"/></svg></span>카탈로그 아님 <span class="k">주문 불가</span></h4><p>카탈로그에는 없지만 모아 두는 것들이에요.</p>${groups(false, NC_GROUP_LABEL)}</section>`;
 }
-// One sheet for both: type to search this tab, or leave the box empty and pick a category.
-function openFind(){
+
+/* ---------- v45: 보기 창 = 검색 + 분류 + 필터 + 정렬 ----------
+   One window per tab, opened from the big box. 아이템·박물관·주민 have all four parts; 자랑·거래 have search and filters
+   (자랑 also an order). Changes apply at once. 할 일 opens a todo search instead, 섬 꾸미기 keeps its menu. */
+const SH_SORTS = [["0", "최신순"], ["1", "추천순"], ["2", "조회순"]];
+const viewOn = t => t === "item" || t === "museum" || t === "villager" || t === "trade" || (t === "dream" && SRV);
+const viewWide = () => matchMedia("(min-width:900px)").matches;
+function viewSpec(T){
+  const F = [];
+  const sw = (k, t, d, get, set, o) => F.push(Object.assign({kind:"sw", k, t, d, get, set}, o || {}));
+  const rd = (k, t, d, opts, get, set, o) => F.push(Object.assign({kind:"radio", k, t, d, opts, get, set}, o || {}));
+  const liked = (t, d) => sw("liked", t, d, () => ui.liked, v => { ui.liked = v; }, {pin:true});
+  let sort = null, setting = null;
+  if(T === "item"){
+    liked("좋아요만", "♡를 누른 아이템만 보여요. 위쪽 하트 버튼과 같아요.");
+    sw("buyable", "다시 살 수 있는 것만", "너굴 쇼핑 카탈로그에서 다시 주문할 수 있는 아이템만 보여요. 시즌 상품 포함.", () => ui.buyable, v => { ui.buyable = v; }, {pin:true});
+    sw("showNS", "비매품 보이기", "카탈로그에 등록돼도 다시 살 수 없는 아이템이에요.", () => ui.showNS, v => { ui.showNS = v; }, {pin:true, dis:() => ui.buyable});
+    sw("showNC", "카탈로그 외 아이템 보이기", "같은 종류 안에 있지만 카탈로그에 등록되지 않는 아이템이에요.", () => ui.showNC, v => { ui.showNC = v; }, {pin:true, dis:() => ui.buyable});
+    F.push({kind:"note", t:'위 세 가지는 카탈로그 카테고리에만 적용돼요. "다시 살 수 있는 것만"을 켜면 비매품과 카탈로그 외 아이템은 자동으로 빠져요.'});
+    sw("new3", "3.0 신규만", "3.0 업데이트에서 새로 나온 것만 보여요.", () => ui.new3, v => { ui.new3 = v; });
+    sw("diy", "DIY 레시피가 있는 것만", "직접 만들 수 있는 아이템이에요.", () => ui.diy, v => { ui.diy = v; });
+    sw("remake", "리폼할 수 있는 것만", "색이나 무늬를 바꿀 수 있는 아이템이에요.", () => ui.remake, v => { ui.remake = v; });
+    F.push({kind:"src", k:"src", t:"얻는 법", d:"얻는 곳이나 방법으로 골라 봐요."});
+    sort = {d:"가격이 없는 아이템은 맨 뒤로 가요.", opts:Object.entries(SORTS), get:() => ui.sort, set:v => { ui.sort = v; }};
+  } else if(T === "museum"){
+    liked("좋아요만", "♡를 누른 것만 보여요. 위쪽 하트 버튼과 같아요.");
+    rd("mmon", "이번 달", `${NOW_M + 1}월 기준이에요. 화석과 미술품은 이 필터를 켜면 빠져요.`, Object.entries(MMON), () => ui.mmon, v => { ui.mmon = v; });
+    sort = {d:"가격이 없는 것은 맨 뒤로 가요.", opts:Object.entries(MSORTS), get:() => ui.msort, set:v => { ui.msort = v; }};
+    setting = {k:"hemi", t:"반구", d:"섬이 있는 반구에 따라 생물이 나오는 달이 달라요. 필터가 아니라 내 섬 설정이라 원래대로를 눌러도 그대로예요.", opts:[["n", "북반구"], ["s", "남반구"]], get:() => HEMI, set:v => { HEMI = v; try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} }};
+  } else if(T === "villager"){
+    liked("좋아하는 주민만", "♡를 누른 주민만 보여요. 위쪽 하트 버튼과 같아요.");
+    rd("vpers", "성격", "", [["-1", "전부"], ...PERS_KO.map((p, i) => [String(i), p])], () => ui.vpers, v => { ui.vpers = +v; });
+    rd("vgen", "성별", "", [["-1", "전부"], ["0", "남자"], ["1", "여자"]], () => ui.vgen, v => { ui.vgen = +v; });
+    rd("vbm", "생일", "", [["false", "전부"], ["true", `이번 달(${NOW_M + 1}월) 생일만`]], () => ui.vbm, v => { ui.vbm = v === "true"; });
+    sort = {d:"생일 순은 오늘부터 가까운 생일 순서예요.", opts:Object.entries(VSORTS), get:() => ui.vsort, set:v => { ui.vsort = v; }};
+  } else if(T === "dream"){
+    liked("추천한 글만", "내가 추천한 글만 보여요. 위쪽 하트 버튼과 같아요.");
+    sw("mine", "내 글만", "내가 올린 자랑 글만 보여요. 로그인하면 보여요.", () => shCat() >= 10, v => { ui.cat = shCat() % 10 + (v ? 10 : 0); });
+    sort = {d:"추천순은 추천을 많이 받은 글부터 보여요.", opts:SH_SORTS, get:() => shCat() % 10, set:v => { ui.cat = +v + (shCat() >= 10 ? 10 : 0); }};
+  } else if(T === "trade"){
+    liked("좋아요한 것이 든 글만", "♡를 누른 아이템이나 주민이 들어간 글만 보여요. 위쪽 하트 버튼과 같아요.");
+    sw("mine", "내 글만", "내가 쓴 거래 글만 보여요. 끝난 글도 함께 보여요.", () => ui.cat === TRADE_MINE, v => { ui.cat = v ? TRADE_MINE : -1; });
+  }
+  return {cat: T === "item" || T === "museum" || T === "villager", filt: F, sort, setting};
+}
+const SRC_NAME = i => i >= 0 ? SOURCES[i] : "전체";
+// what is switched on right now, in words, for the box pill and the ribbon
+function viewActive(T){
+  const f = [];
+  if(ui.liked) f.push(T === "villager" ? "좋아하는 주민만" : T === "dream" ? "추천한 글만" : T === "trade" ? "좋아요한 것이 든 글만" : "좋아요만");
+  let s = null;
+  if(T === "item"){
+    if(ui.buyable) f.push("다시 살 수 있는 것만"); else { if(!ui.showNS) f.push("비매품 숨김"); if(!ui.showNC) f.push("카탈로그 외 숨김"); }
+    if(ui.new3) f.push("3.0 신규만"); if(ui.diy) f.push("DIY 레시피"); if(ui.remake) f.push("리폼"); if(ui.src >= 0) f.push("얻는 법: " + SRC_NAME(ui.src));
+    if(ui.sort !== "base") s = SORTS[ui.sort];
+  } else if(T === "museum"){
+    if(ui.mmon !== "all") f.push(MMON[ui.mmon]);
+    if(ui.msort !== "base") s = MSORTS[ui.msort];
+  } else if(T === "villager"){
+    if(ui.vpers >= 0) f.push(PERS_KO[ui.vpers]); if(ui.vgen >= 0) f.push(ui.vgen ? "여자" : "남자"); if(ui.vbm) f.push(`${NOW_M + 1}월 생일`);
+    if(ui.vsort !== "name") s = VSORTS[ui.vsort];
+  } else if(T === "dream"){
+    if(shCat() >= 10) f.push("내 글만");
+    if(shCat() % 10) s = SH_SORTS[shCat() % 10][1];
+  } else if(T === "trade"){
+    if(ui.cat === TRADE_MINE) f.push("내 글만");
+  }
+  return {f, s};
+}
+function viewReset(T){
+  ui.liked = false;
+  if(T === "item") Object.assign(ui, {sort:"base", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1});
+  else if(T === "museum") Object.assign(ui, {msort:"base", mmon:"all"});
+  else if(T === "villager") Object.assign(ui, {vsort:"name", vpers:-1, vgen:-1, vbm:false});
+  else if(T === "dream") ui.cat = 0;
+  else if(T === "trade") ui.cat = -1;
+}
+// how many are on screen with the current choices
+function viewCount(T){
+  if(T === "villager") return `${fmt(vilList().filter(v => passVil(v) && vilIn(v, ui.fo)).length)}명이 보여요`;
+  if(T === "dream") return SH.ready ? `${fmt((ui.liked ? SH.list.filter(x => SH.liked(x.id)) : SH.list).length)}개가 보여요` : "글을 불러오는 중이에요";
+  if(T === "trade") return TS.ready ? `${fmt(tradeShown().length)}개가 보여요` : "글을 불러오는 중이에요";
+  return `${fmt(listFor(ui.cat).filter(matchesFilters).length)}개가 보여요`;
+}
+const PIN = `<span class="vpin">${ico("pin")}다시 열어도 남아요</span>`;
+function viewRowsHTML(V){
+  const row = r => r.kind === "note" ? `<p class="sub vnote2">${r.t}</p>`
+    : r.kind === "sw" ? `<div class="opt" data-row="${r.k}"><div class="tx"><b>${r.t}</b><span>${r.d}</span>${r.pin ? PIN : ""}</div><button class="sw" type="button" role="switch" data-vk="${r.k}" aria-label="${r.t}"></button></div>`
+    : r.kind === "src" ? `<div class="opt" data-row="src"><div class="tx"><b>${r.t}</b><span>${r.d}</span></div><button class="pill ghost sm vsrc" type="button" id="v-src">${ico("search")}<span></span></button></div>`
+    : `<div class="opt vstack" data-row="${r.k}"><div class="tx"><b>${r.t}</b>${r.d ? `<span>${r.d}</span>` : ""}${r.pin ? PIN : ""}</div><div class="radios" role="radiogroup" aria-label="${r.t}" data-vg="${r.k}">${r.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+  return V.filt.map(row).join("");
+}
+function viewSortHTML(V){
+  return `<p class="sub">${V.sort.d}</p><div class="radios" role="radiogroup" aria-label="정렬" data-vg="_sort">${V.sort.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div>`;
+}
+function viewSettingHTML(V){
+  const x = V.setting;
+  return `<div class="opt vstack"><div class="tx"><b>${x.t}</b><span>${x.d}</span>${PIN}</div><div class="radios" role="radiogroup" aria-label="${x.t}" data-vg="_set">${x.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+}
+// The box pill, the ribbon over the list, and the right-hand button that only stays where it does something else.
+function viewDecor(){
+  const T = ui.tab, on = viewOn(T), pk = $("btn-pick");
+  $("btn-filt").classList.toggle("tabhide", T === "item" || T === "museum" || T === "villager");
+  pk.querySelector(".pd use").setAttribute("href", on ? "#i-sliders" : "#i-down");
+  pk.title = pk.ariaLabel = on ? "보기: 검색, 분류, 필터, 정렬" : T === "todo" ? "할 일 찾기" : T === "island" ? "섬 메뉴" : "찾기";
+  const A = on ? viewActive(T) : {f:[], s:null}, rib = $("vrib");
+  const c = $("pick-cnt"); c.querySelectorAll(".vf").forEach(x => x.remove());
+  if(A.f.length) c.insertAdjacentHTML("beforeend", `<span class="vf">필터 ${A.f.length}</span>`);
+  if(A.s) c.insertAdjacentHTML("beforeend", `<span class="vf vso">정렬</span>`);
+  if(!A.f.length && !A.s){ rib.hidden = true; rib.innerHTML = ""; return; }
+  const words = [...A.f.map(esc), ...(A.s ? [`정렬: ${esc(A.s)}`] : [])].join(" · ");
+  rib.innerHTML = `<div class="vrt"><b>${A.f.length ? `필터 ${A.f.length}개가 걸려 있어요` : "정렬을 바꿨어요"}</b><span>${words}</span></div><div class="vrbs"><button class="pill sm ghost" type="button" data-vr="edit">${ico("sliders")}바꾸기</button><button class="pill sm ghost" type="button" data-vr="reset">${ico("refresh")}원래대로</button></div>`;
+  rib.hidden = false;
+}
+$("vrib").addEventListener("click", e => {
+  const b = e.target.closest("[data-vr]"); if(!b) return;
+  if(b.dataset.vr === "edit") return openFind("filt");
+  viewReset(ui.tab); ui.limit = 0; saveView(); renderTotals(); render(); toast("필터와 정렬을 원래대로 돌렸어요");
+});
+// 얻는 법: a list you can search (초성·겹자모·영문 자판 모두), over the 보기 window
+function openSrcPick(done){
+  const cnt = SOURCES.map(() => 0); ITEMS.forEach(it => it.src.forEach(i => cnt[i]++));
+  const ord = SOURCES.map((t, i) => i).filter(i => cnt[i]).sort((a, b) => cnt[b] - cnt[a]);
+  sheetOver = true;
+  const s = openSheet(`<div class="hd"><div><h3>얻는 법 고르기</h3><p class="sub">얻는 곳이나 방법으로 아이템을 걸러요</p></div>${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="src-q" placeholder="얻는 법 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
+    <div class="res" id="src-res"></div>`);
+  const inp = s.el.querySelector("#src-q"), out = s.el.querySelector("#src-res");
+  const row = i => `<button class="srow" type="button" data-src="${i}" aria-pressed="${ui.src === i}"><span class="tx"><b>${esc(SRC_NAME(i))}</b><span class="num">${i < 0 ? "얻는 법으로 거르지 않아요" : `아이템 ${fmt(cnt[i])}개`}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`;
+  const paint = () => {
+    const q = inp.value.trim(); let L = ord;
+    if(q){ const m = KS.matcher(q), hits = []; ord.forEach(i => { const r = m(KS.norm(SOURCES[i]), "", {}); if(r >= 0) hits.push([r, i]); }); L = hits.sort((a, b) => a[0] - b[0]).map(h => h[1]); }
+    out.innerHTML = (q ? "" : row(-1)) + (L.length ? L.map(row).join("") : `<p class="sub">"${esc(q)}"에 맞는 얻는 법이 없어요.</p>`);
+  };
+  inp.addEventListener("input", paint); paint();
+  out.addEventListener("click", e => { const b = e.target.closest("[data-src]"); if(!b) return; ui.src = +b.dataset.src; s.close(); done(); });
+}
+// 할 일 찾기: the big box on the 할 일 tab (the four lists are already the tabs under it)
+function openTodoFind(){
+  const s = openSheet(`<div class="hd"><div><h3>할 일 찾기</h3><p class="sub">매일·매주 할 일에서 찾아요</p></div>${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="할 일 이름 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
+    <p class="sub" id="tdf-hint">ㅅㅁ처럼 초성만 넣어도 돼요. 시즌과 무트코인은 위쪽 탭에서 골라요.</p>
+    <div class="res" id="s-res"></div>`);
+  const inp = s.el.querySelector("#s-q"), out = s.el.querySelector("#s-res"), hint = s.el.querySelector("#tdf-hint");
+  const paint = () => {
+    const q = inp.value.trim(); hint.hidden = !!q;
+    if(!q){ out.innerHTML = ""; return; }
+    const m = KS.matcher(q), hits = [];
+    [["d", "day", "매일 할 일"], ["w", "week", "매주 할 일"]].forEach(([t, fo, lab]) => tdShown(t).forEach(x => {
+      let best = -1; [x.n, x.s].forEach(n => { if(!n) return; const r = m(KS.norm(n), "", {}); if(r >= 0 && (best < 0 || r < best)) best = r; });
+      if(best >= 0) hits.push([best, t, fo, lab, x]);
+    }));
+    hits.sort((a, b) => a[0] - b[0]);
+    out.innerHTML = hits.length ? `<p class="sub">누르면 그 할 일로 가요.</p>` + hits.map(([, t, fo, lab, x]) => { const on = tdDone(t, x.id); return `<button class="srow" type="button" data-tfo="${fo}" data-tid="${esc(x.id)}" aria-pressed="${on}">${x.ic ? tIco(x.ic, 42) : `<span class="pic ph" style="--t:42px"><svg style="width:20px;height:20px"><use href="#i-todo"/></svg></span>`}<span class="tx"><b>${esc(x.n)}</b><span>${lab} · ${on ? "했어요" : "아직 안 했어요"}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`; }).join("")
+      : `<p class="sub">"${esc(q)}"에 맞는 할 일이 없어요.</p>`;
+  };
+  let t = 0; inp.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 120); });
+  out.addEventListener("click", e => {
+    const b = e.target.closest("[data-tfo]"); if(!b) return;
+    ui.fo = b.dataset.tfo; saveView(); s.close(); render();
+    const r = $("grid").querySelector(`[data-td="${CSS.escape(b.dataset.tid)}"]`), row = r && r.closest(".tdrow");
+    if(row){ row.scrollIntoView({block:"center", behavior: REDUCED ? "auto" : "smooth"}); row.classList.add("tflash"); setTimeout(() => row.classList.remove("tflash"), 1800); }
+  });
+}
+// One sheet for everything: type to search this tab, or leave the box empty and pick a category, filters and order.
+function openFind(jump){
   const T = ui.tab;
   const what = T === "villager" ? "주민 이름" : T === "dream" ? (SRV ? "제목, 이름, 섬 이름, 아이템" : "제목, 섬 이름, 대표 이름") : T === "trade" ? "아이템, 주민, 이름, 섬 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
   const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? (SRV ? "자랑 글을 찾아요" : "꿈번지를 찾아요") : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
-  const s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
+  const V = viewOn(T) ? viewSpec(T) : null;
+  if(!V){   // 꿈번지 without the server: search only, as before
+    var s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
-    <div class="bd-in" id="f-cats">${T === "dream" || T === "trade" ? `<p class="sub">찾을 말을 넣어 주세요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.</p>` : catsHTML()}</div>
+    <div class="bd-in" id="f-cats"><p class="sub">찾을 말을 넣어 주세요. ㅂㄲ처럼 초성만 넣어도 돼요.</p></div>
     <div class="res" id="s-res" hidden></div>`, () => { renderTotals(); render(); });
+  } else {
+    const scope = T === "villager" ? "모든 주민에서 찾아요. 영어·일본어 이름도 돼요." : T === "museum" ? "박물관 전체에서 찾아요. 분류 이름도 찾아져요." : T === "item" ? "모든 아이템에서 찾아요. 분류 이름도 찾아져요." : `모든 ${T === "dream" ? "자랑" : "거래"} 글에서 찾아요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.`;
+    const secs = [V.cat && ["cat", "분류"], V.filt.length && ["filt", "필터"], V.sort && ["sort", "정렬"]].filter(Boolean);
+    const pinNote = T === "museum" ? "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지 필터와 정렬은 처음으로 돌아가요. 고른 분류도 그대로 남아요." : V.cat ? "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지 필터와 정렬은 처음으로 돌아가요. 고른 분류도 그대로 남아요." : "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지는 처음으로 돌아가요.";
+    var s = openSheet(`<div class="hd"><div><h3>보기</h3><p class="sub" id="v-cnt"></p></div>${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
+    <p class="sub vscope" id="v-scope">${scope}</p>
+    ${secs.length > 1 ? `<div class="vjump" role="group" aria-label="구역으로 가기">${secs.map(([k, l]) => `<button type="button" data-jump="${k}">${l}<b class="num"></b></button>`).join("")}</div>` : ""}
+    <div class="bd-in vwbody" id="f-cats">
+      ${V.cat ? `<section class="vsec vcat" id="vs-cat"><h4 class="vwh">분류</h4><div class="vcats">${catsHTML()}</div></section>` : ""}
+      <div class="vside">
+        ${V.filt.length ? `<section class="vsec" id="vs-filt"><h4 class="vwh">필터</h4>${viewRowsHTML(V)}</section>` : ""}
+        ${V.sort ? `<section class="vsec" id="vs-sort"><h4 class="vwh">정렬</h4>${viewSortHTML(V)}</section>` : ""}
+        ${V.setting ? `<section class="vsec" id="vs-set"><h4 class="vwh">내 섬 설정</h4>${viewSettingHTML(V)}</section>` : ""}
+        <div class="vreset"><button class="pill ghost" type="button" id="f-reset">${ico("refresh")}${V.sort ? "필터와 정렬 원래대로" : "필터 원래대로"}</button><p class="sub">${V.cat ? "분류와 체크한 기록은 그대로 두고 필터와 정렬만 되돌려요." : V.sort ? "글은 그대로 두고 필터와 정렬만 되돌려요." : "글은 그대로 두고 필터만 되돌려요."}</p><p class="sub">${pinNote}</p></div>
+      </div>
+    </div>
+    <div class="res" id="s-res" hidden></div>`, () => { renderTotals(); render(); });
+    s.el.classList.add("vsheet"); if(V.cat) s.el.classList.add("vwide");
+  }
   const inp = s.el.querySelector("#s-q"), out = s.el.querySelector("#s-res"), cats = s.el.querySelector("#f-cats");
+  const jumpBar = s.el.querySelector(".vjump"), scopeP = s.el.querySelector("#v-scope"), bd = s.el.querySelector(".bd");
+  // keep every switch, radio, count and the 분류 highlight in step with ui
+  const vsync = () => {
+    if(!V) return;
+    const one = r => r.get();
+    V.filt.forEach(r => {
+      if(r.kind === "sw"){ const b = s.el.querySelector(`[data-vk="${r.k}"]`), dis = !!(r.dis && r.dis()); b.setAttribute("aria-checked", !!one(r)); b.disabled = dis; b.closest(".opt").classList.toggle("off", dis); }
+      else if(r.kind === "radio") s.el.querySelectorAll(`[data-vg="${r.k}"] button`).forEach(b => b.setAttribute("aria-checked", String(one(r)) === b.dataset.v));
+      else if(r.kind === "src"){ const b = s.el.querySelector("#v-src span"); b.textContent = SRC_NAME(ui.src); }
+    });
+    if(V.sort) s.el.querySelectorAll('[data-vg="_sort"] button').forEach(b => b.setAttribute("aria-checked", String(V.sort.get()) === b.dataset.v));
+    if(V.setting) s.el.querySelectorAll('[data-vg="_set"] button').forEach(b => b.setAttribute("aria-checked", String(V.setting.get()) === b.dataset.v));
+    s.el.querySelectorAll(".vcats .cbtn").forEach(b => b.setAttribute("aria-current", String(+b.dataset.c === ui.cat)));
+    const A = viewActive(T);
+    if(jumpBar){ const fb = jumpBar.querySelector('[data-jump="filt"] b'); if(fb) fb.textContent = A.f.length ? " " + A.f.length : ""; const sb = jumpBar.querySelector('[data-jump="sort"] b'); if(sb) sb.textContent = A.s ? " 1" : ""; }
+    s.el.querySelector("#v-cnt").textContent = viewCount(T) + " · 바꾸면 바로 적용돼요";
+  };
+  const vapply = () => { ui.limit = 0; saveView(); renderTotals(); render(); vsync(); };
+  const vjump = k => { const sec = s.el.querySelector("#vs-" + k); if(!sec || !bd) return; const off = jumpBar && getComputedStyle(jumpBar).display !== "none" ? jumpBar.offsetHeight + 8 : 8; bd.scrollTo({top: Math.max(0, sec.offsetTop - bd.offsetTop - off), behavior: REDUCED ? "auto" : "smooth"}); };
+  const vspy = () => { if(!jumpBar || !bd) return; let cur = null; jumpBar.querySelectorAll("[data-jump]").forEach(b => { const sec = s.el.querySelector("#vs-" + b.dataset.jump); if(sec && sec.offsetTop - bd.offsetTop - bd.scrollTop <= jumpBar.offsetHeight + 40) cur = b.dataset.jump; }); if(!cur) cur = jumpBar.querySelector("[data-jump]").dataset.jump; if(bd.scrollTop + bd.clientHeight >= bd.scrollHeight - 4) cur = jumpBar.querySelector("[data-jump]:last-child").dataset.jump; jumpBar.querySelectorAll("[data-jump]").forEach(b => b.setAttribute("aria-current", String(b.dataset.jump === cur))); };
+  if(V){
+    vsync(); if(bd) bd.addEventListener("scroll", vspy, {passive:true}); vspy();
+    s.ov._reveal = () => { vsync(); if(inp.value.trim()) paint(); };
+    if(jump) requestAnimationFrame(() => vjump(jump));
+    // the list behind changes when 자랑·거래 글 arrive: keep the count right
+    const tick = setInterval(() => { if(!s.ov.isConnected) return clearInterval(tick); if(!inp.value.trim()) s.el.querySelector("#v-cnt").textContent = viewCount(T) + " · 바꾸면 바로 적용돼요"; }, 1500);
+  }
   const LIM = 80;
   const row = it => { const on = own.has(it.id); return `<button class="srow" type="button" data-id="${it.id}" aria-pressed="${on}">${picHTML(it)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])} · ${T === "museum" ? "박물관" : CAT_IS_CATALOG[it.lc] ? "카탈로그" : "카탈로그 아님"}${T === "museum" ? "" : it.st===1?" · 비매품":it.st===2?" · 시즌":it.st===3?" · 카탈로그 외":""}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`; };
   const vrow = v => `<button class="srow" type="button" data-v="${v.f}" aria-pressed="${hasPhoto(v)}">${vilPic(v, 42)}<span class="tx"><b>${esc(v.ko)}</b><span>${esc(vSub(v))} · ${bdText(v)}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`;
@@ -2412,7 +2674,7 @@ function openFind(){
   let t = 0, sfo = "all";
   const paint = () => {
     const q = inp.value.trim();
-    cats.hidden = !!q; out.hidden = !q;
+    cats.hidden = !!q; out.hidden = !q; if(jumpBar) jumpBar.hidden = !!q; if(scopeP) scopeP.hidden = false;
     if(!q){ out.innerHTML = ""; return; }
     let list, html, wrap, hint;
     if(T === "villager"){ list = searchIn(VIL, v => [v.ko, v.en, v.ja], q); html = vilCardHTML; wrap = "grid list vgrid"; hint = "누르면 사진 받은 걸로 체크돼요. ⋯를 누르면 자세히 보여요."; }
@@ -2428,10 +2690,13 @@ function openFind(){
       chips = `<div class="sfo" role="radiogroup" aria-label="보유 상태">${F.map(([v, l, d]) => `<button type="button" role="radio" data-sfo="${v}" aria-checked="${sfo === v}">${d || v === "none" ? `<i class="${d}"></i>` : ""}${l} <b class="num">${fmt(c[v])}</b></button>`).join("")}</div>`;
       if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return sfo === "have" ? st !== "none" : st === sfo; });
     }
-    out.innerHTML = list.length ? `<p class="sub">${hint}</p>${chips}<div class="${wrap} sgrid">${list.slice(0, LIM).map(x => html(x)).join("")}</div>` + (list.length > LIM ? `<p class="sub">${fmt(list.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(q)}"에 맞는 것이 없어요.</p>`;
+    let catHits = "";
+    if(T === "item" || T === "museum"){ const cs = T === "museum" ? MUSEUM_CATS : CATS.map((c, i) => i).filter(i => tabOfCat(i) === "item"); const h = searchIn(cs, i => [CATS[i][0]], q).slice(0, 6); if(h.length) catHits = `<p class="sub">분류로 가기</p><div class="cgrid vchit">${h.map(i => catBtn(i)).join("")}</div>`; }
+    else if(T === "villager"){ const h = searchIn(VSP.map((n, i) => i), i => [VSP[i]], q).slice(0, 6); if(h.length) catHits = `<p class="sub">종족으로 가기</p><div class="cgrid vchit">${h.map(i => vilCatBtn(i)).join("")}</div>`; }
+    out.innerHTML = catHits + (list.length ? `<p class="sub">${hint}</p>${chips}<div class="${wrap} sgrid">${list.slice(0, LIM).map(x => html(x)).join("")}</div>` + (list.length > LIM ? `<p class="sub">${fmt(list.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : catHits ? "" : `<p class="sub">"${esc(q)}"에 맞는 것이 없어요.</p>`);
   };
   inp.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 140); });
-  s.ov._reveal = () => { if(inp.value.trim()) paint(); };   // back from a detail opened here: show its new check state
+  if(!V) s.ov._reveal = () => { if(inp.value.trim()) paint(); };   // back from a detail opened here: show its new check state
   const redo = (el, h) => { const w = document.createElement("div"); w.innerHTML = h; el.replaceWith(w.firstChild); };
   s.el.addEventListener("click", e => {
     const sf = e.target.closest("[data-sfo]"); if(sf){ sfo = sf.dataset.sfo; paint(); return; }
@@ -2455,11 +2720,22 @@ function openFind(){
       else if(a === "v"){ const i = +ab.dataset.i; const m = (vmask.get(id) || 0) ^ (1 << i); if(m){ vmask.set(id, m); own.add(id); } else vmask.delete(id); save(); }
       redo(card, cardHTML(it)); return;
     }
+    if(V){
+      const j = e.target.closest("[data-jump]"); if(j) return vjump(j.dataset.jump);
+      const w = e.target.closest("[data-vk]"); if(w){ const r = V.filt.find(x => x.k === w.dataset.vk); if(r && !w.disabled){ r.set(!r.get()); vapply(); } return; }
+      const rb = e.target.closest("[data-vg] button"); if(rb){ const g = rb.closest("[data-vg]").dataset.vg, v = rb.dataset.v;
+        if(g === "_sort") V.sort.set(v); else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
+        vapply(); return; }
+      if(e.target.closest("#v-src")) return openSrcPick(vapply);
+      if(e.target.closest("#f-reset")){ viewReset(T); vapply(); toast("필터와 정렬을 원래대로 돌렸어요"); return; }
+    }
     const b = e.target.closest(".cbtn"); if(!b) return;
-    ui.cat = +b.dataset.c; ui.limit = 0; saveView(); s.close(); render(); $("page").scrollTo({top:0});
+    ui.cat = +b.dataset.c; ui.limit = 0; saveView();
+    if(V && viewWide() && !b.closest("#s-res")){ renderTotals(); render(); vsync(); return; }   // a wide screen keeps the window open
+    s.close(); render(); $("page").scrollTo({top:0});
   });
 }
-$("btn-pick").addEventListener("click", () => ui.tab === "island" ? openIslandMenu() : ui.tab === "todo" ? openTodoPick() : openFind());
+$("btn-pick").addEventListener("click", () => ui.tab === "island" ? openIslandMenu() : ui.tab === "todo" ? openTodoFind() : openFind());
 // Leaf logo = home: first category, 전체 tab, 좋아요만 off, back to the top. Filters, sort and view stay as chosen.
 $("btn-home").addEventListener("click", () => { saveView(); ui.tab = "item"; ui.cat = 0; ui.fo = "all"; ui.liked = false; ui.limit = 0; saveView(); renderTotals(); render(); $("page").scrollTo({top:0, behavior: REDUCED ? "auto" : "smooth"}); });
 
@@ -2539,7 +2815,7 @@ function openFilters(){
     else if(e.target.closest("#f-reset")){ ui.sort="base"; ui.buyable=false; ui.showNS=true; ui.showNC=true; ui.new3=false; ui.diy=false; ui.remake=false; ui.src=-1; sync(); }
   });
 }
-$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? (SRV ? openShowForm() : openDreamForm()) : ui.tab === "trade" ? openTradeForm() : ui.tab === "villager" ? openVilFilters() : openFilters());
+$("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? (SRV ? openShowForm() : openDreamForm()) : ui.tab === "trade" ? openTradeForm() : openFind("filt"));
 document.addEventListener("change", e => { if(e.target.id === "f-src"){ ui.src = +e.target.value; ui.limit = 0; saveView(); render(); renderHead(); } });
 
 $("btn-like").addEventListener("click", () => {
@@ -3766,13 +4042,13 @@ function renderTrades(){
   const L = tradeShown();
   let body;
   if(!TS.ready) body = `<div class="empty"><b>거래 글을 불러오는 중이에요</b>잠시만 기다려 주세요.</div>`;
-  else if(TS.err && !TS.list.length) body = `<div class="empty"><b>거래 글을 불러오지 못했어요</b>인터넷 연결을 확인하고 위쪽 새로 보기를 눌러 주세요.</div>`;
+  else if(TS.err && !TS.list.length) body = `<div class="empty"><b>거래 글을 불러오지 못했어요</b>인터넷 연결을 확인하고 새로 보기를 눌러 주세요.</div>`;
   else if(ui.cat === TRADE_MINE && !AUTH.me) body = `<div class="empty"><b>로그인하면 내 글이 보여요</b>내가 쓴 거래 글을 여기서 모아 봐요.${signinBtns}</div>`;
   else if(!L.length) body = ui.liked ? `<div class="empty"><b>좋아요한 것이 들어간 글이 없어요</b>아이템이나 주민의 ♡를 누르면, 그게 들어간 글만 모아 볼 수 있어요.</div>`
     : `<div class="empty"><b>${ui.cat === TRADE_MINE ? `아직 쓴 ${ui.fo === "all" ? "" : TRADE_T[ui.fo][0] + " "}글이 없어요` : `아직 ${ui.fo === "all" ? "거래" : TRADE_T[ui.fo][0]} 글이 없어요`}</b>위쪽 글쓰기 버튼으로 첫 글을 올려 보세요.</div>`;
   else body = L.map(tradeCardHTML).join("");
   const mineOn = ui.cat === TRADE_MINE;
-  const bar = TS.ready ? `<div class="tr-bar"><button class="pill sm ${mineOn ? "leaf" : "ghost"}" type="button" id="tr-mine" aria-pressed="${mineOn}">${ico(mineOn ? "check" : "face")}내 글만</button><button class="pill ghost sm" type="button" id="tr-re">${ico("refresh")}새로 보기</button></div>` : "";
+  const bar = TS.ready ? `<div class="tr-bar"><button class="pill ghost sm" type="button" id="tr-re">${ico("refresh")}새로 보기</button></div>` : "";
   grid.innerHTML = intro + bar + body;
   const on = (sel, f) => grid.querySelectorAll(sel).forEach(b => b.addEventListener("click", f));
   on("#trade-hello-x", () => { try{ localStorage.setItem(KEY + ":tradehello", "1"); }catch(e){} render(); });
@@ -4174,7 +4450,7 @@ function renderShows(){
   else if(!L.length) body = ui.liked ? `<div class="empty"><b>추천한 ${kn} 글이 없어요</b>마음에 드는 글에서 추천을 눌러 보세요.</div>`
     : `<div class="empty"><b>${mine ? `아직 올린 ${kn} 글이 없어요` : `아직 ${kn} 글이 없어요`}</b>위쪽 + 버튼을 눌러 첫 글을 올려 보세요.</div>`;
   else body = L.map(showCardHTML).join("");
-  const bar = SH.ready ? `<div class="tr-bar"><span class="sh-sort" role="group" aria-label="순서">${["최신순", "추천순", "조회순"].map((t, i) => `<button type="button" data-sort="${i}" aria-pressed="${sort === i}">${t}</button>`).join("")}</span><button class="pill sm ${mine ? "leaf" : "ghost"}" type="button" id="sh-mine" aria-pressed="${mine}">${ico(mine ? "check" : "face")}내 글만</button><button class="pill ghost sm" type="button" id="sh-re">${ico("refresh")}새로 보기</button></div>` : "";
+  const bar = SH.ready ? `<div class="tr-bar"><button class="pill ghost sm" type="button" id="sh-re">${ico("refresh")}새로 보기</button></div>` : "";
   grid.innerHTML = intro + bar + body + (SH.more ? `<p class="sub" style="grid-column:1/-1; text-align:center">최근 60개까지 보여요. 찾기로 더 찾아보세요.</p>` : "");
   const on = (sel, f) => grid.querySelectorAll(sel).forEach(b => b.addEventListener("click", f));
   on("#show-hello-x", () => { try{ localStorage.setItem(KEY + ":showhello", "1"); }catch(e){} render(); });
