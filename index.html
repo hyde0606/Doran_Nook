@@ -21,6 +21,7 @@
 <meta name="twitter:description" content="모여봐요 동물의 숲 카탈로그·박물관·주민 체크와 섬 꾸미기를 한곳에서">
 <meta name="twitter:image" content="https://doran-nook.pages.dev/og.jpg">
 <meta name="theme-color" content="#7dbd57">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("acnh-catalog-check-v1:theme")==="light"?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1572,6 +1573,116 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
 .tr-cbox .cmt .ch b, .tr-cbox .cmt .ch button{white-space:nowrap}
 @media (max-width:360px){ .tr-cbox .cmt{max-width:100%} .tr-cbox .reps{margin-left:12px} }
 @media (max-width:300px){ .tr-cin textarea{font-size:13.5px; padding:11px 6px} .tr-cinb .pill{padding:7px 10px} }
+
+/* v48 상세 화면 공통 (거래 글 모양을 자랑·아이템·박물관·주민·할 일에): 상자 하나, 구역마다 색 점과 줄 */
+.k-sun{color:var(--sun-ink)} .k-leaf{color:var(--leaf)} .k-plum{color:var(--plum)} .k-blue{color:var(--rcp-ink)} .k-berry{color:var(--berry)} .k-pink{color:var(--like)} .k-mute{color:var(--muted)}
+.d-card{display:grid; gap:0; min-width:0; background:var(--card); border-radius:20px; padding:12px 14px 4px; box-shadow:0 3px 0 var(--card-line)}
+.d-card > *{min-width:0}
+.d-card .d-sec{display:grid; gap:8px; min-width:0; background:transparent; border-radius:0; padding:8px 0 14px; margin:0; box-shadow:none}
+.d-card .shd{flex-wrap:nowrap; gap:8px}
+.d-card .shd::before{content:""; width:10px; height:10px; border-radius:50%; flex:none; background:currentColor}
+.d-card .shd::after{content:""; flex:1 1 12px; min-width:12px; height:2px; border-radius:2px; background:currentColor; opacity:.35; order:1}
+.d-card .shd > :not(b){order:2}
+.d-card .shd > .fi, .d-card .shd > .pic{display:none}
+.d-card .shd b{color:inherit; font-size:15px; white-space:nowrap}
+.d-card .shd .sub{font-size:12px; text-align:right; min-width:0}
+.d-card .shd .hemi{margin-left:0}
+/* 상자 안 정보 칸은 바탕 없이 (누르는 칸만 바탕) */
+.d-card .pr, .d-card .qf:not(.qb){background:transparent; padding:4px 2px; border-radius:0}
+.d-card .prices, .d-card .qgrid{gap:6px 10px}
+.d-card .acq li{padding-left:22px}
+.d-card .acq li::before{left:4px}
+.d-card .acq-note{padding-left:22px}
+.d-card .quote p{padding:0 2px}
+.d-card .dtext{background:transparent; padding:2px 0; line-height:1.65; font-family:var(--f-text); font-size:15.5px}
+.d-card .artbox{margin:0 0 6px; padding:0 0 12px; background:transparent; border-radius:0; border-bottom:1px dashed var(--card-line)}
+.d-card .codebox{background:var(--chip)}
+.d-card .ggrid button{background:var(--chip)}
+.d-card .ggrid button.on{background:var(--sprout)}
+/* 자세한 정보: 이름표 줄이 펼치기 단추 */
+.d-card .more-info{border-radius:0}
+.d-card .more-info summary{padding:0; font-size:inherit; cursor:pointer}
+.d-card .more-info summary::after{content:""; flex:1 1 12px; width:auto; height:2px; margin:0; border:0; border-radius:2px; background:currentColor; opacity:.35; transform:none; transition:none}
+.d-card .more-info summary > i{order:2; flex:none; width:8px; height:8px; margin:0 4px 3px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform .15s}
+.d-card .more-info[open] summary > i{transform:rotate(-135deg); margin-bottom:-3px}
+.d-card .more-info:not([open]){padding-bottom:12px}
+.d-card .qlist{padding:0}
+.d-card .qlist .qf{border-top:0; padding:4px 2px}
+/* 이름 줄 (알림 줄과 이름이 겹쳐 복사 단추가 아래로 밀리던 것 고침) */
+.dnames .nrow{display:flex; align-items:center; gap:8px; padding:4px 0; background:transparent; border-radius:0; width:auto; cursor:default}
+.dnames .nrow .lb{width:88px}
+.dnames .nrow b{font-family:var(--f-display)}
+/* 거래 버튼 셋을 한 묶음으로 */
+.d-seg{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); border-radius:12px; overflow:hidden; background:var(--chip); box-shadow:inset 0 0 0 1px var(--card-line)}
+.d-seg button{border:0; background:transparent; color:var(--muted); font-family:var(--f-display); font-size:14px; line-height:1.25; padding:8px 6px; min-height:40px; min-width:0; overflow-wrap:anywhere; word-break:keep-all}
+.d-seg button + button{box-shadow:inset 1px 0 0 var(--card-line)}
+.d-seg .s1{color:var(--leaf)} .d-seg .s2{color:var(--sun-ink)}
+/* 주민: 세 단추도 한 묶음 */
+.vtog{gap:0; border-radius:16px; overflow:hidden; background:var(--chip); box-shadow:inset 0 0 0 1px var(--card-line)}
+.vtog button{background:transparent; border-radius:0}
+.vtog button + button{box-shadow:inset 1px 0 0 var(--card-line)}
+.vtog button[aria-pressed="true"]{background:var(--card-on); box-shadow:inset 0 -3px 0 var(--leaf)}
+.vtog button + button[aria-pressed="true"]{box-shadow:inset 1px 0 0 var(--card-line), inset 0 -3px 0 var(--leaf)}
+.vtog button[data-vt="like"][aria-pressed="true"]{box-shadow:inset 1px 0 0 var(--card-line), inset 0 -3px 0 var(--like)}
+/* 자랑 글: 추천 + 숫자 + 버튼 한 묶음 */
+#sh-body{gap:12px}
+.d-card .tr-meta{padding-bottom:6px}
+.sh-bar{display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; min-width:0}
+.sh-like{display:inline-flex; align-items:center; gap:6px; border:0; border-radius:999px; padding:7px 14px 7px 10px; min-height:38px; background:var(--chip); color:var(--ink); font-family:var(--f-display); font-size:14px; box-shadow:inset 0 0 0 1px var(--card-line); white-space:nowrap}
+.sh-like svg{width:19px; height:19px; color:var(--like); opacity:.55}
+.sh-like b{font-weight:400; color:var(--muted)}
+.sh-like[aria-pressed="true"]{background:var(--like-soft); color:#9b2f45}
+.sh-like[aria-pressed="true"] svg{opacity:1}
+.sh-like:disabled{opacity:.6}
+.sh-bar .dstat{gap:10px}
+.sh-bar .dstat > span:first-child, .sh-bar .dstat .dt2{display:none}
+.sh-bar .tr-acts{margin:0 0 0 auto}
+/* 할 일: 묶음 제목도 색 점과 줄 */
+.tdgh{border-bottom:0; padding:0 2px; font-size:16px; color:var(--plum)}
+.tdgh > .pic, .tdgh > .fi{display:none}
+.tdgh::before{content:""; width:10px; height:10px; border-radius:50%; flex:none; background:currentColor}
+.tdgh::after{content:""; flex:1 1 12px; min-width:12px; height:2px; border-radius:2px; background:currentColor; opacity:.35; order:1}
+.tdgh .tdgn{order:2; margin-left:0; color:var(--muted)}
+.tdg:nth-of-type(5n+2) .tdgh{color:var(--sun-ink)} .tdg:nth-of-type(5n+3) .tdgh{color:var(--leaf)} .tdg:nth-of-type(5n+4) .tdgh{color:var(--rcp-ink)} .tdg:nth-of-type(5n+5) .tdgh{color:var(--berry)}
+.tcard > .shd{flex-wrap:nowrap; color:var(--leaf)}
+.tcard > .shd::before{content:""; width:10px; height:10px; border-radius:50%; flex:none; background:currentColor}
+.tcard > .shd::after{content:""; flex:1 1 12px; min-width:12px; height:2px; border-radius:2px; background:currentColor; opacity:.35; order:1}
+.tcard > .shd > .fi, .tcard > .shd > .pic{display:none}
+.tcard > .shd > :not(b){order:2}
+.tcard > .shd b{color:inherit; font-size:16px}
+.tcard > .shd .sub{margin-left:0 !important; font-size:12px; text-align:right; min-width:0}
+@media (max-width:360px){ .d-card{padding:10px 12px 2px} .dnames .nrow .lb{width:74px} .d-seg button{font-size:13px; padding:8px 4px} }
+.d-card .pr b{white-space:nowrap}
+
+/* v48 거래 목록 카드: 첫 줄에 종류·작성자·댓글, 드려요/받고 싶어요는 접어 두고 작게 눌러 펼침 */
+.tr-card.tl{position:relative; gap:8px; padding:12px 14px 14px; box-shadow:0 5px 0 var(--grass-shadow)}
+.tl-sh{display:flex; align-items:center; gap:8px; min-width:0}
+.tl-sh::before{content:""; width:10px; height:10px; border-radius:50%; flex:none; background:currentColor}
+.tl-sh::after{content:""; flex:1 1 10px; min-width:10px; height:2px; border-radius:2px; background:currentColor; opacity:.35; order:1}
+.tl-sh b{font-family:var(--f-display); font-weight:400; font-size:15px; white-space:nowrap}
+.tl-by{order:2; display:inline-flex; align-items:center; gap:5px; min-width:0; font-size:12.5px; color:var(--muted); white-space:nowrap}
+.tl-by .fr{width:20px; height:20px; display:grid; place-items:center; flex:none} .tl-by .fr .pic{--t:20px}
+.tl-nm{font-family:var(--f-display); color:var(--ink); font-size:13.5px; overflow:hidden; text-overflow:clip; max-width:7em}
+.tl-ag::before{content:"· "}
+.tl-by .tr-cm{display:inline-flex; align-items:center; gap:3px; margin-left:4px}
+.tl-by .tr-cm .fi{width:15px; height:15px}
+.tr-card.tl .tr-items{padding-left:2px}
+.tr-card.tl .tr-more{padding-left:52px}
+.tl-pay{display:none; gap:8px; min-width:0}
+.tl.open .tl-pay{display:grid}
+.tr-card.tl .tr-pay{background:transparent; padding:0 2px; font-size:14.5px}
+.tl.hasx .tr-items, .tl.hasx .tl-pay{padding-right:34px}
+.tl-x{position:absolute; right:10px; bottom:10px; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--chip); box-shadow:inset 0 0 0 1px var(--card-line); cursor:pointer}
+.tl-x i{width:8px; height:8px; margin-top:-4px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .15s}
+.tl.open .tl-x i{transform:rotate(-135deg); margin-top:4px}
+@media (max-width:380px){ .tl-nm{display:none} .tl-ag::before{content:none} }
+
+/* 밝은 화면: 큰 상자가 바탕과 구분되게 */
+:root{--dcard:#fffcf4; --dcard-line:rgba(122,90,58,.22)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--dcard:var(--card); --dcard-line:transparent} }
+:root[data-theme="dark"]{--dcard:var(--card); --dcard-line:transparent}
+.d-card, .tr-dcard{background:var(--dcard); box-shadow:inset 0 0 0 1px var(--dcard-line), 0 3px 0 var(--card-line)}
+.thm{margin:0 0 4px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2441,17 +2552,17 @@ function acqHTML(it, info){
   if(!lines.length && CR_HOW[it.cat]) lines.push(`<li>${CR_HOW[it.cat]}</li>`);
   if(info.cs) lines.push(`<li>${esc(info.cs)}</li>`);
   if(cd) lines.push(`<li>고를 수 있는 기간: ${esc(cd[0])} ~ ${esc(cd[1])} (북반구 기준)</li>`);
-  if(!lines.length && !note) return `<div class="acq"><div class="shd">${ico("pin")}<b>얻는 법</b></div><p class="acq-note">—</p></div>`;
-  return `<div class="acq"><div class="shd">${ico("pin")}<b>얻는 법</b></div>${lines.length ? `<ul>${lines.join("")}</ul>` : ""}${note ? `<p class="acq-note">${esc(note)}</p>` : ""}</div>`;
+  if(!lines.length && !note) return `<div class="acq d-sec"><div class="shd k-plum">${ico("pin")}<b>얻는 법</b></div><p class="acq-note">—</p></div>`;
+  return `<div class="acq d-sec"><div class="shd k-plum">${ico("pin")}<b>얻는 법</b></div>${lines.length ? `<ul>${lines.join("")}</ul>` : ""}${note ? `<p class="acq-note">${esc(note)}</p>` : ""}</div>`;
 }
-function seasonHTML(cr){
+function crSeasonHTML(cr){
   const arr = (HEMI === "s" ? cr.h : cr.n) || [], now = new Date().getMonth(), tm = (DET && DET.tm) || [];
   const groups = new Map(); arr.forEach((t, m) => { if(t >= 0){ if(!groups.has(t)) groups.set(t, []); groups.get(t).push(m); } });
   const here = arr[now] >= 0;
   const cells = arr.map((t, m) => `<span class="mo${t >= 0 ? " on" : ""}${m === now ? " now" : ""}"${m === now ? ` title="이번 달"` : ""}>${m + 1}</span>`).join("");
   const lines = [...groups].map(([t, ms]) => `<div class="tline">${ico("clock")}<b>${esc(tm[t] || "")}</b>${groups.size > 1 ? `<span>${monthText(ms)}</span>` : ""}</div>`).join("");
-  return `<div class="season" id="d-season">
-    <div class="shd">${ico("cal")}<b>서식 시기</b><div class="hemi" role="radiogroup" aria-label="반구"><button type="button" role="radio" data-hemi="n" aria-checked="${HEMI === "n"}">북반구</button><button type="button" role="radio" data-hemi="s" aria-checked="${HEMI === "s"}">남반구</button></div></div>
+  return `<div class="season d-sec" id="d-season">
+    <div class="shd k-blue">${ico("cal")}<b>서식 시기</b><div class="hemi" role="radiogroup" aria-label="반구"><button type="button" role="radio" data-hemi="n" aria-checked="${HEMI === "n"}">북반구</button><button type="button" role="radio" data-hemi="s" aria-checked="${HEMI === "s"}">남반구</button></div></div>
     <div class="months num">${cells}</div>
     ${lines}
     <div class="tline st${here ? "" : " off"}">${ico("spark")}<b>${here ? `이번 달(${now + 1}월)에 나와요` : `이번 달(${now + 1}월)엔 안 나와요`}</b></div>
@@ -2504,14 +2615,13 @@ function openDetail(it, startSel){
       </div>
       ${n ? `<div class="vgrid" id="d-strip">${it.vs.map((v,i) => `<div class="vc"><button class="vt" type="button" data-own="${i}" aria-label="${esc(v)} 체크" title="${esc(v)}">${nf > 1 ? framePic(it, i, 48) : `<span class="vn">${esc(v)}</span>`}</button><button class="vh" type="button" data-like="${i}" aria-label="${esc(v)} 좋아요"><svg><use href="#i-heart"/></svg></button></div>`).join("")}</div>
       ${own.has(it.id) && !(vmask.get(it.id)) ? `<p class="sub hint">가진 색을 눌러 주세요</p>` : ""}` : ""}
-      <div class="prices"><div class="pr">${ico("bag")}<div><span>구매가</span><b>${b ? bells(b) : "살 수 없어요"}</b></div></div><div class="pr">${ico("coin")}<div><span>판매가</span><b>${it.sell ? bells(it.sell) : "팔 수 없어요"}</b></div></div></div>
-      ${artBox(it)}
-      ${quick.length ? `<div class="qgrid">${quick.map(tile).join("")}</div>` : ""}
+      <div class="d-card">${artBox(it)}<section class="d-sec"><div class="shd k-sun"><b>가격</b></div><div class="prices"><div class="pr">${ico("bag")}<div><span>구매가</span><b>${b ? bells(b) : "살 수 없어요"}</b></div></div><div class="pr">${ico("coin")}<div><span>판매가</span><b>${it.sell ? bells(it.sell) : "팔 수 없어요"}</b></div></div></div></section>
+      ${quick.length ? `<section class="d-sec"><div class="shd k-leaf"><b>정보</b></div><div class="qgrid">${quick.map(tile).join("")}</div></section>` : ""}
       ${acqHTML(it, info)}
-      ${cr ? seasonHTML(cr) : ""}
-      ${more.length ? `<details class="more-info" id="d-more"${open ? " open" : ""}><summary>자세한 정보</summary><div class="qlist">${more.map(tile).join("")}</div></details>` : ""}
+      ${cr ? crSeasonHTML(cr) : ""}
+      ${more.length ? `<details class="d-sec more-info" id="d-more"${open ? " open" : ""}><summary class="shd k-mute"><b>자세한 정보</b><i aria-hidden="true"></i></summary><div class="qlist">${more.map(tile).join("")}</div></details>` : ""}
       ${tradeBox("i", it)}
-      <div class="dnames"><div class="dlab">이름</div>${names.map(([c,l,v]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span>${v ? `<b lang="${c}">${esc(v)}</b><button class="cp" type="button" data-copy="${esc(v)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button>` : `<b class="miss">공식 한국어 이름을 아직 못 구했어요</b>`}</div>`).join("")}</div>
+      <section class="d-sec dnames"><div class="shd k-mute"><b>이름</b></div>${names.map(([c,l,v]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span>${v ? `<b lang="${c}">${esc(v)}</b><button class="cp" type="button" data-copy="${esc(v)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button>` : `<b class="miss">공식 한국어 이름을 아직 못 구했어요</b>`}</div>`).join("")}</section></div>
     </div>`;
     const det = body.querySelector("#d-more"); det && det.addEventListener("toggle", () => { try{ localStorage.setItem(KEY + ":more", det.open ? "1" : "0"); }catch(e){} });
     sync(false);
@@ -2531,7 +2641,7 @@ function openDetail(it, startSel){
     const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
     if(t.dataset.copy) return copyText(t.dataset.copy);
     if(t.dataset.twin){ const o = BY_ID.get(+t.dataset.twin); if(o){ sheetOver = true; openDetail(o); } return; }
-    if(t.dataset.hemi){ HEMI = t.dataset.hemi; try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} const box = body.querySelector("#d-season"); if(box && info.cr) box.outerHTML = seasonHTML(info.cr); return; }
+    if(t.dataset.hemi){ HEMI = t.dataset.hemi; try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} const box = body.querySelector("#d-season"); if(box && info.cr) box.outerHTML = crSeasonHTML(info.cr); return; }
     if(t.dataset.nav) return go(+t.dataset.nav);
     if(t.dataset.own !== undefined){
       const i = +t.dataset.own; sel = i; const m = (vmask.get(it.id) || 0) ^ (1 << i);
@@ -3116,7 +3226,7 @@ function openVillager(v){
         <button type="button" data-vt="res" aria-pressed="${res.has(v.f)}">${ico("house")}우리 섬에 살아요</button>
         <button type="button" data-vt="like" aria-pressed="${vlike.has(v.f)}">${ico("heart")}좋아하는 주민</button>
       </div>
-      <div class="qgrid vinfo">
+      <div class="d-card"><section class="d-sec"><div class="shd k-leaf"><b>정보</b></div><div class="qgrid vinfo">
         ${tile(spIco(v.sp, "qi"), "종족", esc(VSP[v.sp] || ""))}
         ${tile(ico("spark"), "성격", `<span class="vpe p${v.pe}">${esc(PERS_KO[v.pe] || "")}</span>`)}
         ${tile(gIco(v), "성별", v.g ? "여자" : "남자")}
@@ -3125,17 +3235,17 @@ function openVillager(v){
         ${tile(ico("book"), "취미", esc(HOBBY_KO[v.hb] || ""))}
         ${tile(ico("palette"), "좋아하는 색", `<span class="vcols">${cols}</span>`)}
         ${tile(ico("bag"), "옷 스타일", `<span class="vcols">${stys}</span>`)}
-      </div>
-      ${v.sy ? `<div class="quote"><div class="shd">${ico("chat")}<b>좌우명</b></div><p>${esc(v.sy)}</p></div>` : ""}
-      ${gifts.length ? `<div class="acq"><div class="shd">${tIco("wrap", 28)}<b>어울리는 선물</b></div>
+      </div></section>
+      ${v.sy ? `<div class="quote d-sec"><div class="shd k-sun">${ico("chat")}<b>좌우명</b></div><p>${esc(v.sy)}</p></div>` : ""}
+      ${gifts.length ? `<div class="acq d-sec"><div class="shd k-pink">${tIco("wrap", 28)}<b>어울리는 선물</b></div>
         <div class="ggrid">${gifts.map(([it, n]) => `<button type="button" data-open-item="${it.id}" data-var="${n}" class="${own.has(it.id) ? "on" : ""}">${framePic(it, n, 56)}<b>${esc(it.ko)}</b><span>${esc(it.vs[n] || "")}</span></button>`).join("")}</div></div>` : ""}
-      ${v.hh ? `<div class="acq"><div class="shd">${ico("house")}<b>집</b></div><div class="vhouse"><span class="vhimg" role="img" aria-label="${esc(v.ko)}의 집" style="background-image:url(img/vh-${hk}.webp);--x:${hl % 2};--y:${hl >> 1}"></span></div></div>` : ""}
-      ${inside.length || furn.length ? `<div class="acq"><div class="shd">${ico("sofa")}<b>집 안</b><span class="sub" style="margin-left:auto">누르면 자세히 보여요</span></div>
+      ${v.hh ? `<div class="acq d-sec"><div class="shd k-blue">${ico("house")}<b>집</b></div><div class="vhouse"><span class="vhimg" role="img" aria-label="${esc(v.ko)}의 집" style="background-image:url(img/vh-${hk}.webp);--x:${hl % 2};--y:${hl >> 1}"></span></div></div>` : ""}
+      ${inside.length || furn.length ? `<div class="acq d-sec"><div class="shd k-plum">${ico("sofa")}<b>집 안</b><span class="sub" style="margin-left:auto">누르면 자세히 보여요</span></div>
         ${inside.length ? `<div class="qgrid">${inside.map(([k, it]) => `<button type="button" class="qf qb${own.has(it.id) ? " on" : ""}" data-open-item="${it.id}">${framePic(it, 0, 44)}<div><span>${k}</span><b>${esc(it.ko)}</b></div></button>`).join("")}</div>` : ""}
         ${furn.length ? `<div class="fgrid">${furn.map(it => `<button type="button" data-open-item="${it.id}" class="${own.has(it.id) ? "on" : ""}" title="${esc(it.ko)}">${framePic(it, 0, 52)}<span>${esc(it.ko)}</span></button>`).join("")}</div>` : ""}</div>` : ""}
-      ${rel.length ? `<div class="acq"><div class="shd">${ico("box")}<b>관련 아이템</b><span class="sub" style="margin-left:auto">누르면 체크돼요</span></div>${rel.map(([k, it, n]) => `<button class="irow" type="button" data-own-item="${it.id}" aria-pressed="${own.has(it.id)}">${framePic(it, n, 46)}<span class="tx"><span>${k}</span><b>${esc(it.ko)}${n && it.vs[n] ? ` <small>${esc(it.vs[n])}</small>` : ""}</b></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`).join("")}</div>` : ""}
+      ${rel.length ? `<div class="acq d-sec"><div class="shd k-leaf">${ico("box")}<b>관련 아이템</b><span class="sub" style="margin-left:auto">누르면 체크돼요</span></div>${rel.map(([k, it, n]) => `<button class="irow" type="button" data-own-item="${it.id}" aria-pressed="${own.has(it.id)}">${framePic(it, n, 46)}<span class="tx"><span>${k}</span><b>${esc(it.ko)}${n && it.vs[n] ? ` <small>${esc(it.vs[n])}</small>` : ""}</b></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`).join("")}</div>` : ""}
       ${tradeBox("v", v)}
-      <div class="dnames"><div class="dlab">이름</div>${[["ko", "한국어", v.ko], ["en", "English", v.en], ["ja", "日本語", v.ja]].filter(r => r[2]).map(([c, l, val]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span><b lang="${c}">${esc(val)}</b><button class="cp" type="button" data-copy="${esc(val)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button></div>`).join("")}</div>`;
+      <section class="d-sec dnames"><div class="shd k-mute"><b>이름</b></div>${[["ko", "한국어", v.ko], ["en", "English", v.en], ["ja", "日本語", v.ja]].filter(r => r[2]).map(([c, l, val]) => `<div class="nrow"><span class="lb">${FLAG[c]}${l}</span><b lang="${c}">${esc(val)}</b><button class="cp" type="button" data-copy="${esc(val)}" aria-label="${l} 이름 복사"><svg><use href="#i-copy"/></svg></button></div>`).join("")}</section></div>`;
   }
   draw();
   s.ov._reveal = draw;   // back from an item opened here: show its new check state
@@ -4164,13 +4274,22 @@ function payParts(pay){
   return a.join("");
 }
 const payHTML = p => p.type === "free" ? `<span class="tr-pp">${ico("leaf")}<span>대가 없이 나눠요</span></span>` : payParts(p.pay || {});
+function tlToggle(e){
+  const x = e.target.closest && e.target.closest("[data-tlx]"); if(!x) return;
+  if(e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault(); e.stopPropagation();
+  const c = x.closest(".tl"), on = !c.classList.contains("open");
+  c.classList.toggle("open", on); x.setAttribute("aria-expanded", String(on));
+}
+document.addEventListener("click", tlToggle, true);
+document.addEventListener("keydown", tlToggle, true);
 function tradeCardHTML(p){
   const ents = p.items.map(x => tEntry(x, 40)), more = ents.length - 3;
-  return `<button class="tr-card${p.status === "done" ? " tr-closed" : ""}" type="button" data-trade="${esc(p.id)}">
-    <span class="tr-h"><span class="tr-tag tr-${p.type}">${TRADE_T[p.type][0]}</span>${p.status === "done" ? `<span class="tr-tag tr-fin">거래 완료</span>` : ""}<span class="tr-tm">${ago(p.created)}</span></span>
+  const k1 = p.type === "want" ? "k-plum" : p.type === "sell" ? "k-sun" : "k-leaf", k2 = p.type === "want" ? "k-sun" : "k-plum", fold = p.type !== "free";
+  return `<button class="tr-card tl${fold ? " hasx" : ""}${p.status === "done" ? " tr-closed" : ""}" type="button" data-trade="${esc(p.id)}">
+    <span class="tl-sh ${k1}"><b>${ITEM_HEAD[p.type]}</b>${p.status === "done" ? `<span class="tr-tag tr-fin">거래 완료</span>` : ""}<span class="tl-by"><span class="fr">${fruitPic(p.author.fruit)}</span><span class="tl-nm">${esc(p.author.name)}</span><span class="tl-ag">${ago(p.created)}</span><span class="tr-cm">${ico("chat")}<span class="num">${fmt(p.cmts || 0)}</span></span></span></span>
     <span class="tr-items">${ents.slice(0, 3).map(e => `<span class="tr-it">${e.pic}<span class="tx"><b>${esc(e.name)}</b>${e.sub ? `<i>${esc(e.sub)}</i>` : ""}</span></span>`).join("")}${more > 0 ? `<span class="tr-more">외 ${more}개 더</span>` : ""}</span>
-    <span class="tr-pay">${p.type === "free" ? "" : `<em>${PAY_HEAD[p.type]}</em>`}${payHTML(p)}</span>
-    <span class="tr-by"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span class="tr-isl">${esc(islandText(p.author.island))}</span><span class="tr-cm">${ico("chat")}<span class="num">${fmt(p.cmts || 0)}</span></span></span>
+    ${fold ? `<span class="tl-pay"><span class="tl-sh ${k2}"><b>${PAY_HEAD[p.type]}</b></span><span class="tr-pay">${payHTML(p)}</span></span><span class="tl-x" role="button" tabindex="0" data-tlx aria-expanded="false" aria-label="${PAY_HEAD[p.type]} 펼치기"><i></i></span>` : ""}
   </button>`;
 }
 const TRADE_ERR = {
@@ -4253,8 +4372,8 @@ function renderTradeHead(){
 function tradeBox(k, x){
   if(!AUTH.on || (k === "i" && !tradable(x))) return "";
   const a = `data-tk="${k}" data-tid="${esc(k === "i" ? x.id : x.f)}"`;
-  return `<div class="acq tr-box"><div class="shd">${itemPic(7731, 28)}<b>거래</b></div>
-    <div class="acts2"><button class="pill leaf" type="button" data-tw="want" ${a}>구해요 글 쓰기</button><button class="pill sun" type="button" data-tw="sell" ${a}>팔아요 글 쓰기</button><button class="pill ghost" type="button" data-tw="find" ${a}>${ico("search")}거래 글 보기</button></div></div>`;
+  return `<div class="acq tr-box d-sec"><div class="shd k-berry">${itemPic(7731, 28)}<b>거래</b></div>
+    <div class="d-seg"><button class="s1" type="button" data-tw="want" ${a}>구해요 글 쓰기</button><button class="s2" type="button" data-tw="sell" ${a}>팔아요 글 쓰기</button><button type="button" data-tw="find" ${a}>거래 글 보기</button></div></div>`;
 }
 $("layer").addEventListener("click", e => {
   const t = e.target.closest("[data-tw]"); if(!t) return;
@@ -4370,7 +4489,7 @@ function openTrade(id, p0, opt){
     head();
     const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
     const meta = `<div class="tr-meta"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span>${p.author.island ? esc(islandText(p.author.island)) + " · " : ""}${ago(p.created)}${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div>`;
-    body.innerHTML = `<div class="tr-card">${meta}
+    body.innerHTML = `<div class="tr-card tr-dcard">${meta}
       <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span></div><div class="res">${p.items.map(row).join("")}</div></section>
       ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
       ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
@@ -4711,24 +4830,30 @@ function openShow(id, x0, opt){
   }
   function draw(){
     s.el.querySelector("#sh-t").textContent = showTitle(x);
-    s.el.querySelector("#sh-s").textContent = `${KIND[x.kind][0]} · ${x.author.name} · ${ago(x.created)}`;
+    s.el.querySelector("#sh-s").textContent = KIND[x.kind][0];
     const typed = body.querySelector("#shc-text"), keep = typed ? typed.value : "";
     body.innerHTML = `
       ${picHTML2()}
-      <div class="dstat num" id="sh-stat">${statHTML({...x, id: x.id})}</div>
-      <button class="likebar" type="button" id="sh-like" aria-pressed="${liked}"><span class="hb"><svg aria-hidden="true"><use href="#i-heart"/></svg></span><span>${liked ? "추천했어요" : me() ? "추천" : "로그인하면 추천할 수 있어요"}</span><span class="n num">${fmt(x.likes || 0)}</span></button>
-      ${x.kind === "dream" && x.code ? `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>` : ""}
-      ${x.body ? `<div class="dtext">${esc(x.body)}</div>` : ""}
-      ${x.items.length ? `<div class="shd">${ico("box")}<b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div>` : ""}
-      <div class="who tr-auth"><span class="fr">${fruitPic(x.author.fruit)}</span><div class="wt"><b>${esc(x.author.name)}</b><span>${esc(islandText(x.author.island))} · ${ago(x.created)}에 올림${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div></div>
-      ${mine() ? `<div class="acts2"><button class="pill ghost" type="button" id="sh-edit">고치기</button><button class="pill danger" type="button" id="sh-del">지우기</button></div>`
-        : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="sh-edit">관리자로 고치기</button><button class="pill danger" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
+      <div class="d-card">
+      <div class="tr-meta"><span class="fr">${fruitPic(x.author.fruit)}</span><b>${esc(x.author.name)}</b><span>${x.author.island ? esc(islandText(x.author.island)) + " · " : ""}${ago(x.created)}${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div>
+      ${x.kind === "dream" && x.code ? `<section class="d-sec"><div class="shd k-blue"><b>꿈번지</b></div><div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div></section>` : ""}
+      ${x.body ? `<section class="d-sec"><div class="shd k-mute"><b>내용</b></div><div class="dtext">${esc(x.body)}</div></section>` : ""}
+      ${x.items.length ? `<section class="d-sec"><div class="shd k-leaf"><b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div></section>` : ""}
+      </div>
+      <div class="sh-bar">
+        <button class="sh-like" type="button" id="sh-like" aria-pressed="${liked}"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>${liked ? "추천했어요" : "추천"}</span><b class="num">${fmt(x.likes || 0)}</b></button>
+        <span class="dstat num" id="sh-stat">${statHTML({...x, id: x.id})}</span>
+        ${mine() ? `<div class="tr-acts"><button type="button" id="sh-edit">고치기</button><button class="tr-a3" type="button" id="sh-del">지우기</button></div>`
+          : me() && me().admin ? `<div class="tr-acts"><button type="button" id="sh-edit">관리자로 고치기</button><button class="tr-a3" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
+      </div>
       <div id="sh-msg"></div>
+      <div class="tr-cbox">
       <div class="shd tr-cmh">${ico("chat")}<b id="sh-cn">댓글 ${fmt(x.cmts || 0)}</b></div>
       <div class="cmts" id="sh-cl">${cmtsHTML()}</div>
-      ${me() ? `<label class="fld"><span>댓글 달기<i id="shc-cnt">0/300</i></span><textarea id="shc-text" maxlength="300" placeholder="느낌을 남겨 주세요"></textarea></label>
-        <div id="shc-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="shc-send">댓글 달기</button></div>`
-        : `<p class="note">댓글과 추천은 로그인하고 할 수 있어요.</p>${signinBtns}`}`;
+      ${me() ? `<div class="tr-cin"><textarea id="shc-text" maxlength="300" aria-label="댓글 달기" placeholder="느낌을 남겨 주세요"></textarea><div class="tr-cinb"><i id="shc-cnt" class="num">0/300</i><button class="pill leaf sm" type="button" id="shc-send">댓글 달기</button></div></div>
+        <div id="shc-msg"></div>`
+        : `<p class="note">댓글과 추천은 로그인하고 할 수 있어요.</p>${signinBtns}`}
+      </div>`;
     const t2 = body.querySelector("#shc-text"); if(t2 && keep){ t2.value = keep; body.querySelector("#shc-cnt").textContent = `${keep.length}/300`; }
   }
   function drawCmts(){ const cl = body.querySelector("#sh-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#sh-cn"); if(cn) cn.textContent = `댓글 ${fmt(x.cmts || 0)}`; const st = body.querySelector("#sh-stat"); if(st) st.innerHTML = statHTML(x); }
@@ -5303,7 +5428,10 @@ function openAdminUser(id){
 }
 function openBackup(){
   const s = openSheet(`<div class="hd"><h3>${AUTH.live ? "내 계정·기록" : "기록 옮기기"}</h3>${XBTN}</div>
-    ${AUTH.live ? `<div id="acct-box"></div><h4 class="bk-h">코드로 옮기기</h4>` : ""}
+    ${AUTH.live ? `<div id="acct-box"></div>` : ""}
+    <h4 class="bk-h">화면</h4>
+    <div class="hemi wide thm" role="radiogroup" aria-label="화면 밝기"><button type="button" role="radio" data-thm="dark" aria-checked="${document.documentElement.dataset.theme !== "light"}">어두운 화면</button><button type="button" role="radio" data-thm="light" aria-checked="${document.documentElement.dataset.theme === "light"}">밝은 화면</button></div>
+    ${AUTH.live ? `<h4 class="bk-h">코드로 옮기기</h4>` : ""}
     <p class="sub">다른 기기의 코드 붙여넣기에 넣으세요</p>
     <textarea id="bk-out" readonly aria-label="내 백업 코드">코드를 만드는 중…</textarea>
     <div class="acts2"><button class="pill leaf" type="button" id="bk-copy">코드 복사</button></div>
@@ -5314,6 +5442,12 @@ function openBackup(){
     <div class="acts2" style="justify-content:flex-end"><button class="pill danger" type="button" id="bk-reset">기록 전부 지우기</button></div>`);
   const out = s.el.querySelector("#bk-out"), msg = s.el.querySelector("#bk-msg");
   if(AUTH.live) mountAcct(s.el.querySelector("#acct-box"));
+  s.el.querySelector(".thm").addEventListener("click", e => {
+    const b = e.target.closest("[data-thm]"); if(!b) return;
+    document.documentElement.dataset.theme = b.dataset.thm;
+    try{ localStorage.setItem(KEY + ":theme", b.dataset.thm); }catch(err){}
+    s.el.querySelectorAll("[data-thm]").forEach(x => x.setAttribute("aria-checked", String(x === b)));
+  });
   makeCode().then(c => { out.value = c; });
   s.el.querySelector("#bk-copy").addEventListener("click", () => {
     const v = out.value;
