@@ -1855,6 +1855,12 @@ html.lscB .card.li .meta .tag{font-size:1em; line-height:1.5; padding:0 .5em; ma
 html.lscB .card.li .meta .tag:last-child{margin-right:0}
 @media (max-width:360px){ html.lscB .card.li .pw .pic{--t:34px !important} html.lscB .card.li .tog{gap:5px; padding-left:5px} }
 @media (max-width:340px){ html.lscB .card.li .nm{font-size:clamp(7.5px, calc(100cqw * 1.02 / var(--wems, 1)), 13px)} }
+/* v48 댓글 글쓴이 표시 (링크님 2026-11-26 시안 D): 이름 옆 노란 "글쓴이" 표 + 말풍선 왼쪽 노란 굵은 막대 (내 댓글 초록에서도 막대는 남음) */
+:root{--cau:#e0ad2e; --cau-bg:#f5c842}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--cau:#f0c552; --cau-bg:#f0c552} }
+:root[data-theme="dark"]{--cau:#f0c552; --cau-bg:#f0c552}
+.cmts .cmt.au{box-shadow:inset 4px 0 0 var(--cau)}
+.cmts .cmt .ch .cau{flex:none; font-style:normal; font-family:var(--f-display); font-size:11.5px; line-height:18px; padding:0 7px; border-radius:999px; background:var(--cau-bg); color:#3b2a1a; white-space:nowrap}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4636,7 +4642,8 @@ function cmtBox(o){
   function one(c, topAuthor){
     if(c.gone) return `<div class="cmt gone" data-cid="${esc(c.id)}"><p>지워진 댓글이에요.</p></div>`;
     const to = c.parent && c.to && c.to.id !== topAuthor ? `<b class="cto">@${esc(c.to.name || "친구")}</b> ` : "";
-    return `<div class="cmt${c.parent ? " rep" : ""}${o.me() && c.author.id === o.me().id ? " mine" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">${o.delLabel ? o.delLabel(c) : "지우기"}</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
+    const au = c.author.id === o.owner();
+    return `<div class="cmt${c.parent ? " rep" : ""}${o.me() && c.author.id === o.me().id ? " mine" : ""}${au ? " au" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b>${au ? `<i class="cau">글쓴이</i>` : ""}<span>${esc(islandText(c.author.island))} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">${o.delLabel ? o.delLabel(c) : "지우기"}</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
   }
   const box = () => `<div class="rbox"><label class="fld"><span>${esc(rep.name)} 님에게 답글<i id="rp-cnt">${text.length}/300</i></span><textarea id="rp-text" maxlength="300" placeholder="답글을 적어 주세요">${esc(text)}</textarea></label><div id="rp-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="rp-send">답글 달기</button><button class="pill ghost" type="button" id="rp-no">그만두기</button></div></div>`;
   return {
