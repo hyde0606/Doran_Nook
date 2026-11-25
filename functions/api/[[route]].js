@@ -47,6 +47,11 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS push_subs (endpoint TEXT PRIMARY KEY, user_id TEXT NOT NULL, s_hash TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL, created INTEGER NOT NULL, ok INTEGER NOT NULL DEFAULT 0, err TEXT NOT NULL DEFAULT '')`,
   `CREATE INDEX IF NOT EXISTS push_subs_user ON push_subs(user_id)`,
   `CREATE TABLE IF NOT EXISTS conf (k TEXT PRIMARY KEY, v TEXT NOT NULL)`,
+  // v48: 12시간 지난 거래 글·댓글을 지우거나 고쳐 달라는 요청 (관리자가 처리)
+  `CREATE TABLE IF NOT EXISTS reqs (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, on_t TEXT NOT NULL, ref TEXT NOT NULL, post_id TEXT NOT NULL,
+     data TEXT NOT NULL DEFAULT '', reason TEXT NOT NULL DEFAULT '', created INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'wait', done INTEGER NOT NULL DEFAULT 0, done_by TEXT NOT NULL DEFAULT '')`,
+  `CREATE INDEX IF NOT EXISTS reqs_post ON reqs(post_id, status)`,
+  `CREATE INDEX IF NOT EXISTS reqs_status ON reqs(status, created)`,
   `CREATE TABLE IF NOT EXISTS visits (user_id TEXT NOT NULL, day TEXT NOT NULL, first INTEGER NOT NULL, last INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 1, dev TEXT NOT NULL DEFAULT '', PRIMARY KEY (user_id, day))`,
 ];
 let schemaReady = null;
@@ -274,7 +279,7 @@ async function newSession(env, url, userId){
    pasted anywhere. Each device's subscription is tied to the session that turned it on: signing out, a password change that
    signs other devices out, or the session running out stops that device's notifications. */
 const PUSH_HOSTS = /(^|\.)(googleapis\.com|push\.apple\.com|push\.services\.mozilla\.com|notify\.windows\.com)$/;
-const NT_TEXT = { reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요" };
+const NT_TEXT = { reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요", rqdel: "글 삭제를 요청했어요", rqedit: "글 수정을 요청했어요", rqcdel: "댓글 삭제를 요청했어요", rqok: "요청을 승인했어요", rqno: "요청을 거절했어요" };
 const TYPE_NAME = { want: "구해요", sell: "팔아요", free: "나눔" }, KIND_NAME = { dream: "꿈번지", area: "구역", fashion: "패션" };
 let vapid = null;
 async function vapidKeys(db){
@@ -336,6 +341,39 @@ async function pushTo(db, url, uid, data){
   return Promise.all(subs.map(s => pushSend(db, url, s, { ...data, n })));
 }
 // After a comment is saved: the same notices that went into 알림 go to each person's phones, without making the writer wait.
+/* ---------- v48: 거래 글 보호. 12시간이 지나면 지우기·고치기는 관리자 승인 ---------- */
+const FREE_MS = 12 * 3600000;
+const REQ_KIND = { "del.post": "rqdel", "edit.post": "rqedit", "del.cmt": "rqcdel" };
+const REQ_WHAT = { "del.post": "글 삭제", "edit.post": "글 수정", "del.cmt": "댓글 삭제" };
+const locked = (u, created) => u.role !== "admin" && Date.now() - created > FREE_MS;
+async function makeReq(ctx, db, url, u, r){
+  const now = Date.now(), reason = cleanBody(r.reason, 200);
+  const old = await db.prepare(`SELECT id FROM reqs WHERE user_id = ? AND kind = ? AND on_t = ? AND ref = ? AND status = 'wait'`).bind(u.id, r.kind, r.on, r.ref).first();
+  if(old){
+    await db.prepare(`UPDATE reqs SET data = ?, reason = ?, created = ? WHERE id = ?`).bind(r.data || "", reason, now, old.id).run();
+    return json({ requested: r.kind, again: true }, 202);
+  }
+  if(await overLimit(db, "rq:" + u.id, 30, DAY)) return fail("slow_down", 429);
+  const id = rand(9), admins = (await db.prepare(`SELECT id FROM users WHERE role = 'admin' AND id <> ?`).bind(u.id).all()).results;
+  const kk = r.kind + "." + r.on, body = reason || REQ_WHAT[kk];
+  const nn = { actor: u.id, on: "trade", ref: r.post, cmt: r.on === "cmt" ? r.ref : "", body, now, rows: admins.map(a => [a.id, REQ_KIND[kk], rand(9)]) };
+  await db.batch([
+    db.prepare(`INSERT INTO reqs (id, user_id, kind, on_t, ref, post_id, data, reason, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, u.id, r.kind, r.on, r.ref, r.post, r.data || "", reason, now),
+    ...nn.rows.map(([uid, kind, nid]) => db.prepare(`INSERT INTO notifs (id, user_id, kind, on_t, ref, cmt, actor, body, created) VALUES (?, ?, ?, 'trade', ?, ?, ?, ?, ?)`).bind(nid, uid, kind, r.post, nn.cmt, u.id, body.slice(0, 80), now)),
+  ]);
+  pushNotifs(ctx, db, url, nn, u, "거래 · " + REQ_WHAT[kk] + " 요청");
+  return json({ requested: r.kind }, 202);
+}
+const reqOut = x => ({ id: x.id, kind: x.kind, on: x.on_t, ref: x.ref, post: x.post_id, reason: x.reason, created: x.created, status: x.status, done: x.done,
+  data: x.data ? JSON.parse(x.data) : null, by: { id: x.user_id, name: x.r_name || "", island: x.r_island || "", fruit: x.r_fruit || "" }, cmt: x.c_body != null ? { body: x.c_body, created: x.c_created } : null,
+  title: x.p_type ? { type: x.p_type, items: JSON.parse(x.p_items) } : null });
+const REQ_SQL = `SELECT r.*, u.name AS r_name, u.island AS r_island, u.fruit AS r_fruit, c.body AS c_body, c.created AS c_created, p.type AS p_type, p.items AS p_items
+  FROM reqs r LEFT JOIN users u ON u.id = r.user_id LEFT JOIN comments c ON r.on_t = 'cmt' AND c.id = r.ref LEFT JOIN posts p ON p.id = r.post_id`;
+const delPostQs = (db, id) => [db.prepare(`DELETE FROM comments WHERE post_id = ?`).bind(id), db.prepare(`DELETE FROM posts WHERE id = ?`).bind(id),
+  db.prepare(`DELETE FROM notifs WHERE on_t = 'trade' AND ref = ? AND kind NOT IN ('rqok', 'rqno')`).bind(id), db.prepare(`UPDATE reqs SET status = 'gone' WHERE post_id = ? AND status = 'wait'`).bind(id)];
+const delCmtQs = (db, c) => [db.prepare(`DELETE FROM comments WHERE id = ?`).bind(c.id), db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.post_id),
+  db.prepare(`DELETE FROM notifs WHERE cmt = ? AND kind NOT IN ('rqok', 'rqno')`).bind(c.id), db.prepare(`UPDATE reqs SET status = 'gone' WHERE on_t = 'cmt' AND ref = ? AND status = 'wait'`).bind(c.id)];
+
 function pushNotifs(ctx, db, url, n, actor, where){
   if(!n || !n.rows || !n.rows.length) return;
   const job = Promise.all(n.rows.map(([uid, kind, id]) => pushTo(db, url, uid, {
@@ -371,7 +409,10 @@ export async function onRequest(ctx){
       const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(pm[1]).first();
       if(!r) return fail("no_post", 404);
       const c = await db.prepare(cmtSql("comments", "post_id")).bind(pm[1]).all();
-      return json({ post: postOut(r), comments: c.results.map(cmtOut) });
+      const v = await currentUser(req, env, url);
+      const rq = v ? (await db.prepare(REQ_SQL + ` WHERE r.post_id = ? AND r.status = 'wait'` + (v.role === "admin" ? "" : ` AND r.user_id = ?`) + ` ORDER BY r.created`)
+        .bind(...(v.role === "admin" ? [pm[1]] : [pm[1], v.id])).all()).results.map(reqOut) : [];
+      return json({ post: postOut(r), comments: c.results.map(cmtOut), reqs: rq });
     }
     if(m === "GET" && (pm = /^img\/(i\/[A-Za-z0-9_-]{12,24}\.(webp|jpg))$/.exec(path))){
       if(!env.IMG) return fail("no_store", 404);
@@ -576,8 +617,8 @@ export async function onRequest(ctx){
       }
       if(m === "DELETE"){
         if(!own && !admin) return fail("not_yours", 403);
-        await db.batch([db.prepare(`DELETE FROM comments WHERE post_id = ?`).bind(p.id), db.prepare(`DELETE FROM posts WHERE id = ?`).bind(p.id),
-          db.prepare(`DELETE FROM notifs WHERE on_t = 'trade' AND ref = ?`).bind(p.id)]);
+        if(locked(u, p.created)){ const b = await body(req).catch(() => ({})); return makeReq(ctx, db, url, u, { kind: "del", on: "post", ref: p.id, post: p.id, reason: b && b.reason }); }
+        await db.batch(delPostQs(db, p.id));
         return json({ ok: true });
       }
       if(m === "POST"){
@@ -588,6 +629,7 @@ export async function onRequest(ctx){
           await db.prepare(`UPDATE posts SET status = ?, updated = ? WHERE id = ?`).bind(b.status, now, p.id).run();
         } else {
           const v = await postInput(b); if(v.err) return fail(v.err);
+          if(locked(u, p.created)) return makeReq(ctx, db, url, u, { kind: "edit", on: "post", ref: p.id, post: p.id, data: JSON.stringify(v), reason: b.reason });
           await db.prepare(`UPDATE posts SET type = ?, items = ?, pay = ?, body = ?, updated = ? WHERE id = ?`).bind(v.type, JSON.stringify(v.items), JSON.stringify(v.pay), v.body, now, p.id).run();
         }
         const r = await db.prepare(POST_SQL + ` AND p.id = ?`).bind(p.id).first();
@@ -607,8 +649,8 @@ export async function onRequest(ctx){
         const p = await db.prepare(`SELECT user_id FROM posts WHERE id = ?`).bind(c.post_id).first();
         if(!p || p.user_id !== u.id) return fail("not_yours", 403);   // the post's author may tidy comments on their own post
       }
-      await db.batch([db.prepare(`DELETE FROM comments WHERE id = ?`).bind(c.id), db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - 1) WHERE id = ?`).bind(c.post_id),
-        db.prepare(`DELETE FROM notifs WHERE cmt = ?`).bind(c.id)]);
+      if(locked(u, c.created)){ const b = await body(req).catch(() => ({})); return makeReq(ctx, db, url, u, { kind: "del", on: "cmt", ref: c.id, post: c.post_id, reason: b && b.reason }); }
+      await db.batch(delCmtQs(db, c));
       return json({ ok: true });
     }
 
@@ -725,6 +767,34 @@ export async function onRequest(ctx){
                      ...sc.map(c => ({ id: c.id, body: c.body, created: c.created, on: "show", ref: c.show_id, kind: c.kind || "", title: c.title || "" }))].sort((a, b) => b.created - a.created).slice(0, 100),
           likesGiven: likes.n, devices: sess.n, lastSignin: sess.last || 0,
         });
+      }
+      if(m === "GET" && path === "admin/reqs"){
+        const w = await db.prepare(REQ_SQL + ` WHERE r.status = 'wait' ORDER BY r.created`).all();
+        const d = await db.prepare(REQ_SQL + ` WHERE r.status IN ('ok', 'no') ORDER BY r.done DESC LIMIT 30`).all();
+        return json({ wait: w.results.map(reqOut), done: d.results.map(reqOut) });
+      }
+      if(m === "POST" && (pm = /^admin\/reqs\/([A-Za-z0-9_-]{6,24})$/.exec(path))){
+        const b = await body(req), r = await db.prepare(`SELECT * FROM reqs WHERE id = ?`).bind(pm[1]).first();
+        if(!r || r.status !== "wait") return fail("no_req", 404);
+        const ok = !!b.ok, now = Date.now(), qs = [];
+        if(ok){
+          if(r.on_t === "post"){
+            const p = await db.prepare(`SELECT id FROM posts WHERE id = ?`).bind(r.ref).first(); if(!p) return fail("no_post", 404);
+            if(r.kind === "del") qs.push(...delPostQs(db, p.id));
+            else { const v = await postInput(JSON.parse(r.data || "{}")); if(v.err) return fail(v.err);
+              qs.push(db.prepare(`UPDATE posts SET type = ?, items = ?, pay = ?, body = ?, updated = ? WHERE id = ?`).bind(v.type, JSON.stringify(v.items), JSON.stringify(v.pay), v.body, now, p.id)); }
+          } else {
+            const c = await db.prepare(`SELECT * FROM comments WHERE id = ?`).bind(r.ref).first(); if(!c) return fail("no_comment", 404);
+            qs.push(...delCmtQs(db, c));
+          }
+        }
+        const what = REQ_WHAT[r.kind + "." + r.on_t], kind = ok ? "rqok" : "rqno", nid = rand(9);
+        qs.push(db.prepare(`UPDATE reqs SET status = ?, done = ?, done_by = ? WHERE id = ?`).bind(ok ? "ok" : "no", now, u.id, r.id),
+          db.prepare(`DELETE FROM notifs WHERE on_t = 'trade' AND ref = ? AND kind IN ('rqdel', 'rqedit', 'rqcdel') AND actor = ?`).bind(r.post_id, r.user_id));
+        if(r.user_id !== u.id) qs.push(db.prepare(`INSERT INTO notifs (id, user_id, kind, on_t, ref, cmt, actor, body, created) VALUES (?, ?, ?, 'trade', ?, '', ?, ?, ?)`).bind(nid, r.user_id, kind, r.post_id, u.id, what, now));
+        await db.batch(qs);
+        if(r.user_id !== u.id) pushNotifs(ctx, db, url, { on: "trade", ref: r.post_id, cmt: "", body: what, now, rows: [[r.user_id, kind, nid]] }, u, "거래 · " + what + " 요청");
+        return json({ ok: true, status: ok ? "ok" : "no" });
       }
       if(m === "POST" && path === "admin/reset"){
         const b = await body(req), t = await db.prepare(`SELECT id, role FROM users WHERE id = ?`).bind(String(b.id || "")).first();

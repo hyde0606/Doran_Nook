@@ -389,6 +389,13 @@ textarea{width:100%; min-height:96px; border:0; background:var(--paper2); border
 .toggle input{width:18px; height:18px; accent-color:var(--plum)}
 .err{background:var(--berry-soft); color:var(--berry); border-radius:12px; padding:10px 12px; font-size:14px}
 .confirm{background:var(--berry-soft); border-radius:12px; padding:12px; display:grid; gap:8px}
+.confirm textarea{width:100%; min-height:64px; resize:vertical; border:0; border-radius:10px; padding:10px 12px; background:var(--paper); color:var(--ink); font:inherit; font-size:15px}
+.rqbox{background:var(--sun-soft, rgba(240,190,70,.18)); border-radius:12px; padding:12px; display:grid; gap:6px; margin-bottom:8px}
+.rqbox > b{font-family:var(--f-display); font-weight:400; font-size:16px; color:var(--h-ink)}
+.rqbox > span{font-size:14px; color:var(--muted); overflow-wrap:anywhere}
+.rqbox .rqnew{background:var(--paper); border-radius:10px; padding:8px 10px; font-size:14px; overflow-wrap:anywhere}
+.rqbox .rqnew b{font-family:var(--f-display); font-weight:400}
+.rqhd{font-family:var(--f-display); font-size:18px; color:var(--h-ink); margin:4px 0 8px}
 /* v29 account */
 .acct{display:grid; gap:10px; padding-bottom:16px; border-bottom:2px dashed var(--card-line)}
 .acct h4,.bk-h,.leave h4{margin:0; font-family:var(--f-display); font-weight:400; font-size:19px; color:var(--h-ink); line-height:1.25}
@@ -775,11 +782,11 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .vrib .vrbs{display:flex; gap:8px; flex:0 0 auto; flex-wrap:wrap}
 .vrib .pill{flex:none}
 .vscope{margin-top:-6px}
-.vtabs{flex:1; min-width:0; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px}
-.vtabs button{border:0; background:rgba(255,248,232,.92); color:#5b4126; border-radius:12px; padding:9px 4px; min-height:42px; font-family:var(--f-display); font-size:16px; white-space:nowrap; box-shadow:0 3px 0 rgba(0,0,0,.22)}
-.vtabs button b{font-weight:400; color:#c0482f}
-.vtabs button[aria-selected="true"]{background:var(--leaf); color:var(--leaf-ink)}
-.vtabs button[aria-selected="true"] b{color:inherit}
+.vtabs{flex:1; min-width:0; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:0; background:rgba(0,0,0,.28); border-radius:999px; padding:4px}
+.vtabs button{border:0; background:none; color:var(--cream); border-radius:999px; padding:7px 4px; min-height:38px; font-family:var(--f-display); font-size:16px; white-space:nowrap}
+.vtabs button b{font-weight:400; color:var(--sun)}
+.vtabs button[aria-selected="true"]{background:var(--cream); color:var(--soil-deep); box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.vtabs button[aria-selected="true"] b{color:#c0482f}
 .vsec[hidden]{display:none}
 .vhint{margin:0}
 .vfoot{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:12px max(18px, env(safe-area-inset-left, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); background:var(--paper); border-top:2px dashed var(--paper2)}
@@ -803,7 +810,7 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
   .vlist{grid-template-columns:repeat(3, minmax(0,1fr))}
 }
 .vsheet .bd{flex:1 1 auto}
-@media (max-width:300px){ .vtabs{gap:4px} .vtabs button{font-size:14.5px} }
+@media (max-width:300px){ .vtabs button{font-size:14.5px} }
 @media (max-width:300px){ .vsheet .sbox input::placeholder{font-size:13px} }
 .vcats .cgrid .cbtn[aria-current="true"]::after{content:"✓"; position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; background:var(--leaf); color:var(--leaf-ink); font:15px/22px var(--f-display); text-align:center; box-shadow:0 0 0 2px var(--paper)}
 .cbtn.top .cn b{white-space:normal; overflow:visible; word-break:keep-all}
@@ -1855,7 +1862,7 @@ const MSORTS = {base:"랜덤", name:"이름 순", sellD:"판매가 높은 순", 
 const VSORTS = {rand:"랜덤", name:"이름 순", bday:"생일 순", species:"종족 순"};
 const MMON = {all:"전부", now:"이번 달에 나오는 것", new:"이번 달 새로 나온 것", last:"이번 달이 마지막인 것"};
 const TAB_FO = {
-  item: [["all","전체"], ["none","미보유"], ["have","보유"], ["part","일부 보유","일부"], ["done","완료"]],
+  item: [["all","전체"], ["none","미보유"], ["part","일부 보유","일부"], ["done","완료"]],
   museum: [["all","전체"], ["none","미기증"], ["done","기증 완료","기증"]],
   villager: [["all","전체"], ["res","우리 섬"], ["nophoto","사진 없음"], ["photo","사진 있음"]],
   dream: SRV ? [["all","전체"], ["dream","꿈번지"], ["area","구역"], ["fashion","패션"]] : [["new","최신순","최신"], ["hot","인기순","인기"], ["view","많이 본 순","조회"]],
@@ -2813,7 +2820,7 @@ function openFind(jump){
     let chips = "";
     if(html === cardHTML && list.length){
       const c = {all:list.length, none:0, part:0, done:0}; list.forEach(it => c[ownState(it)]++); c.have = c.part + c.done;
-      const F = T === "museum" ? [["all", "전체", ""], ["none", "미기증", ""], ["have", "기증", "on"]] : [["all", "전체", ""], ["none", "미보유", ""], ["have", "보유", ""], ["part", "일부 보유", "part"], ["done", "완료", "on"]];
+      const F = T === "museum" ? [["all", "전체", ""], ["none", "미기증", ""], ["have", "기증", "on"]] : [["all", "전체", ""], ["none", "미보유", ""], ["part", "일부 보유", "part"], ["done", "완료", "on"]];
       if(!F.some(f => f[0] === sfo) || !c[sfo]) sfo = "all";
       chips = `<div class="sfo" role="radiogroup" aria-label="보유 상태">${F.map(([v, l, d]) => `<button type="button" role="radio" data-sfo="${v}" aria-checked="${sfo === v}">${d || v === "none" ? `<i class="${d}"></i>` : ""}${l} <b class="num">${fmt(c[v])}</b></button>`).join("")}</div>`;
       if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return sfo === "have" ? st !== "none" : st === sfo; });
@@ -4119,7 +4126,7 @@ const TRADE_ERR = {
   cash: "현금이나 상품권 거래로 보이는 말이 있어서 올릴 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.",
   type: "글 종류를 골라 주세요.", empty: "댓글 내용을 적어 주세요.",
   slow_down: "오늘은 너무 많이 썼어요. 내일 다시 해 주세요.",
-  not_yours: "내가 쓴 글만 고칠 수 있어요.", no_post: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.",
+  not_yours: "내가 쓴 글만 고칠 수 있어요.", no_post: "지워진 글이에요.", no_comment: "이미 지워진 댓글이에요.", no_req: "이미 처리된 요청이에요.",
   range: "마일 여행권은 1~999장, 벨은 1~999,999,999벨까지 넣을 수 있어요.",
 };
 const tradeErr = e => TRADE_ERR[e && e.message] || authErr(e);
@@ -4237,7 +4244,7 @@ function cmtBox(o){
   function one(c, topAuthor){
     if(c.gone) return `<div class="cmt gone" data-cid="${esc(c.id)}"><p>지워진 댓글이에요.</p></div>`;
     const to = c.parent && c.to && c.to.id !== topAuthor ? `<b class="cto">@${esc(c.to.name || "친구")}</b> ` : "";
-    return `<div class="cmt${c.parent ? " rep" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">지우기</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
+    return `<div class="cmt${c.parent ? " rep" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">${o.delLabel ? o.delLabel(c) : "지우기"}</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
   }
   const box = () => `<div class="rbox"><label class="fld"><span>${esc(rep.name)} 님에게 답글<i id="rp-cnt">${text.length}/300</i></span><textarea id="rp-text" maxlength="300" placeholder="답글을 적어 주세요">${esc(text)}</textarea></label><div id="rp-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="rp-send">답글 달기</button><button class="pill ghost" type="button" id="rp-no">그만두기</button></div></div>`;
   return {
@@ -4282,14 +4289,16 @@ function cmtBox(o){
 }
 function openTrade(id, p0, opt){
   let p = TS.find(id) || p0; if(!p) return;
-  let cmts = null, loadErr = false;
+  let cmts = null, loadErr = false, reqs = [];
   const s = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="tr-t"></h3><p class="sub" id="tr-s"></p></div>${XBTN}</div><div class="bd-in" id="tr-body"></div>`, () => { stop(); if(ui.tab === "trade") render(); });
   const body = s.el.querySelector("#tr-body"), me = () => AUTH.me;
   const mine = () => !!me() && me().id === p.author.id;
   const canDel = c => !!me() && (me().admin || me().id === c.author.id || mine());
-  const cb = cmtBox({list: () => cmts || [], owner: () => p.author.id, canDel, me, body: () => body, url: () => "posts/" + p.id + "/comments", cash: true, err: tradeErr,
+  const cb = cmtBox({list: () => cmts || [], owner: () => p.author.id, canDel, me, body: () => body, url: () => "posts/" + p.id + "/comments", cash: true, err: tradeErr, delLabel: c => tLocked(c) ? "삭제 요청" : "지우기",
     added(c){ (cmts = cmts || []).push(c); p = {...p, cmts: (p.cmts || 0) + 1}; TS.put(p); drawCmts(); }, redraw: () => drawCmts(),
-    reload: () => AUTH.api("posts/" + encodeURIComponent(p.id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); drawCmts(); }).catch(() => {})});
+    reload: () => AUTH.api("posts/" + encodeURIComponent(p.id)).then(j => { p = j.post; cmts = j.comments; reqs = j.reqs || []; TS.put(p); drawCmts(); }).catch(() => {})});
+  const reload = () => AUTH.api("posts/" + encodeURIComponent(p.id)).then(j => { p = j.post; cmts = j.comments; reqs = j.reqs || []; TS.put(p); draw(); });
+  const rqWait = k => reqs.some(r => r.on === "post" && r.kind === k && me() && r.by.id === me().id);
   function cmtsHTML(){
     if(cmts === null) return loadErr ? `<p class="sub">댓글을 불러오지 못했어요. 닫았다가 다시 열어 주세요.</p>` : `<p class="sub">댓글을 불러오는 중이에요…</p>`;
     if(!cmts.length) return `<p class="sub">아직 댓글이 없어요.</p>`;
@@ -4311,7 +4320,8 @@ function openTrade(id, p0, opt){
       ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
       ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
       <section class="tr-sec by"><div class="tr-sh"><span class="lb">작성자</span></div><div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div></section>
-      ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">고치기</button><button class="pill danger" type="button" id="tr-del">지우기</button></div>`
+      ${reqs.length && me() ? reqs.map(r => rqHTML(r, me().admin, false)).join("") : ""}
+      ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">${tLocked(p) ? "고치기 요청" : "고치기"}</button><button class="pill danger" type="button" id="tr-del"${rqWait("del") ? " disabled" : ""}>${tLocked(p) ? (rqWait("del") ? "지우기 요청함" : "지우기 요청") : "지우기"}</button></div>`
         : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="tr-edit">관리자로 고치기</button><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
       <div id="tr-msg"></div>
       <div class="shd tr-cmh">${ico("chat")}<b id="tr-cn">댓글 ${fmt(p.cmts || 0)}</b></div>
@@ -4324,7 +4334,7 @@ function openTrade(id, p0, opt){
   function drawCmts(){ const cl = body.querySelector("#tr-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#tr-cn"); if(cn) cn.textContent = `댓글 ${fmt(p.cmts || 0)}`; }
   const stop = AUTH.sub(draw);
   draw();
-  AUTH.api("posts/" + encodeURIComponent(id)).then(j => { p = j.post; cmts = j.comments; TS.put(p); draw(); focusCmt(body, opt); })
+  AUTH.api("posts/" + encodeURIComponent(id)).then(j => { p = j.post; cmts = j.comments; reqs = j.reqs || []; TS.put(p); draw(); focusCmt(body, opt); })
     .catch(e => { if(e.message === "no_post"){ TS.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
   s.el.addEventListener("input", e => {
@@ -4346,13 +4356,25 @@ function openTrade(id, p0, opt){
       p = j.post; TS.put(p); draw(); toast(p.status === "done" ? "거래 완료로 바꿨어요. '내 글만'에서 볼 수 있어요" : "다시 거래 중으로 바꿨어요");
     }, tradeErr);
     if(t.id === "tr-edit"){ s.close(); return openTradeForm(p); }
+    if(t.dataset.rq) return busyRun(t, t.closest(".rqbox").querySelector(".rqmsg"), async () => {
+      const r = reqs.find(x => x.id === t.dataset.rq), ok = t.dataset.ok === "1";
+      await AUTH.api("admin/reqs/" + t.dataset.rq, {method: "POST", body: JSON.stringify({ok})});
+      toast(ok ? "승인했어요" : "거절했어요");
+      if(ok && r && r.on === "post" && r.kind === "del"){ TS.drop(p.id); s.close(); return; }
+      await reload();
+    }, tradeErr);
     if(t.id === "tr-del"){
-      msg("#tr-msg").innerHTML = `<div class="confirm"><p>이 글을 지울까요? 댓글도 함께 지워져요.</p><div class="acts2"><button class="pill danger" type="button" id="tr-yes">네, 지울게요</button><button class="pill ghost" type="button" id="tr-no">그만두기</button></div></div>`;
+      msg("#tr-msg").innerHTML = tLocked(p)
+        ? `<div class="confirm"><p>올린 지 12시간이 지나서 관리자에게 삭제를 요청해요.</p><textarea id="tr-why" maxlength="200" placeholder="이유 (안 써도 돼요)"></textarea><div class="acts2"><button class="pill danger" type="button" id="tr-yes">요청 보내기</button><button class="pill ghost" type="button" id="tr-no">그만두기</button></div></div>`
+        : `<div class="confirm"><p>이 글을 지울까요? 댓글도 함께 지워져요.</p><div class="acts2"><button class="pill danger" type="button" id="tr-yes">네, 지울게요</button><button class="pill ghost" type="button" id="tr-no">그만두기</button></div></div>`;
       return;
     }
     if(t.id === "tr-no"){ msg("#tr-msg").innerHTML = ""; return; }
     if(t.id === "tr-yes"){ t.disabled = true;
-      try{ await AUTH.api("posts/" + p.id, {method: "DELETE"}); TS.drop(p.id); s.close(); toast("글을 지웠어요"); }
+      const why = body.querySelector("#tr-why");
+      try{ const j = await AUTH.api("posts/" + p.id, {method: "DELETE", body: JSON.stringify({reason: why ? why.value : ""})});
+        if(j && j.requested){ toast("관리자에게 삭제를 요청했어요"); await reload().catch(() => {}); return; }
+        TS.drop(p.id); s.close(); toast("글을 지웠어요"); }
       catch(err){ t.disabled = false; msg("#tr-msg").innerHTML = `<p class="err">${tradeErr(err)}</p>`; }
       return; }
     if(t.id === "trc-send"){
@@ -4367,9 +4389,11 @@ function openTrade(id, p0, opt){
     }
     if(t.dataset.delc){
       const c = (cmts || []).find(y => y.id === t.dataset.delc); if(!c) return;
-      if(!t.dataset.armed){ t.dataset.armed = "1"; t.textContent = "한 번 더 누르면 지워요"; return; }
+      if(!t.dataset.armed){ t.dataset.armed = "1"; t.textContent = tLocked(c) ? "한 번 더 누르면 요청해요" : "한 번 더 누르면 지워요"; return; }
       t.disabled = true;
-      try{ await AUTH.api("comments/" + c.id, {method: "DELETE"}); cmts = cmts.filter(y => y.id !== c.id); p = {...p, cmts: Math.max(0, (p.cmts || 0) - 1)}; TS.put(p); drawCmts(); toast("댓글을 지웠어요"); }
+      try{ const j = await AUTH.api("comments/" + c.id, {method: "DELETE"});
+        if(j && j.requested){ toast("관리자에게 댓글 삭제를 요청했어요"); await reload().catch(() => {}); return; }
+        cmts = cmts.filter(y => y.id !== c.id); p = {...p, cmts: Math.max(0, (p.cmts || 0) - 1)}; TS.put(p); drawCmts(); toast("댓글을 지웠어요"); }
       catch(err){ t.disabled = false; toast(tradeErr(err)); }
     }
   });
@@ -4383,7 +4407,7 @@ function openTradeForm(p, preset){
     : {type: (preset && preset.type) || (["want", "sell", "free"].includes(ui.fo) && ui.tab === "trade" ? ui.fo : "want"), items: preset && preset.items ? preset.items.map(x => ({...x})) : []};
   const pay = edit ? p.pay || {} : {};
   st.swap = edit ? (pay.swapItems || []).map(x => ({...x})) : [];
-  const asAdmin = edit && AUTH.me.id !== p.author.id;
+  const asAdmin = edit && AUTH.me.id !== p.author.id, ask = edit && !asAdmin && tLocked(p);
   const sh = openSheet(`<div class="hd"><div><h3>${edit ? "거래 글 고치기" : "거래 글 쓰기"}</h3><p class="sub">${asAdmin ? `${esc(p.author.name)} 님의 글을 관리자로 고쳐요` : "게임 속 벨, 마일 여행권, 아이템으로만 거래해요"}</p></div>${XBTN}</div>
     <div class="fld"><span>어떤 글인가요?</span><div class="tr-seg" role="radiogroup" aria-label="글 종류">${["want", "sell", "free"].map(t => `<button type="button" role="radio" class="tr-${t}" data-ty="${t}">${TRADE_T[t][0]}</button>`).join("")}</div></div>
     <div class="fld"><span><b class="tr-fh" id="tf-ih"></b><i id="tf-in"></i></span><div class="res" id="tf-items"></div>
@@ -4396,8 +4420,9 @@ function openTradeForm(p, preset){
       <label class="toggle"><input type="checkbox" id="tf-nego"${pay.nego ? " checked" : ""}>다른 제안도 받아요</label>
     </div>
     <label class="fld"><span><b class="tr-fh">하고 싶은 말</b><i id="tf-cnt">0/500</i></span><textarea id="tf-body" maxlength="500" placeholder="언제 비행장을 여는지, 어떻게 주고받을지 적어 주세요"></textarea></label>
+    ${asAdmin ? "" : `<p class="sub">${ask ? "올린 지 12시간이 지나서 관리자가 확인한 뒤에 바뀌어요" : "올린 지 12시간이 지나면 고치기·지우기는 관리자 확인 후 돼요"}</p>`}
     <div id="tf-msg"></div>
-    <div class="acts2"><button class="pill leaf big" type="button" id="tf-ok">${edit ? "고친 대로 올리기" : "올리기"}</button></div>`, () => { if(ui.tab === "trade") render(); });
+    <div class="acts2"><button class="pill leaf big" type="button" id="tf-ok">${ask ? "수정 요청 보내기" : edit ? "고친 대로 올리기" : "올리기"}</button></div>`, () => { if(ui.tab === "trade") render(); });
   const q = sel => sh.el.querySelector(sel);
   if(edit){ q("#tf-body").value = p.body || ""; q("#tf-cnt").textContent = `${(p.body || "").length}/500`; }
   function rowEdit(x, i){
@@ -4456,6 +4481,7 @@ function openTradeForm(p, preset){
       }
       if(cashWord(out.body, out.pay.swap, ...st.items.filter(x => x.k === "t").map(x => x.id))) bad("cash");
       const j = await AUTH.api(edit ? "posts/" + p.id : "posts", {method: "POST", body: JSON.stringify(out)});
+      if(j && j.requested){ sh.close(); toast("관리자에게 수정을 요청했어요"); return; }
       TS.put(j.post); sh.close();
       toast(edit ? "고친 대로 올렸어요" : ui.tab === "trade" ? "글을 올렸어요" : "글을 올렸어요. 거래 탭에서 볼 수 있어요");
     }, tradeErr);
@@ -4696,7 +4722,21 @@ function openShow(id, x0, opt){
 }
 // v41: 알림 — comments on my posts and replies to my comments. The bell shows how many are new; the page asks the server
 // when it opens, when it comes back on screen, and every minute while it is on screen. Opening the list marks them read.
-const NT_TEXT = {reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요"};
+const NT_TEXT = {reply: "내 댓글에 답글을 달았어요", cmt: "내 글에 댓글을 달았어요", cmtr: "내 글에 답글을 달았어요", rqdel: "글 삭제를 요청했어요", rqedit: "글 수정을 요청했어요", rqcdel: "댓글 삭제를 요청했어요", rqok: "요청을 승인했어요", rqno: "요청을 거절했어요"};
+const FREE_MS = 12 * 3600000;   // v48: 거래 글·댓글은 12시간이 지나면 관리자 승인으로만 지우고 고침
+const tLocked = x => !!AUTH.me && !AUTH.me.admin && Date.now() - x.created > FREE_MS;
+const RQ_WHAT = {"del.post": "글 삭제", "edit.post": "글 수정", "del.cmt": "댓글 삭제"};
+const rqPayHTML = d => [d.pay && d.pay.mile ? `마일 여행권 ${fmt(d.pay.mile)}장` : "", d.pay && d.pay.bells ? `${fmt(d.pay.bells)} 벨` : "", d.pay && d.pay.swap ? `맞교환 ${esc(d.pay.swap)}` : ""].filter(Boolean).join(" · ");
+// 요청 하나: 관리자에겐 승인·거절, 요청한 사람에겐 "관리자 확인 중"
+function rqHTML(r, admin, withPost){
+  const what = RQ_WHAT[r.kind + "." + r.on] || "요청";
+  const head = admin ? `${esc(r.by.name || "친구")} 님 · ${what} 요청` : `관리자 확인 중 · ${what} 요청`;
+  const post = withPost && r.title ? `<span>거래 · ${esc(tradeTitle(r.title))}</span>` : "";
+  const cm = r.cmt ? `<span>댓글 “${esc(r.cmt.body)}”</span>` : "";
+  const nw = r.kind === "edit" && r.data ? `<div class="rqnew"><b>바꿀 내용</b> ${esc(tradeTitle(r.data))}${rqPayHTML(r.data) ? ` · ${rqPayHTML(r.data)}` : ""}${r.data.body ? `<br>${esc(r.data.body)}` : ""}</div>` : "";
+  const why = r.reason && r.reason !== what ? `<span>이유: ${esc(r.reason)}</span>` : "";
+  return `<div class="rqbox" data-rqid="${esc(r.id)}"><b>${head}</b>${post}${cm}${nw}${why}<span>${ago(r.created)}</span>${admin ? `<div class="acts2">${withPost ? `<button class="pill ghost" type="button" data-rqgo="${esc(r.post)}">글 보기</button>` : ""}<button class="pill leaf" type="button" data-rq="${esc(r.id)}" data-ok="1">승인</button><button class="pill danger" type="button" data-rq="${esc(r.id)}" data-ok="0">거절</button></div><div class="rqmsg"></div>` : ""}</div>`;
+}
 const NT = (() => {
   const btn = $("btn-bell"), bdg = btn.querySelector(".bdg"), base = document.title;
   let unread = 0;
@@ -5082,8 +5122,24 @@ function openPassword(forced){
 }
 function openAdmin(){
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div><h3>친구 관리</h3></div>${XBTN}</div><div id="fm-list"><p>불러오는 중…</p></div>`);
-  const box = sh.el.querySelector("#fm-list");
+  const sh = openSheet(`<div class="hd"><div><h3>친구 관리</h3></div>${XBTN}</div><div id="fm-req"></div><div id="fm-list"><p>불러오는 중…</p></div>`);
+  const box = sh.el.querySelector("#fm-list"), rbox = sh.el.querySelector("#fm-req");
+  let rq = [];
+  async function loadReqs(){
+    try{ rq = (await AUTH.api("admin/reqs")).wait; }catch(e){ rq = []; }
+    rbox.innerHTML = rq.length ? `<div class="rqhd">요청 ${fmt(rq.length)}개</div>${rq.map(r => rqHTML(r, true, true)).join("")}` : "";
+  }
+  rbox.addEventListener("click", async e => {
+    const g = e.target.closest("[data-rqgo]");
+    if(g){ try{ const r = await AUTH.api("posts/" + encodeURIComponent(g.dataset.rqgo)); sheetOver = true; openTrade(r.post.id, r.post); }catch(err){ toast(tradeErr(err)); } return; }
+    const t = e.target.closest("[data-rq]"); if(!t) return;
+    busyRun(t, t.closest(".rqbox").querySelector(".rqmsg"), async () => {
+      const ok = t.dataset.ok === "1";
+      await AUTH.api("admin/reqs/" + t.dataset.rq, {method: "POST", body: JSON.stringify({ok})});
+      toast(ok ? "승인했어요" : "거절했어요"); await loadReqs();
+    }, tradeErr);
+  });
+  loadReqs();
   async function load(){
     let j; try{ j = await AUTH.api("admin/users"); }catch(e){ box.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
     const fact = (k, v) => `<span>${k} <b>${v}</b></span>`;
