@@ -1845,15 +1845,16 @@ html.lscB .res .sgrid.grid.list{grid-template-columns:repeat(2, minmax(0, 1fr));
 .tag .tg-s{display:none}
 html.lscB .tag .tg-l{display:none}
 html.lscB .tag .tg-s{display:inline}
-/* 이름: 두 줄까지, 단어 중간에서 안 끊음. 한 단어가 한 줄보다 길거나(--wems) 두 줄로도 모자랄 때(--ems)만 그 이름 글자를 작게 */
+/* 이름: 두 줄까지, 단어 중간에서 안 끊음(긴 한 단어는 정해 둔 자리 <wbr>에서만). 두 줄로 나눈 긴 줄(--wems)이 칸보다 길 때만 그 이름 글자를 작게 */
 html.lscB .card.li .nm{white-space:normal; word-break:keep-all; overflow-wrap:normal; text-wrap:balance; overflow:hidden; text-overflow:clip; line-height:1.22;
-  font-size:clamp(7px, min(calc(100cqw * 1.02 / var(--wems, 1)), calc(100cqw * 1.7 / (var(--ems, 1.4) - .4))), 13.5px)}
+  font-size:clamp(10px, calc(100cqw * 1.02 / var(--wems, 1)), 13.5px)}
 /* 칸 높이 통일: 이름 두 줄 + 꼬리표 한 줄이 들어가는 높이 */
 html.lscB .card.li{height:70px; min-height:70px; contain-intrinsic-size:auto 70px}
 html.lscB .card.li .meta{white-space:nowrap; overflow:hidden; line-height:16px; font-size:clamp(6px, calc(100cqw / var(--tems, 6)), 10.5px)}
 html.lscB .card.li .meta .tag{font-size:1em; line-height:1.5; padding:0 .5em; margin-right:.4em; white-space:nowrap; max-width:none}
 html.lscB .card.li .meta .tag:last-child{margin-right:0}
 @media (max-width:360px){ html.lscB .card.li .pw .pic{--t:34px !important} html.lscB .card.li .tog{gap:5px; padding-left:5px} }
+@media (max-width:340px){ html.lscB .card.li .nm{font-size:clamp(7.5px, calc(100cqw * 1.02 / var(--wems, 1)), 13px)} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2253,7 +2254,16 @@ const fmt = n => n.toLocaleString("ko-KR");
 // Long names shrink to fit their row instead of being cut: --ems = the name's width in em (Hangul = 1), used with the row's width (cqw).
 // 작은 칸 꼬리표 줄 너비(em): 짧은 말 기준 글자 + 꼬리표마다 안쪽 여백·사이 1.7em
 const tagEms = h => { const n = (h.match(/class="tag/g) || []).length; if(!n) return "1"; const t = h.replace(/<span class="tg-l">.*?<\/span>/g, "").replace(/<[^>]+>/g, ""); return (parseFloat(nameEms(t)) - .4 + n * 1.7).toFixed(2); };
-const wordEms = t => Math.max(...t.split(" ").map(w => parseFloat(nameEms(w)) - .4)).toFixed(2);
+// 작은 칸 이름 줄바꿈 자리: 띄어쓰기 말고도 긴 한 단어는 자연스러운 곳(…/사슴벌레, …/사우루스의, K.K./…, …&/…)에서만 나눔 (링크님 2026-11-26 "너무 작아서 기괴해")
+const NM_SUF = ["사우루스의", "사우루스", "사슴벌레", "장수풍뎅이", "제비나방", "제비나비", "비단나비", "피테쿠스", "스테우스", "아이스크림", "플레이어", "와이셔츠", "해파리", "꽃무지", "바구미", "글라스", "케로피", "트리", "나비"];
+const nmSegs = t => t.split(" ").map(w => { let g = w.replace(/(K\.K\.)(?=\S{2,})/g, "$1\u200b").replace(/(\S{2,})(K\.K\.)/g, "$1\u200b$2").replace(/(\S{2,}[&×])(?=\S{2,})/g, "$1\u200b");
+  if(!/K\.K\./.test(w) && [...w].length >= 7) for(const x of NM_SUF){ const i = g.length - x.length; if(i >= 3 && g.endsWith(x) && g[i - 1] !== "\u200b"){ g = g.slice(0, i) + "\u200b" + x; break; } }
+  return g; });
+const nmHTML = t => nmSegs(t).map(w => w.split("\u200b").map(esc).join("<wbr>")).join(" ");
+// --wems: 두 줄로 가장 고르게 나눴을 때 긴 줄의 너비(em). 한 줄에 들어가면 이름 전체 너비. 글자 크기는 이 줄이 칸에 맞게만 줄임.
+const wordEms = t => { const g = nmSegs(t).join(" "), em = x => parseFloat(nameEms(x.replace(/\u200b/g, ""))) - .4; let best = em(g);
+  for(let i = 0; i < g.length; i++) if(g[i] === " " || g[i] === "\u200b"){ const m = Math.max(em(g.slice(0, i)), em(g.slice(i + 1))); if(m < best) best = m; }
+  return best.toFixed(2); };
 const nameEms = t => { let e = .4; for(const ch of t) e += /[가-힣ㄱ-ㅎ]/.test(ch) ? 1 : ch === " " ? .32 : /[A-Z0-9]/.test(ch) ? .64 : .54; return e.toFixed(2); };
 
 function picStyle(it){
@@ -2315,7 +2325,7 @@ function cardHTML(it){
   const pic = `<span class="pw">${framePic(it, f0, picT())}${it.vs.length > 1 ? vcntHTML(it, st) : ""}</span>`;
   const attrs = `data-id="${it.id}"${n > 1 ? ` data-n="${n}"` : ""}`;
   if(ui.view === "list")
-    return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="tx"><span class="nm" style="--ems:${nameEms(it.ko)};--wems:${wordEms(it.ko)}">${esc(it.ko)}</span>${priceLine(it)}${(t => `<span class="meta" style="--tems:${tagEms(t)}">${t}</span>`)(tagsHTML(it))}</span></button><div class="side">${heart}${more}</div></div>`;
+    return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="tx"><span class="nm" style="--ems:${nameEms(it.ko)};--wems:${wordEms(it.ko)}">${nmHTML(it.ko)}</span>${priceLine(it)}${(t => `<span class="meta" style="--tems:${tagEms(t)}">${t}</span>`)(tagsHTML(it))}</span></button><div class="side">${heart}${more}</div></div>`;
   return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="nm">${esc(it.ko)}</span><span class="meta">${tagsHTML(it)}</span></button><div class="cbar">${heart}${more}</div></div>`;
 }
 
