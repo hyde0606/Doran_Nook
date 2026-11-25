@@ -1683,6 +1683,103 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
 :root[data-theme="dark"]{--dcard:var(--card); --dcard-line:transparent}
 .d-card, .tr-dcard{background:var(--dcard); box-shadow:inset 0 0 0 1px var(--dcard-line), 0 3px 0 var(--card-line)}
 .thm{margin:0 0 4px}
+
+/* v48 할 일 작게 보기 */
+.tdv{display:inline-flex; flex:none; border-radius:10px; overflow:hidden; background:var(--chip); box-shadow:inset 0 0 0 1px var(--card-line)}
+.tdv button{border:0; background:transparent; width:38px; height:34px; display:grid; place-items:center; color:var(--muted)}
+.tdv button + button{box-shadow:inset 1px 0 0 var(--card-line)}
+.tdv button[aria-pressed="true"]{background:var(--card-on); color:var(--leaf)}
+.tdv svg{width:18px; height:18px}
+.tcard.tdc .tdlist{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:5px}
+.tcard.tdc .tdmain{gap:8px; padding:5px 8px; min-height:46px}
+.tcard.tdc .tdmain > .pic{--t:32px !important}
+.tcard.tdc .tdmain > .pic.ph svg{width:18px !important; height:18px !important}
+.tcard.tdc .tdmain .tx > span{display:none}
+.tcard.tdc .tdmain .tx b{font-size:13.5px; line-height:1.25; gap:4px; word-break:keep-all; overflow-wrap:anywhere}
+.tcard.tdc .tdmain .tx b .tag{font-size:10.5px; padding:1px 5px}
+.tcard.tdc .tdmain .ck{position:absolute; left:3px; top:3px; width:18px; height:18px; box-shadow:none; background:transparent}
+.tcard.tdc .tdmain .ck svg{width:11px; height:11px}
+.tcard.tdc .tdmain[aria-pressed="false"] .ck{visibility:hidden}
+.tcard.tdc .tdmain[aria-pressed="true"] .ck{background:var(--leaf); box-shadow:0 0 0 2px var(--paper2)}
+.tcard.tdc .tdgo{display:none}
+.tcard.tdc .tdrow.go .tdmain .tx{margin-right:0}
+@media (max-width:300px){ .tcard.tdc .tdlist{grid-template-columns:minmax(0, 1fr)} }
+.tdgh .tdgn{white-space:nowrap; flex:none}
+/* 묶음 접기 */
+.tdgh[data-tdg]{cursor:pointer; user-select:none; border-radius:8px}
+.tdgh[data-tdg]:focus-visible{outline:2px solid var(--leaf); outline-offset:2px}
+.tdgc{order:3; flex:none; width:8px; height:8px; margin:0 4px 3px 2px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .15s}
+.tdg.fold .tdgc{transform:rotate(-45deg); margin-bottom:0}
+.tdg.fold .tdlist{display:none}
+
+/* v48 줄바꿈 균형 (링크님 2026-11-25): 한국어 단어는 중간에서 끊지 않고, 두 줄이 되는 이름·제목·버튼은 두 줄 길이를 비슷하게,
+   문단은 마지막 줄에 한 단어만 남지 않게. 줄 바꿀지(nowrap)는 건드리지 않도록 text-wrap-style만 씀. */
+body{word-break:keep-all; overflow-wrap:break-word; text-wrap-style:pretty}
+h1, h2, h3, h4, h5, h6, b, strong, em, button, label, summary, figcaption, th, .nm, .tag, .pill, .lb, .tx > span{text-wrap-style:balance}
+
+/* v48 목록 작게 보기 (링크님 2026-11-25): 아이템은 기본·두 칸(B)·사진 칸(C), 박물관은 기본·두 칸(B). 주민은 그대로.
+   버튼 #btn-lsc 를 누르면 차례로 바뀌고, 탭마다 KEY+":lsc"에 기억. 지금 탭의 모양을 <html class="lscB|lscC"> 로 표시 (검색 창 결과도 같이). */
+#btn-lsc[aria-pressed="true"]{background:var(--leaf, #6fbf73); color:#fff}
+
+/* B 두 칸 */
+html.lscB .card.li .pl{display:none}
+html.lscB .card.li .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:keep-all; overflow-wrap:anywhere}
+html.lscB .grid.list{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px}
+html.lscB .card.li{height:auto; min-height:62px; contain-intrinsic-size:auto 62px; border-radius:14px}
+html.lscB .card.li .tog{gap:7px; padding:6px 2px 6px 6px}
+html.lscB .card.li .pw .pic{--t:38px !important}
+html.lscB .card.li .tx, html.lscB .card.li .tx:has(> .pl){display:grid; grid-template-rows:none; gap:2px}
+html.lscB .card.li .nm{font-size:13.5px; line-height:1.25; width:auto}
+html.lscB .card.li .meta{height:auto; line-height:16px; white-space:normal}
+html.lscB .card.li .meta:empty{display:none}
+html.lscB .card.li .meta .tag{font-size:10.5px; line-height:15px; height:auto; white-space:nowrap; max-width:100%}
+html.lscB .card.li .side{width:30px}
+html.lscB .card.li .side svg{width:15px; height:15px}
+@media (max-width:300px){ html.lscB .grid.list{grid-template-columns:minmax(0, 1fr)} }
+
+/* C 사진 칸 */
+html.lscC .card.li .pl{display:none}
+html.lscC .card.li .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:keep-all; overflow-wrap:anywhere}
+html.lscC .grid.list{grid-template-columns:repeat(auto-fill, minmax(84px, 1fr)); gap:6px}
+html.lscC .card.li{position:relative; flex-direction:column; align-items:stretch; height:auto; min-height:0; contain-intrinsic-size:auto 110px; border-radius:14px}
+html.lscC .card.li .tog{flex-direction:column; justify-content:flex-start; gap:4px; padding:10px 4px 8px; text-align:center}
+html.lscC .card.li .pw .pic{--t:50px !important}
+html.lscC .card.li .tx, html.lscC .card.li .tx:has(> .pl){display:block; width:100%}
+html.lscC .card.li .nm{font-size:12.5px; line-height:1.25; width:auto; text-align:center}
+html.lscC .card.li .meta{display:none}
+html.lscC .card.li .side{position:absolute; inset:0 0 auto 0; height:26px; width:auto; flex-direction:row; justify-content:space-between; border:0; pointer-events:none}
+html.lscC .card.li .side .lk, html.lscC .card.li .dt{pointer-events:auto; width:28px; height:26px; border:0; border-radius:0}
+html.lscC .card.li .side svg{width:14px; height:14px}
+
+html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100%}
+
+/* 버튼 알아보기: 안내 줄 아이콘, 보기 창 목록 모양, 처음 한 번 반짝 */
+.plank p .wi{width:1.1em; height:1.1em; vertical-align:-.18em; margin:0 1px; fill:none; color:inherit}
+.lscpick{margin:8px 0 18px}
+.lscpick button .fi{width:15px; height:15px; margin-right:4px; vertical-align:-2px; color:inherit}
+[data-page="sort"] > .vwh + .vlist{margin-top:8px}
+@keyframes lscHint{0%, 100%{box-shadow:0 0 0 0 rgba(255, 220, 120, 0)} 50%{box-shadow:0 0 0 5px rgba(255, 220, 120, .55)}}
+#btn-lsc.hint{animation:lscHint 1.1s ease-in-out 1.2s 4}
+@media (prefers-reduced-motion:reduce){ #btn-lsc.hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
+
+/* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-25, 시안 E 선택): 폰(560px 아래)에서
+   아이콘+이름이 한 줄, 아래 줄에 개수와 막대. 300px 아래(한 칸씩 쌓임)는 아이콘·이름·개수 한 줄 + 막대. */
+@media (max-width:560px){
+  .cbtn.top{display:grid; grid-template-columns:auto minmax(0, 1fr); grid-template-rows:auto auto; align-items:center; column-gap:4px; row-gap:7px; padding:9px 7px 10px}
+  .cbtn.top .ct{display:contents}
+  .cbtn.top .pic{--t:18px; border-radius:6px; grid-row:1; grid-column:1}
+  .cbtn.top .pic.ph svg{width:12px; height:12px}
+  .cbtn.top .cn{grid-row:1; grid-column:2; min-width:0}
+  .cbtn.top b{font-size:clamp(12px, 3.6vw, 14.5px); line-height:1.25}
+  .cbtn.top .num{grid-row:2; grid-column:1 / -1; font-size:11.5px}
+  .cbtn.top > .ct > i{grid-row:2; grid-column:1 / -1; align-self:center; margin-left:auto; width:38%; height:4px}
+}
+@media (max-width:300px){
+  .cbtn.top{grid-template-columns:auto minmax(0, 1fr) auto; padding:8px 10px; row-gap:5px; column-gap:8px}
+  .cbtn.top .pic{--t:22px}
+  .cbtn.top .num{grid-row:1; grid-column:3}
+  .cbtn.top > .ct > i{grid-row:2; grid-column:1 / -1; width:auto; margin-left:0}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1775,6 +1872,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
         <button type="button" role="tab" data-fo="done">완료<span class="tn num"></span></button>
       </div>
       <button class="filt sq" id="btn-like" type="button" aria-pressed="false" aria-label="좋아요만 보기" title="좋아요만 보기"><svg class="ic"><use href="#i-heart"/></svg></button>
+      <button class="filt sq" id="btn-lsc" type="button" aria-pressed="false" aria-label="목록 모양" title="목록 모양"><svg class="ic"><use href="#i-list"/></svg></button>
       <button class="filt" id="btn-filt" type="button" aria-haspopup="dialog" aria-label="필터와 정렬" title="필터와 정렬"><svg class="ic"><use href="#i-sliders"/></svg><span class="lb">필터·정렬</span><span class="badge num" id="filt-badge" hidden>0</span></button>
     </div>
     <div class="meter" title="전체 진행률" role="progressbar" aria-label="전체 진행률" id="p-bar"><i></i></div>
@@ -1789,7 +1887,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
     <button class="x" type="button" id="kk-x" aria-label="카카오톡 안내 닫기"><svg><use href="#i-x"/></svg></button>
   </div>
   <div class="plank" id="welcome" hidden>
-    <p>누르면 <b>체크</b>, <b>⋯</b>에서 색 고르기</p>
+    <p>누르면 <b>체크</b>, <b>⋯</b>에서 색 고르기, <svg class="wi" aria-label="목록 모양 버튼"><use href="#i-grid"/></svg>로 작게 보기</p>
     <button class="x" type="button" id="welcome-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button>
   </div>
   <div class="vrib" id="vrib" role="status" hidden></div>
@@ -2002,6 +2100,20 @@ const KS = (() => {
 
 /* ---------- State ---------- */
 const KEY = "acnh-catalog-check-v1";
+const LSC_MODES = {item:["", "B", "C"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"두 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
+let lsMode = (() => { try{ const o = JSON.parse(localStorage.getItem(KEY + ":lsc") || "{}"); return o && typeof o === "object" ? o : {}; }catch(e){ return {}; } })();
+function lscApply(tab){
+  const L = LSC_MODES[tab], m = L && L.includes(lsMode[tab]) ? lsMode[tab] : "", h = document.documentElement;
+  h.classList.toggle("lscB", m === "B"); h.classList.toggle("lscC", m === "C");
+  const b = document.getElementById("btn-lsc"); if(!b) return;
+  b.classList.toggle("tabhide", !L); b.setAttribute("aria-pressed", String(!!m));
+  const nx = L ? L[(L.indexOf(m) + 1) % L.length] : "";
+  b.title = b.ariaLabel = `목록 모양: ${LSC_NAME[m]} (누르면 ${LSC_NAME[nx]})`;
+  b.querySelector("use").setAttribute("href", "#i-" + (m ? LSC_ICO[m] : "grid"));   // 기본일 땐 ☰(메뉴처럼 보임) 대신 ▦ = 작게 보기
+  let seen = true; try{ seen = !!localStorage.getItem(KEY + ":lsc-seen"); }catch(e){}
+  b.classList.toggle("hint", !!L && !seen);
+}
+function lscSeen(){ try{ localStorage.setItem(KEY + ":lsc-seen", "1"); }catch(e){} const b = document.getElementById("btn-lsc"); if(b) b.classList.remove("hint"); }
 const own = new Set();      // checked item ids
 const vmask = new Map();    // id -> bitmask of checked variants
 const like = new Map();     // 좋아요: id -> bitmask of liked colors (1 for items without colors)
@@ -2279,6 +2391,7 @@ function renderHead0(){
     : ui.fo === "season" ? ["설정", "sliders", "시즌 설정"] : ui.fo === "turnip" ? ["지난 기록", "cal", "무트코인 지난 기록"] : ["고치기", "sliders", "할 일 고치기"];
   fl.querySelector(".lb").textContent = flb; fl.querySelector("use").setAttribute("href", "#i-" + fic); fl.title = fl.ariaLabel = ft;
   $("btn-like").classList.toggle("tabhide", todo || island);
+  lscApply(ui.tab);
   if(island) return renderIslandHead();
   if(todo) return renderTodoHead();
   if(ui.tab === "villager") return renderVillagerHead();
@@ -2669,7 +2782,8 @@ function catBtn(i, cls){
   const ico = i >= 0 ? catIcon(i === FAKE_CAT ? 23 : i) : `<span class="pic ph${i===-3?" lkph":""}"><svg><use href="#${i===-1?(ui.tab==="museum"?"i-museum":"i-grid"):i===-2?"i-book":i===-4?"i-box":"i-heart"}"/></svg></span>`;
   const done = all.length && o === all.length && i !== -3;
   const num = i === -3 ? `${fmt(all.length)}개${all.length ? ` · ${fmt(o)}개 체크` : ""}` : `${fmt(o)} / ${fmt(all.length)}`;
-  return catBtnHTML(i, catLabel(i), ico, o, all.length, done, num, cls);
+  const topName = typeof cls === "string" && cls.startsWith("top") && ui.tab === "item" ? {"-1":"모든 아이템", "-2":"카탈로그", "-4":"카탈로그 X"}[i] : "";
+  return catBtnHTML(i, topName || catLabel(i), ico, o, all.length, done, num, cls);
 }
 function vilCatBtn(i, cls){
   const all = i === -3 ? VIL.filter(v => vlike.has(v.f)) : i >= 0 ? VBY_SP[i] : VIL, o = all.filter(hasPhoto).length;
@@ -2875,10 +2989,10 @@ function openFind(jump){
   const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? (SRV ? "자랑 글을 찾아요" : "꿈번지를 찾아요") : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
   const V = viewOn(T) ? viewSpec(T) : null;
   // what the window opened with: closing without 적용 puts it back
-  const take = () => { const o = {hemi: HEMI}; VKEYS.forEach(k => o[k] = Array.isArray(ui[k]) ? ui[k].slice() : ui[k]); return o; };
+  const take = () => { const o = {hemi: HEMI, lsc: lsMode[T] || ""}; VKEYS.forEach(k => o[k] = Array.isArray(ui[k]) ? ui[k].slice() : ui[k]); return o; };
   const snap = take(), sig = JSON.stringify(snap);
   const dirty = () => !!V && JSON.stringify(take()) !== sig;
-  const restore = () => { VKEYS.forEach(k => ui[k] = Array.isArray(snap[k]) ? snap[k].slice() : snap[k]); HEMI = snap.hemi; };
+  const restore = () => { VKEYS.forEach(k => ui[k] = Array.isArray(snap[k]) ? snap[k].slice() : snap[k]); HEMI = snap.hemi; lsMode[T] = snap.lsc; };
   let applied = false, s, first = "";
   const done = () => {
     if(!V || applied){ renderTotals(); render(); if(applied) $("page").scrollTo({top:0}); return; }
@@ -2893,7 +3007,7 @@ function openFind(jump){
   } else {
     const scope = T === "villager" ? "모든 주민에서 찾아요. 영어·일본어 이름도 돼요." : T === "museum" ? "박물관 전체에서 찾아요. 분류 이름도 찾아져요." : T === "item" ? "모든 아이템에서 찾아요. 분류 이름도 찾아져요." : `모든 ${T === "dream" ? "자랑" : "거래"} 글에서 찾아요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.`;
     const ph = T === "item" ? "아이템·분류 이름 (초성도 돼요)" : T === "museum" ? "생물·화석·미술품·분류 이름" : T === "villager" ? "주민·종족 이름 (초성도 돼요)" : `${what} (초성도 돼요)`;
-    const pages = [V.cat && ["cat", "분류"], V.filt.length && ["filt", "필터"], V.sort && ["sort", "정렬"]].filter(Boolean);
+    const pages = [V.cat && ["cat", "분류"], V.filt.length && ["filt", "필터"], V.sort && ["sort", LSC_MODES[T] ? "모양·정렬" : "정렬"]].filter(Boolean);
     first = pages.some(p => p[0] === jump) ? jump : pages[0][0];
     // v48: no second line under the title and no scope line: the list keeps the room (the count is on the 적용 button)
     const tabsHTML = `<div class="vtabs" role="tablist" aria-label="보기 화면">${pages.map(([k, l]) => `<button type="button" role="tab" data-pg="${k}" aria-selected="${k === first}">${l}<b class="num"></b></button>`).join("")}</div>`;
@@ -2902,7 +3016,7 @@ function openFind(jump){
     <div class="vwbody" id="f-cats">
       ${V.cat ? `<section class="vsec" data-page="cat" role="tabpanel" aria-label="분류"><div class="vcats">${catsHTML()}</div></section>` : ""}
       ${V.filt.length ? `<section class="vsec" data-page="filt" role="tabpanel" aria-label="필터"><div>${viewRowsHTML(V)}</div>${V.setting ? `<h4 class="vwh">내 섬 설정</h4>${viewSettingHTML(V)}` : ""}</section>` : ""}
-      ${V.sort ? `<section class="vsec" data-page="sort" role="tabpanel" aria-label="정렬">${viewSortHTML(V)}</section>` : ""}
+      ${V.sort ? `<section class="vsec" data-page="sort" role="tabpanel" aria-label="정렬">${LSC_MODES[T] ? `<h4 class="vwh">목록 모양</h4><div class="radios lscpick" role="radiogroup" aria-label="목록 모양" data-vg="_lsc">${LSC_MODES[T].map(m => `<button type="button" role="radio" data-v="${m}">${ico(LSC_ICO[m])}${LSC_NAME[m].replace(" 보기", "")}</button>`).join("")}</div><h4 class="vwh">정렬</h4>` : ""}${viewSortHTML(V)}</section>` : ""}
     </div>
     <div class="res" id="s-res" hidden></div>`, done);
     s.el.classList.add("vsheet"); s.ov.classList.add("vov");
@@ -2933,7 +3047,7 @@ function openFind(jump){
       else if(T === "dream") ui.cat = shCat() % 10;
       else if(T === "trade") ui.cat = -1;
     } else {
-      if(T === "item") ui.sort = "base"; else if(T === "museum") ui.msort = "base"; else if(T === "villager") ui.vsort = "rand"; else if(T === "dream") ui.cat = shCat() >= 10 ? 10 : 0;
+      if(LSC_MODES[T]) lsMode[T] = ""; if(T === "item") ui.sort = "base"; else if(T === "museum") ui.msort = "base"; else if(T === "villager") ui.vsort = "rand"; else if(T === "dream") ui.cat = shCat() >= 10 ? 10 : 0;
     }
     toast(`${PNAME[page]}${page === "cat" ? "를" : "을"} 처음으로 돌렸어요. 적용을 눌러야 목록이 바뀌어요`);
   };
@@ -2952,6 +3066,7 @@ function openFind(jump){
       else if(r.kind === "src"){ const b = s.el.querySelector("#v-src span"); b.textContent = SRC_NAME(ui.src); }
     });
     if(V.sort) s.el.querySelectorAll('[data-vg="_sort"] button').forEach(b => b.setAttribute("aria-checked", String(V.sort.get()) === b.dataset.v));
+    s.el.querySelectorAll('[data-vg="_lsc"] button').forEach(b => b.setAttribute("aria-checked", String((lsMode[T] || "") === b.dataset.v)));
     if(V.setting) s.el.querySelectorAll('[data-vg="_set"] button').forEach(b => b.setAttribute("aria-checked", String(V.setting.get()) === b.dataset.v));
     s.el.querySelectorAll(".cbtn[data-c]").forEach(b => b.setAttribute("aria-current", String(catOn(+b.dataset.c))));
     const A = viewActive(T);
@@ -2961,7 +3076,7 @@ function openFind(jump){
     }
     vcount();
   };
-  const apply = () => { applied = true; ui.limit = 0; if(HEMI !== snap.hemi){ try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} } saveView(); s.close(); };
+  const apply = () => { applied = true; ui.limit = 0; if((lsMode[T] || "") !== snap.lsc){ try{ localStorage.setItem(KEY + ":lsc", JSON.stringify(lsMode)); }catch(e){} } if(HEMI !== snap.hemi){ try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} } saveView(); s.close(); };
   if(V){
     showPage(page); vsync();
     s.ov._reveal = () => { vsync(); if(inp.value.trim()) paint(); };
@@ -3023,7 +3138,7 @@ function openFind(jump){
     const pg = e.target.closest("[data-pg]"); if(pg){ if(inp.value){ inp.value = ""; paint(); } return showPage(pg.dataset.pg); }
     const w = e.target.closest("[data-vk]"); if(w){ const r = V.filt.find(x => x.k === w.dataset.vk); if(r && !w.disabled){ r.set(!r.get()); vsync(); } return; }
     const rb = e.target.closest("[data-vg] button"); if(rb){ const g = rb.closest("[data-vg]").dataset.vg, v = rb.dataset.v;
-      if(g === "_sort"){ if(v === "base" || v === "rand") RSEED = (Math.random() * 4294967296) >>> 0; V.sort.set(v); } else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
+      if(g === "_lsc"){ lsMode[T] = v; lscSeen(); } else if(g === "_sort"){ if(v === "base" || v === "rand") RSEED = (Math.random() * 4294967296) >>> 0; V.sort.set(v); } else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
       vsync(); return; }
     if(e.target.closest("#v-src")) return openSrcPick(vsync);
     if(e.target.closest("#v-reset")){ resetPage(); vsync(); return; }
@@ -3119,6 +3234,12 @@ function openFilters(){
 $("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? (SRV ? openShowForm() : openDreamForm()) : ui.tab === "trade" ? openTradeForm() : openFind("filt"));
 document.addEventListener("change", e => { if(e.target.id === "f-src"){ ui.src = +e.target.value; ui.limit = 0; saveView(); render(); renderHead(); } });
 
+$("btn-lsc").addEventListener("click", () => {
+  const L = LSC_MODES[ui.tab]; if(!L) return;
+  const m = L.includes(lsMode[ui.tab]) ? lsMode[ui.tab] : "", nx = L[(L.indexOf(m) + 1) % L.length];
+  lsMode[ui.tab] = nx; try{ localStorage.setItem(KEY + ":lsc", JSON.stringify(lsMode)); }catch(e){}
+  lscSeen(); lscApply(ui.tab); toast(LSC_NAME[nx]);
+});
 $("btn-like").addEventListener("click", () => {
   ui.liked = !ui.liked; ui.limit = 0; saveView(); render();
   if(!ui.liked) return;
@@ -3705,6 +3826,8 @@ function renderTodo(){
   renderHead();
   if(ui.fo === "turnip") tkUpdate();
 }
+let tdFold = new Set(); try{ tdFold = new Set(JSON.parse(localStorage.getItem(KEY + ":tdfold") || "[]")); }catch(e){}
+let tdCompact = false; try{ tdCompact = localStorage.getItem(KEY + ":tdc") === "1"; }catch(e){}
 function taskRowHTML(t, x){
   const on = tdDone(t, x.id), today = gameNow().getDay();
   let extra = "";
@@ -3720,12 +3843,13 @@ function taskListHTML(t){
   const pct = all ? n / all * 100 : 0;
   const vis = t === "w" ? `<div class="tcard"><div class="shd">${ico("face")}<b>이번 주에 온 손님</b><span class="sub" style="margin-left:auto">만났으면 눌러 두세요</span></div>
     <div class="vchips">${TD_VIS.map(([k, nm, what]) => { const on = td.w.vis.includes(k); return `<button class="vchip" type="button" data-vis="${k}" aria-pressed="${on}">${tIco("npc:" + k, 40)}<span class="tx"><b>${nm}</b><span>${what}</span></span></button>`; }).join("")}</div></div>` : "";
-  return `<div class="tcard">
-      <div class="tdhd"><div class="tx">${head}</div><span class="tdp num">${n}/${all}</span></div>
+  return `<div class="tcard${tdCompact ? " tdc" : ""}">
+      <div class="tdhd"><div class="tx">${head}</div><span class="tdp num">${n}/${all}</span><span class="tdv" role="group" aria-label="보기 모양"><button type="button" data-tdv="0" aria-pressed="${!tdCompact}" aria-label="자세히 보기"><svg aria-hidden="true"><use href="#i-list"/></svg></button><button type="button" data-tdv="1" aria-pressed="${tdCompact}" aria-label="작게 보기"><svg aria-hidden="true"><use href="#i-grid"/></svg></button></span></div>
       <div class="tdbar" role="progressbar" aria-label="${t === "d" ? "오늘" : "이번 주"} 할 일" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
       ${all && n === all ? `<p class="tdall">${t === "d" ? "오늘 할 일을 다 했어요. 수고했어요!" : "이번 주 할 일을 다 했어요!"}</p>` : ""}
       ${L.length ? tdGroupList(t).map(([g, ic, name]) => { const R = L.filter(x => tdGroupOf(x) === g); if(!R.length) return "";
-        return `<section class="tdg"><h4 class="tdgh">${ic ? tIco(ic, 28) : ico("todo")}<span>${name}</span><span class="tdgn num">${R.filter(x => tdDone(t, x.id)).length}/${R.length}</span></h4><div class="tdlist">${R.map(x => taskRowHTML(t, x)).join("")}</div></section>`; }).join("")
+        const fk = t + ":" + g, fo = tdFold.has(fk);
+        return `<section class="tdg${fo ? " fold" : ""}"><h4 class="tdgh" role="button" tabindex="0" data-tdg="${esc(fk)}" aria-expanded="${!fo}">${ic ? tIco(ic, 28) : ico("todo")}<span>${name}</span><span class="tdgn num">${R.filter(x => tdDone(t, x.id)).length}/${R.length}</span><i class="tdgc" aria-hidden="true"></i></h4><div class="tdlist">${R.map(x => taskRowHTML(t, x)).join("")}</div></section>`; }).join("")
         : `<p class="sub">보이는 할 일이 없어요. 위쪽 고치기에서 다시 켜거나 추가해 보세요.</p>`}
     </div>${vis}`;
 }
@@ -3799,8 +3923,15 @@ function openSeasonSettings(){
 function todoFiltClick(){ if(ui.fo === "season") openSeasonSettings(); else if(ui.fo === "turnip") openTurnipWeeks(); else openTodoEdit(); }
 function todoBind(){
   const grid = $("grid");
+  grid.addEventListener("keydown", e => { const gh = e.target.closest && e.target.closest("[data-tdg]"); if(gh && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); gh.click(); } });
   grid.addEventListener("click", e => {
     if(ui.tab !== "todo") return;
+    const gh = e.target.closest("[data-tdg]");
+    if(gh){ const k = gh.dataset.tdg, sec = gh.closest(".tdg"), fo = !tdFold.has(k); fo ? tdFold.add(k) : tdFold.delete(k);
+      try{ localStorage.setItem(KEY + ":tdfold", JSON.stringify([...tdFold])); }catch(err){}
+      sec.classList.toggle("fold", fo); gh.setAttribute("aria-expanded", String(!fo)); return; }
+    const tv = e.target.closest("[data-tdv]");
+    if(tv){ tdCompact = tv.dataset.tdv === "1"; try{ localStorage.setItem(KEY + ":tdc", tdCompact ? "1" : "0"); }catch(err){} render(); return; }
     const b = e.target.closest("[data-td]");
     if(b){ const t = ui.fo === "week" ? "w" : "d", box = t === "d" ? td.d : td.w, id = b.dataset.td; tdRoll();
       box.ids = box.ids.includes(id) ? box.ids.filter(x => x !== id) : [...box.ids, id]; tdSave();
