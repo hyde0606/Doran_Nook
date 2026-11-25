@@ -1719,7 +1719,6 @@ h1, h2, h3, h4, h5, h6, b, strong, em, button, label, summary, figcaption, th, .
 
 /* v48 목록 작게 보기 (링크님 2026-11-25): 아이템은 기본·두 칸(B)·사진 칸(C), 박물관은 기본·두 칸(B). 주민은 그대로.
    버튼 #btn-lsc 를 누르면 차례로 바뀌고, 탭마다 KEY+":lsc"에 기억. 지금 탭의 모양을 <html class="lscB|lscC"> 로 표시 (검색 창 결과도 같이). */
-#btn-lsc[aria-pressed="true"]{background:var(--leaf, #6fbf73); color:#fff}
 
 /* B 두 칸 */
 html.lscB .card.li .pl{display:none}
@@ -1759,8 +1758,8 @@ html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100
 .lscpick button .fi{width:15px; height:15px; margin-right:4px; vertical-align:-2px; color:inherit}
 [data-page="sort"] > .vwh + .vlist{margin-top:8px}
 @keyframes lscHint{0%, 100%{box-shadow:0 0 0 0 rgba(255, 220, 120, 0)} 50%{box-shadow:0 0 0 5px rgba(255, 220, 120, .55)}}
-#btn-lsc.hint{animation:lscHint 1.1s ease-in-out 1.2s 4}
-@media (prefers-reduced-motion:reduce){ #btn-lsc.hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
+#btn-lsc.lsc-hint{animation:lscHint 1.1s ease-in-out 1.2s 2}
+@media (prefers-reduced-motion:reduce){ #btn-lsc.lsc-hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
 
 /* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-25, 시안 E 선택): 폰(560px 아래)에서
    아이콘+이름이 한 줄, 아래 줄에 개수와 막대. 300px 아래(한 칸씩 쌓임)는 아이콘·이름·개수 한 줄 + 막대. */
@@ -1780,6 +1779,23 @@ html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100
   .cbtn.top .num{grid-row:1; grid-column:3}
   .cbtn.top > .ct > i{grid-row:2; grid-column:1 / -1; width:auto; margin-left:0}
 }
+
+/* v48 자랑 글 목록 카드 (링크님 2026-11-25 시안 D "세로로 너무 길어, 제목이 위에"): 글 상자 없이 사진 위에 겹침.
+   위: 분류 표·아이템 수, 그 아래 제목 / 아래: 과일·이름·섬 (왼쪽), 추천·댓글·조회 (오른쪽). 사진 위아래는 어둡게 깔아 글이 보이게. */
+.dcard.sh-card{grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto; position:relative; contain-intrinsic-size:auto 220px}
+.dcard.sh-card .dct{display:contents}
+.dcard.sh-card .dimg{grid-row:1; grid-column:1 / -1; aspect-ratio:16/10; min-height:0; overflow:hidden; position:relative}
+.dcard.sh-card .dimg img{position:absolute; inset:0}
+.dcard.sh-card .dimg::before{content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(20,14,8,.72) 0, rgba(20,14,8,0) 42%, rgba(20,14,8,0) 62%, rgba(20,14,8,.72) 100%); z-index:1}
+.dcard.sh-card .sh-top, .dcard.sh-card .dct > b, .dcard.sh-card .sh-who, .dcard.sh-card .dstat{grid-row:1; z-index:2; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.dcard.sh-card .sh-top{grid-column:1 / -1; align-self:start; padding:11px 14px 0}
+.dcard.sh-card .sh-tag{text-shadow:none}
+.dcard.sh-card .sh-it{color:rgba(255,255,255,.88)}
+.dcard.sh-card .dct > b{grid-column:1 / -1; align-self:start; justify-self:start; text-align:left; padding:38px 14px 0; font-size:18px; line-height:1.3}
+.dcard.sh-card .sh-who{grid-column:1; align-self:end; padding:0 8px 11px 14px; font-size:13px}
+.dcard.sh-card .dstat{grid-column:2; align-self:end; justify-self:end; padding:0 14px 11px 0; gap:10px; color:#fff}
+.dcard.sh-card .dstat .on{color:#ff9fb4}
+.dcard.sh-card .dt2, .dcard.sh-card .sh-n{display:none}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2111,9 +2127,9 @@ function lscApply(tab){
   b.title = b.ariaLabel = `목록 모양: ${LSC_NAME[m]} (누르면 ${LSC_NAME[nx]})`;
   b.querySelector("use").setAttribute("href", "#i-" + (m ? LSC_ICO[m] : "grid"));   // 기본일 땐 ☰(메뉴처럼 보임) 대신 ▦ = 작게 보기
   let seen = true; try{ seen = !!localStorage.getItem(KEY + ":lsc-seen"); }catch(e){}
-  b.classList.toggle("hint", !!L && !seen);
+  b.classList.toggle("lsc-hint", !!L && !seen);
 }
-function lscSeen(){ try{ localStorage.setItem(KEY + ":lsc-seen", "1"); }catch(e){} const b = document.getElementById("btn-lsc"); if(b) b.classList.remove("hint"); }
+function lscSeen(){ try{ localStorage.setItem(KEY + ":lsc-seen", "1"); }catch(e){} const b = document.getElementById("btn-lsc"); if(b) b.classList.remove("lsc-hint"); }
 const own = new Set();      // checked item ids
 const vmask = new Map();    // id -> bitmask of checked variants
 const like = new Map();     // 좋아요: id -> bitmask of liked colors (1 for items without colors)
