@@ -1800,6 +1800,20 @@ html.lscC .card.li{contain-intrinsic-size:auto 104px}
 .dcard.sh-card .dstat{grid-column:2; align-self:end; justify-self:end; padding:0 14px 11px 0; gap:10px; color:#fff}
 .dcard.sh-card .dstat .on{color:#ff9fb4}
 .dcard.sh-card .dt2, .dcard.sh-card .sh-n{display:none}
+
+/* v48 자랑 글 자세히 버튼 줄 (링크님 2026-11-26 시안 D): 고치기·지우기는 글쓴이 줄 오른쪽에 작게, 아래 줄은 추천과 숫자만 한 줄 */
+.d-card .tr-meta.shm{flex-wrap:nowrap}
+.d-card .tr-meta.shm > span:not(.fr):not(.sh-acts){min-width:0}
+.sh-acts{margin-left:auto; display:flex; align-items:center; gap:2px; flex:none}
+.sh-acts button{border:0; background:transparent; font-family:var(--f-display); font-size:13px; color:var(--muted); padding:4px 6px; border-radius:8px; white-space:nowrap}
+.sh-acts button.del{color:var(--berry, #d0563d)}
+.sh-acts button:disabled{opacity:.55}
+.sh-acts .adm{font-size:11px; color:var(--muted); border-radius:6px; padding:1px 5px; box-shadow:inset 0 0 0 1px var(--card-line); margin-right:2px; white-space:nowrap}
+@media (max-width:360px){ .sh-acts .adm{display:none} .sh-acts button{padding:4px} }
+.sh-bar{flex-wrap:nowrap}
+/* 추천했을 때 글씨가 분홍 바탕에 묻히지 않게 */
+.sh-bar .sh-like[aria-pressed="true"], .sh-bar .sh-like[aria-pressed="true"] b{color:#ff9fb4}
+:root[data-theme=light] .sh-bar .sh-like[aria-pressed="true"], :root[data-theme=light] .sh-bar .sh-like[aria-pressed="true"] b{color:#b83256}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4986,7 +5000,8 @@ function openShow(id, x0, opt){
     body.innerHTML = `
       ${picHTML2()}
       <div class="d-card">
-      <div class="tr-meta"><span class="fr">${fruitPic(x.author.fruit)}</span><b>${esc(x.author.name)}</b><span>${x.author.island ? esc(islandText(x.author.island)) + " · " : ""}${ago(x.created)}${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div>
+      <div class="tr-meta shm"><span class="fr">${fruitPic(x.author.fruit)}</span><b>${esc(x.author.name)}</b><span>${x.author.island ? esc(islandText(x.author.island)) + " · " : ""}${ago(x.created)}${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span>${mine() ? `<span class="sh-acts"><button type="button" id="sh-edit">고치기</button><button class="del" type="button" id="sh-del">지우기</button></span>`
+          : me() && me().admin ? `<span class="sh-acts"><span class="adm">관리자</span><button type="button" id="sh-edit" aria-label="관리자로 고치기">고치기</button><button class="del" type="button" id="sh-del" aria-label="관리자로 지우기">지우기</button></span>` : ""}</div>
       ${x.kind === "dream" && x.code ? `<section class="d-sec"><div class="shd k-blue"><b>꿈번지</b></div><div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div></section>` : ""}
       ${x.body ? `<section class="d-sec"><div class="shd k-mute"><b>내용</b></div><div class="dtext">${esc(x.body)}</div></section>` : ""}
       ${x.items.length ? `<section class="d-sec"><div class="shd k-leaf"><b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div></section>` : ""}
@@ -4994,8 +5009,6 @@ function openShow(id, x0, opt){
       <div class="sh-bar">
         <button class="sh-like" type="button" id="sh-like" aria-pressed="${liked}"><svg aria-hidden="true"><use href="#i-heart"/></svg><span>${liked ? "추천했어요" : "추천"}</span><b class="num">${fmt(x.likes || 0)}</b></button>
         <span class="dstat num" id="sh-stat">${statHTML({...x, id: x.id})}</span>
-        ${mine() ? `<div class="tr-acts"><button type="button" id="sh-edit">고치기</button><button class="tr-a3" type="button" id="sh-del">지우기</button></div>`
-          : me() && me().admin ? `<div class="tr-acts"><button type="button" id="sh-edit">관리자로 고치기</button><button class="tr-a3" type="button" id="sh-del">관리자로 지우기</button></div>` : ""}
       </div>
       <div id="sh-msg"></div>
       <div class="tr-cbox">
