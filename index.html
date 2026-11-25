@@ -1722,7 +1722,6 @@ h1, h2, h3, h4, h5, h6, b, strong, em, button, label, summary, figcaption, th, .
 
 /* B 두 칸 */
 html.lscB .card.li .pl{display:none}
-html.lscB .card.li .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:keep-all; overflow-wrap:anywhere}
 html.lscB .grid.list{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px}
 html.lscB .card.li{height:auto; min-height:62px; contain-intrinsic-size:auto 62px; border-radius:14px}
 html.lscB .card.li .tog{gap:7px; padding:6px 2px 6px 6px}
@@ -1749,23 +1748,26 @@ html.lscB .vcnt{transform:scale(.72); transform-origin:100% 100%}
 @media (prefers-reduced-motion:reduce){ #btn-lsc.lsc-hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
 /* 두 칸 보기: 폰은 두 칸, 넓은 화면(PC)은 칸 너비를 220px 안팎으로 두고 칸 수를 늘림 (링크님 2026-11-26 "PC에서 두 칸 보기가 여백이 너무 심해서") */
 @media (min-width:600px){ html.lscB .grid.list{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
-/* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-26 시안 A): 폰·PC 같은 짜임.
-   첫 줄 작은 아이콘 + 이름, 둘째 줄 개수, 막대는 칸 맨 아래 가장자리. (이전 시안 E는 숫자가 커지면 막대가 개수를 덮었음) */
-.cbtn.top{display:grid; grid-template-columns:auto minmax(0, 1fr); align-items:center; column-gap:5px; row-gap:7px; padding:9px 8px 13px; position:relative; overflow:hidden}
-.cbtn.top .ct{display:contents}
-.cbtn.top .pic{--t:18px; border-radius:6px; grid-row:1; grid-column:1}
-.cbtn.top .pic.ph svg{width:12px; height:12px}
-.cbtn.top .cn{grid-row:1; grid-column:2; min-width:0}
+/* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-26): 폰·PC 같은 규칙, 막대는 칸 아래 가장자리, 아이콘 없음.
+   박물관·주민처럼 칸이 하나뿐이면 줄 전체가 아니라 절반 너비. */
+/* 2026-11-26 링크님 "아이콘을 그냥 아예 없애줘": 맨 위 칸은 아이콘 없이 이름·개수만.
+   칸 너비 240px 미만: 이름 / 개수 두 줄, 둘 다 가운데. 240px 이상: 한 줄 — 이름 왼쪽, 개수 오른쪽. */
+.cbtn.top{display:block; container-type:inline-size; padding:10px 8px 14px; position:relative; overflow:hidden; text-align:left}
+.cbtn.top .cti{display:grid; grid-template-columns:minmax(0, 1fr); justify-items:center; align-items:center; column-gap:8px; row-gap:4px; min-width:0; text-align:center}
+.cbtn.top .cti .ct{display:contents}
+.cbtn.top .cti .pic{display:none}
+.cbtn.top .cn{grid-row:1; grid-column:1; min-width:0; max-width:100%}
 .cbtn.top b{font-size:clamp(12px, 3.6vw, 15.5px); line-height:1.25}
-.cbtn.top .num{grid-row:2; grid-column:1 / -1; font-size:clamp(10.5px, 3.2vw, 13px); overflow:visible; text-overflow:clip}
-.cbtn.top > .ct > i{position:absolute; left:0; right:0; bottom:0; width:auto; height:4px; margin:0; border-radius:0}
-@media (min-width:561px){
-  .cbtn.top{padding:12px 14px 15px; column-gap:9px}
-  .cbtn.top .pic{--t:28px; border-radius:8px}
-  .cbtn.top .pic.ph svg{width:17px; height:17px}
+.cbtn.top .num{grid-row:2; grid-column:1; justify-self:center; font-size:clamp(10.5px, 3.2vw, 13px); overflow:visible; text-overflow:clip}
+.cbtn.top .cti .ct > i{position:absolute; left:0; right:0; bottom:0; width:auto; height:4px; margin:0; border-radius:0}
+@container (min-width:240px){
+  .cbtn.top .cti{grid-template-columns:minmax(0, 1fr) auto; justify-items:start; text-align:left}
+  .cbtn.top .num{grid-row:1; grid-column:2; justify-self:end; margin-right:6px; padding-left:8px}
 }
-@media (max-width:340px){ .cbtn.top{padding-left:6px; padding-right:6px; column-gap:4px} .cbtn.top b{font-size:11.5px} }
-@media (max-width:300px){ .cbtn.top{padding:9px 12px 13px} .cbtn.top .pic{--t:22px} .cbtn.top b{font-size:14.5px} }
+@media (min-width:561px){ .cbtn.top{padding:13px 14px 16px} }
+@media (max-width:340px){ .cbtn.top{padding-left:6px; padding-right:6px} .cbtn.top b{font-size:11.5px} }
+.ctop[style*="--n:1"]{grid-template-columns:repeat(2, minmax(0, 1fr))}
+@media (max-width:300px){ .ctop[style*="--n:1"]{grid-template-columns:minmax(0, 1fr)} .cbtn.top{padding:9px 12px 13px} .cbtn.top b{font-size:14.5px} }
 
 /* v48 자랑 글 목록 카드 (링크님 2026-11-25 시안 D "세로로 너무 길어, 제목이 위에"): 글 상자 없이 사진 위에 겹침.
    위: 분류 표·아이템 수, 그 아래 제목 / 아래: 과일·이름·섬 (왼쪽), 추천·댓글·조회 (오른쪽). 사진 위아래는 어둡게 깔아 글이 보이게. */
@@ -1811,6 +1813,47 @@ html.lscB .vcnt{transform:scale(.72); transform-origin:100% 100%}
 
 /* v48 할 일 작게 보기(칸): PC에서 두 칸은 여백이 많아 칸 너비 220px 안팎으로 칸 수를 늘림 (링크님 2026-11-26 "여기도 여백 너무 많다") */
 @media (min-width:600px){ .tcard.tdc .tdlist{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
+
+/* v48 보기 창 검색 결과 보유 상태 칸: 언제나 한 줄 (링크님 2026-11-26) */
+.sfo{flex-wrap:nowrap; gap:5px}
+.sfo button{flex:1 1 auto; min-width:0; justify-content:center; padding:0 8px; gap:5px}
+@media (max-width:440px){ .sfo .sfo-l{display:none} .sfo button{padding:0 6px; gap:4px; font-size:12.5px} }
+@media (max-width:340px){ .sfo{gap:4px} .sfo button{padding:0 4px; font-size:12px} .sfo button i{display:none} }
+/* 보기 창 검색 결과도 메인 목록과 같은 배율: 작은 칸 보기면 폰 두 칸, 넓은 화면은 220px 안팎 (링크님 2026-11-26, 아이템·박물관) */
+html.lscB .res .sgrid.grid.list{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px}
+@media (min-width:600px){ html.lscB .res .sgrid.grid.list{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
+@media (max-width:300px){ html.lscB .res .sgrid.grid.list{grid-template-columns:minmax(0, 1fr)} }
+
+/* v48 거래 글 자세히 = 자랑 글 모양 (링크님 2026-11-26): 위 상자 구해요·드려요, 아래 상자 글쓴이 줄 + 내용 */
+.tr-dtop, .tr-dwho{margin-bottom:12px}
+.tr-dwho .tr-meta.shm{display:flex; align-items:center; flex-wrap:wrap; row-gap:4px}
+.tr-dwho .tr-meta.shm > span:not(.fr):not(.sh-acts){min-width:0}
+.tr-dwho .tr-meta.shm + .tr-sec{margin-top:4px}
+.sh-acts .tr-a1{color:var(--leaf)} .sh-acts .tr-a1.on{color:var(--muted)}
+/* 2026-11-26 링크님 시안 A: 거래·내용·댓글 상자 색을 모두 다르게. 위 거래 상자는 글 종류 색(구해요 보라·팔아요 노랑·나눔 초록),
+   가운데 이름·내용은 원래 상자색, 아래 댓글 판은 더 어둡게. */
+:root{--dt-want:#efe7fb; --dt-sell:#fdf3d2; --dt-free:#e8f4d9; --cbox:rgba(122,90,58,.13)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--dt-want:rgba(160,130,220,.26); --dt-sell:rgba(240,197,82,.2); --dt-free:rgba(124,216,137,.2); --cbox:rgba(0,0,0,.24)} }
+:root[data-theme="dark"]{--dt-want:rgba(160,130,220,.26); --dt-sell:rgba(240,197,82,.2); --dt-free:rgba(124,216,137,.2); --cbox:rgba(0,0,0,.24)}
+.sheet .tr-card.tr-dtop.t-want{background:var(--dt-want)}
+.sheet .tr-card.tr-dtop.t-sell{background:var(--dt-sell)}
+.sheet .tr-card.tr-dtop.t-free{background:var(--dt-free)}
+/* v48 작은 칸 보기 (링크님 2026-11-26): 꼬리표는 무조건 한 줄, 이름은 두 줄까지(단어 단위), 칸 높이는 모두 같게.
+   길면 그 글자만 작아짐. --ems(이름 너비 추정, 한글 1em + .4 여유)는 Jua 실제 너비의 약 1.06~1.28배라
+   여유 .4를 빼고 1.02배 해도 넘치지 않음(2026-11-26 360개 이름으로 잼). 꼬리표 줄은 --tems로 같은 방식.
+   박물관 꼬리표는 작은 칸에서 짧은 말: 이번 달부터 / 이번 달까지 / 이번 달 ✕ */
+.tag .tg-s{display:none}
+html.lscB .tag .tg-l{display:none}
+html.lscB .tag .tg-s{display:inline}
+/* 이름: 두 줄까지, 단어 중간에서 안 끊음. 한 단어가 한 줄보다 길거나(--wems) 두 줄로도 모자랄 때(--ems)만 그 이름 글자를 작게 */
+html.lscB .card.li .nm{white-space:normal; word-break:keep-all; overflow-wrap:normal; text-wrap:balance; overflow:hidden; text-overflow:clip; line-height:1.22;
+  font-size:clamp(7px, min(calc(100cqw * 1.02 / var(--wems, 1)), calc(100cqw * 1.7 / (var(--ems, 1.4) - .4))), 13.5px)}
+/* 칸 높이 통일: 이름 두 줄 + 꼬리표 한 줄이 들어가는 높이 */
+html.lscB .card.li{height:70px; min-height:70px; contain-intrinsic-size:auto 70px}
+html.lscB .card.li .meta{white-space:nowrap; overflow:hidden; line-height:16px; font-size:clamp(6px, calc(100cqw / var(--tems, 6)), 10.5px)}
+html.lscB .card.li .meta .tag{font-size:1em; line-height:1.5; padding:0 .5em; margin-right:.4em; white-space:nowrap; max-width:none}
+html.lscB .card.li .meta .tag:last-child{margin-right:0}
+@media (max-width:360px){ html.lscB .card.li .pw .pic{--t:34px !important} html.lscB .card.li .tog{gap:5px; padding-left:5px} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2208,6 +2251,9 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt = n => n.toLocaleString("ko-KR");
 // Long names shrink to fit their row instead of being cut: --ems = the name's width in em (Hangul = 1), used with the row's width (cqw).
+// 작은 칸 꼬리표 줄 너비(em): 짧은 말 기준 글자 + 꼬리표마다 안쪽 여백·사이 1.7em
+const tagEms = h => { const n = (h.match(/class="tag/g) || []).length; if(!n) return "1"; const t = h.replace(/<span class="tg-l">.*?<\/span>/g, "").replace(/<[^>]+>/g, ""); return (parseFloat(nameEms(t)) - .4 + n * 1.7).toFixed(2); };
+const wordEms = t => Math.max(...t.split(" ").map(w => parseFloat(nameEms(w)) - .4)).toFixed(2);
 const nameEms = t => { let e = .4; for(const ch of t) e += /[가-힣ㄱ-ㅎ]/.test(ch) ? 1 : ch === " " ? .32 : /[A-Z0-9]/.test(ch) ? .64 : .54; return e.toFixed(2); };
 
 function picStyle(it){
@@ -2235,7 +2281,7 @@ function tagsHTML(it){
   if(it.cat === 23) return artTag(it) + (!it.sell && it.st === 1 ? `<span class="tag ns">비매품</span>` : "");
   if(tabOfCat(it.lc) === "museum"){
     const m = monthState(it);
-    return m === "new" ? `<span class="tag mn">이번 달 새로 나옴</span>` : m === "last" ? `<span class="tag ml">이번 달이 마지막</span>` : m === "off" ? `<span class="tag mo">이번 달엔 안 나옴</span>` : "";
+    return m === "new" ? `<span class="tag mn"><span class="tg-l">이번 달 새로 나옴</span><span class="tg-s">이번 달부터</span></span>` : m === "last" ? `<span class="tag ml"><span class="tg-l">이번 달이 마지막</span><span class="tg-s">이번 달까지</span></span>` : m === "off" ? `<span class="tag mo"><span class="tg-l">이번 달엔 안 나옴</span><span class="tg-s">이번 달 ✕</span></span>` : "";
   }
   const tags = [];
   if(isRcp(it)) tags.push(RCP_TAG);
@@ -2269,7 +2315,7 @@ function cardHTML(it){
   const pic = `<span class="pw">${framePic(it, f0, picT())}${it.vs.length > 1 ? vcntHTML(it, st) : ""}</span>`;
   const attrs = `data-id="${it.id}"${n > 1 ? ` data-n="${n}"` : ""}`;
   if(ui.view === "list")
-    return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="tx"><span class="nm" style="--ems:${nameEms(it.ko)}">${esc(it.ko)}</span>${priceLine(it)}<span class="meta">${tagsHTML(it)}</span></span></button><div class="side">${heart}${more}</div></div>`;
+    return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="tx"><span class="nm" style="--ems:${nameEms(it.ko)};--wems:${wordEms(it.ko)}">${esc(it.ko)}</span>${priceLine(it)}${(t => `<span class="meta" style="--tems:${tagEms(t)}">${t}</span>`)(tagsHTML(it))}</span></button><div class="side">${heart}${more}</div></div>`;
   return `<div class="${cls}" ${attrs}><button class="tog" type="button" data-act="tog" aria-pressed="${on}" title="${esc(it.en)}">${pic}<span class="nm">${esc(it.ko)}</span><span class="meta">${tagsHTML(it)}</span></button><div class="cbar">${heart}${more}</div></div>`;
 }
 
@@ -2805,8 +2851,8 @@ function openDetail(it, startSel){
 // img/cats.webp: one 96px tile per category (tile i = category i), so the popup doesn't download every category's pictures.
 const catIcon = i => `<span class="pic" style="background-image:url(img/cats.webp?v=2a89c76c);--cols:11;--x:${i % 11};--y:${Math.floor(i / 11)}" aria-hidden="true"></span>`;
 function catBtnHTML(i, label, ico, o, total, done, numText, cls){
-  const pct = total ? o/total*100 : 0;
-  return `<button class="cbtn${cls ? " " + cls : ""}${done?" done":""}" type="button" data-c="${i}" aria-current="${catOn(i)}">${ico}<span class="ct"><span class="cn"><b>${esc(label)}</b></span><span class="num">${done ? `<em class="done-mark">완성</em>` : numText}</span><i><u style="width:${pct}%"></u></i></span></button>`;
+  const pct = total ? o/total*100 : 0, top = typeof cls === "string" && /(^| )top( |$)/.test(cls);
+  return `<button class="cbtn${cls ? " " + cls : ""}${done?" done":""}" type="button" data-c="${i}" aria-current="${catOn(i)}">${top ? `<span class="cti">` : ""}${ico}<span class="ct"><span class="cn"><b>${esc(label)}</b></span><span class="num">${done ? `<em class="done-mark">완성</em>` : numText}</span><i><u style="width:${pct}%"></u></i></span>${top ? "</span>" : ""}</button>`;
 }
 function catBtn(i, cls){
   const all = listFor(i); const o = ownedIn(all);
@@ -3130,7 +3176,7 @@ function openFind(jump){
     let chips = "";
     if(html === cardHTML && list.length){
       const c = {all:list.length, none:0, part:0, done:0}; list.forEach(it => c[ownState(it)]++); c.have = c.part + c.done;
-      const F = T === "museum" ? [["all", "전체", ""], ["none", "미기증", ""], ["have", "기증", "on"]] : [["all", "전체", ""], ["none", "미보유", ""], ["part", "일부 보유", "part"], ["done", "완료", "on"]];
+      const F = T === "museum" ? [["all", "전체", ""], ["none", "미기증", ""], ["have", "기증", "on"]] : [["all", "전체", ""], ["none", "미보유", ""], ["part", `일부<span class="sfo-l"> 보유</span>`, "part"], ["done", "완료", "on"]];
       if(!F.some(f => f[0] === sfo) || !c[sfo]) sfo = "all";
       chips = `<div class="sfo" role="radiogroup" aria-label="보유 상태">${F.map(([v, l, d]) => `<button type="button" role="radio" data-sfo="${v}" aria-checked="${sfo === v}">${d || v === "none" ? `<i class="${d}"></i>` : ""}${l} <b class="num">${fmt(c[v])}</b></button>`).join("")}</div>`;
       if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return sfo === "have" ? st !== "none" : st === sfo; });
@@ -4405,6 +4451,7 @@ const CASH_RE = /(계좌|입금|송금|현금|현거래|현질|(?<![가-힣])토
 const TRADE_MINE = 1;   // mem.trade.cat: -1 = everyone's open posts, 1 = only mine (open and finished)
 const TRADE_T = {want:["구해요"], sell:["팔아요"], free:["나눔"]};
 const PAY_HEAD = {want:"드려요", sell:"받고 싶어요", free:"나눔"};
+const NEGO_TXT = {want:"원하시는 걸로 드려요", sell:"다른 것도 괜찮아요"}, NEGO_FORM = {want:"원하는 걸로 맞춰 드려요", sell:"다른 것도 받을래요"};
 const ITEM_HEAD = {want:"구해요", sell:"팔아요", free:"나눔해요"};
 const SERVICE = {turnip:["무 팔러 가기", "섬에 들어가서 무를 팔아요"], shop:["상점 구경", "섬 가게에 가서 물건을 사요"], catalog:["만지작", "만져 보고 카탈로그에 등록해요"], help:["그 밖의 부탁", "글에 적어 주세요"]};
 const SERVICE_PIC = {turnip:7734, shop:"bag", catalog:"hand", help:"chat"};
@@ -4426,16 +4473,16 @@ function tEntry(x, t, form){   // form: shown while writing (a service then says
 const tradeTitle = p => { const e = tEntry(p.items[0] || {k:"s", id:"help"}, 10); return p.items.length > 1 ? `${e.name} 외 ${p.items.length - 1}개` : e.name; };
 const tradeNames = p => [...p.items.map(x => tEntry(x, 10).name), ...((p.pay && p.pay.swapItems) || []).map(x => tEntry(x, 10).name), ...p.items.filter(x => x.k === "i").map(x => { const it = BY_ID.get(x.id); return it ? it.en : ""; }), p.author.name, islandText(p.author.island), p.body, p.pay.swap];
 const tradeLiked = p => p.items.some(x => x.k === "i" ? like.has(x.id) : x.k === "v" ? vlike.has(x.id) : false);
-function payParts(pay){
+function payParts(pay, type){
   const a = [];
   if(pay.mile) a.push(`<span class="tr-pp">${itemPic(5851, 26)}<span>마일 여행권 <b class="num">${fmt(pay.mile)}</b>장</span></span>`);
   if(pay.bells) a.push(`<span class="tr-pp">${itemPic(7731, 26)}<span><b class="num">${fmt(pay.bells)}</b>벨</span></span>`);
   const si = (pay.swapItems || []).map(x => tEntry(x, 22));
   if(pay.swap || si.length) a.push(`<span class="tr-pp">${ico("refresh")}<span>맞교환: ${si.map(e => `<span class="tr-si">${e.pic}${esc(e.name)}</span>`).join("")}${pay.swap ? esc(pay.swap) : ""}</span></span>`);
-  if(pay.nego) a.push(`<span class="tr-pp">${ico("chat")}<span>다른 제안도 받아요</span></span>`);
+  if(pay.nego) a.push(`<span class="tr-pp">${ico("chat")}<span>${NEGO_TXT[type] || NEGO_TXT.sell}</span></span>`);
   return a.join("");
 }
-const payHTML = p => p.type === "free" ? `<span class="tr-pp">${ico("leaf")}<span>대가 없이 나눠요</span></span>` : payParts(p.pay || {});
+const payHTML = p => p.type === "free" ? `<span class="tr-pp">${ico("leaf")}<span>대가 없이 나눠요</span></span>` : payParts(p.pay || {}, p.type);
 function tlToggle(e){
   const x = e.target.closest && e.target.closest("[data-tlx]"); if(!x) return;
   if(e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
@@ -4457,7 +4504,7 @@ function tradeCardHTML(p){
 const TRADE_ERR = {
   items: "거래할 아이템이나 주민을 하나 이상 고르거나, 목록에 없으면 직접 적어 주세요.",
   no_parent: "답글을 달려던 댓글이 지워졌어요.",
-  pay: "주고받을 것을 하나 이상 넣어 주세요. (마일 여행권, 벨, 맞교환, 다른 제안 중에서)",
+  pay: "주고받을 것을 하나 이상 넣거나 맨 아래 칸을 체크해 주세요.",
   cash: "현금이나 상품권 거래로 보이는 말이 있어서 올릴 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.",
   type: "글 종류를 골라 주세요.", empty: "댓글 내용을 적어 주세요.",
   slow_down: "오늘은 너무 많이 썼어요. 내일 다시 해 주세요.",
@@ -4650,15 +4697,17 @@ function openTrade(id, p0, opt){
   function draw(){
     head();
     const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
-    const meta = `<div class="tr-meta"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span>${p.author.island ? esc(islandText(p.author.island)) + " · " : ""}${ago(p.created)}${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div>`;
-    body.innerHTML = `<div class="tr-card tr-dcard">${meta}
+    const acts = mine() ? `<span class="sh-acts"><button class="tr-a1${p.status === "done" ? " on" : ""}" type="button" id="tr-done">${p.status === "done" ? "거래 중으로" : "거래완료"}</button><button type="button" id="tr-edit">${tLocked(p) ? "고치기 요청" : "고치기"}</button><button class="del" type="button" id="tr-del"${rqWait("del") ? " disabled" : ""}>${tLocked(p) ? (rqWait("del") ? "지우기 요청함" : "지우기 요청") : "지우기"}</button></span>`
+      : me() && me().admin ? `<span class="sh-acts"><span class="adm">관리자</span><button type="button" id="tr-edit" aria-label="관리자로 고치기">고치기</button><button class="del" type="button" id="tr-del" aria-label="관리자로 지우기">지우기</button></span>` : "";
+    const meta = `<div class="tr-meta shm"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span>${p.author.island ? esc(islandText(p.author.island)) + " · " : ""}${ago(p.created)}${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span>${acts}</div>`;
+    body.innerHTML = `<div class="tr-card tr-dcard tr-dtop t-${p.type}">
       <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span></div><div class="res">${p.items.map(row).join("")}</div></section>
       ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
+      </div>
+      <div class="tr-card tr-dcard tr-dwho">${meta}
       ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
       </div>
       ${reqs.length && me() ? reqs.map(r => rqHTML(r, me().admin, false)).join("") : ""}
-      ${mine() ? `<div class="tr-acts"><button class="tr-a1${p.status === "done" ? " on" : ""}" type="button" id="tr-done">${p.status === "done" ? "거래 중으로" : "거래완료"}</button><button type="button" id="tr-edit">${tLocked(p) ? "고치기 요청" : "고치기"}</button><button class="tr-a3" type="button" id="tr-del"${rqWait("del") ? " disabled" : ""}>${tLocked(p) ? (rqWait("del") ? "지우기 요청함" : "지우기 요청") : "지우기"}</button></div>`
-        : me() && me().admin ? `<div class="tr-acts"><button type="button" id="tr-edit">관리자로 고치기</button><button class="tr-a3" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
       <div id="tr-msg"></div>
       <div class="tr-cbox">
       <div class="shd tr-cmh">${ico("chat")}<b id="tr-cn">댓글 ${fmt(p.cmts || 0)}</b></div>
@@ -4755,7 +4804,7 @@ function openTradeForm(p, preset){
       <label class="tr-payrow">${itemPic(7731, 34)}<span class="tr-lb">벨</span><input id="tf-bells" type="number" inputmode="numeric" min="1" max="999999999" placeholder="0" value="${pay.bells || ""}"><span class="tr-u">벨</span></label>
       <label class="tr-payrow tr-swp">${ico("refresh")}<span class="tr-lb">맞교환</span><input id="tf-swap" maxlength="100" placeholder="예) 체리 10개" value="${esc(pay.swap || "")}"></label>
       <div class="tr-swi"><div class="tr-swl" id="tf-swl"></div><button class="pill ghost" type="button" id="tf-swadd">${ico("plus")}맞교환할 아이템 고르기</button></div>
-      <label class="toggle"><input type="checkbox" id="tf-nego"${pay.nego ? " checked" : ""}>다른 제안도 받아요</label>
+      <label class="toggle"><input type="checkbox" id="tf-nego"${pay.nego ? " checked" : ""}><span id="tf-nego-t"></span></label>
     </div>
     <label class="fld"><span><b class="tr-fh">하고 싶은 말</b><i id="tf-cnt">0/500</i></span><textarea id="tf-body" maxlength="500" placeholder="언제 비행장을 여는지, 어떻게 주고받을지 적어 주세요"></textarea></label>
     ${asAdmin ? "" : `<p class="sub">${ask ? "올린 지 12시간이 지나서 관리자가 확인한 뒤에 바뀌어요" : "올린 지 12시간이 지나면 고치기·지우기는 관리자 확인 후 돼요"}</p>`}
@@ -4780,6 +4829,7 @@ function openTradeForm(p, preset){
     sh.el.querySelectorAll("[data-ty]").forEach(b => b.setAttribute("aria-checked", b.dataset.ty === st.type));
     q("#tf-ih").textContent = ITEM_HEAD[st.type];
     q("#tf-ph").textContent = PAY_HEAD[st.type];
+    q("#tf-nego-t").textContent = NEGO_FORM[st.type] || NEGO_FORM.sell;
     q("#tf-pay").hidden = st.type === "free";
   }
   const check = () => { const w = cashWord(q("#tf-body").value, q("#tf-swap").value); q("#tf-msg").innerHTML = w ? `<p class="err">"${esc(w)}" 같은 돈 이야기는 쓸 수 없어요. 게임 속 벨이나 마일 여행권으로 적어 주세요.</p>` : ""; return !w; };
