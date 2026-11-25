@@ -555,24 +555,17 @@ export async function onRequest(ctx){
     if(m === "POST" && path === "leave"){
       const b = await body(req);
       if(!(await checkPw(String(b.pw || ""), u.pw))) return fail("wrong", 401);
-      if(u.role === "admin" && (await db.prepare(`SELECT COUNT(*) AS n FROM users`).first()).n > 1) return fail("admin_last", 409);
-      const gone = (await db.prepare(`SELECT imgs FROM shows WHERE user_id = ?`).bind(u.id).all()).results.flatMap(x => imgKeys(JSON.parse(x.imgs)));
+      if(u.role === "admin" && (await db.prepare(`SELECT COUNT(*) AS n FROM users WHERE login NOT LIKE '~%'`).first()).n > 1) return fail("admin_last", 409);
+      // v48: 글·댓글·자랑·추천은 남기고 사람 정보만 지움
       await db.batch([
         db.prepare(`DELETE FROM sync WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM visits WHERE user_id = ?`).bind(u.id),
         db.prepare(`DELETE FROM push_subs WHERE user_id = ?`).bind(u.id),
-        db.prepare(`DELETE FROM notifs WHERE user_id = ? OR actor = ? OR (on_t = 'trade' AND ref IN (SELECT id FROM posts WHERE user_id = ?)) OR (on_t = 'show' AND ref IN (SELECT id FROM shows WHERE user_id = ?))`).bind(u.id, u.id, u.id, u.id),
-        db.prepare(`UPDATE posts SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM comments c WHERE c.post_id = posts.id AND c.user_id = ?))`).bind(u.id),
-        db.prepare(`DELETE FROM comments WHERE user_id = ? OR post_id IN (SELECT id FROM posts WHERE user_id = ?)`).bind(u.id, u.id),
-        db.prepare(`DELETE FROM posts WHERE user_id = ?`).bind(u.id),
-        db.prepare(`UPDATE shows SET cmts = MAX(0, cmts - (SELECT COUNT(*) FROM show_cmts c WHERE c.show_id = shows.id AND c.user_id = ?)), likes = MAX(0, likes - (SELECT COUNT(*) FROM show_likes l WHERE l.show_id = shows.id AND l.user_id = ?))`).bind(u.id, u.id),
-        db.prepare(`DELETE FROM show_cmts WHERE user_id = ? OR show_id IN (SELECT id FROM shows WHERE user_id = ?)`).bind(u.id, u.id),
-        db.prepare(`DELETE FROM show_likes WHERE user_id = ? OR show_id IN (SELECT id FROM shows WHERE user_id = ?)`).bind(u.id, u.id),
-        db.prepare(`DELETE FROM shows WHERE user_id = ?`).bind(u.id),
+        db.prepare(`DELETE FROM notifs WHERE user_id = ?`).bind(u.id),
+        db.prepare(`UPDATE reqs SET status = 'gone' WHERE user_id = ? AND status = 'wait'`).bind(u.id),
         db.prepare(`DELETE FROM sessions WHERE user_id = ?`).bind(u.id),
-        db.prepare(`DELETE FROM users WHERE id = ?`).bind(u.id),
+        db.prepare(`UPDATE users SET login = ?, pw = '!', name = '탈퇴한 친구', island = '', fruit = '', role = '', must_change = 0, seen = ? WHERE id = ?`).bind("~" + u.id, Date.now(), u.id),
       ]);
-      if(env.IMG && gone.length) for(let i = 0; i < gone.length; i += 500) await env.IMG.delete(gone.slice(i, i + 500));
       return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(url, "", 0) });
     }
 
@@ -742,7 +735,7 @@ export async function onRequest(ctx){
             (SELECT COUNT(*) FROM shows s WHERE s.user_id = u.id) AS ns,
             (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) + (SELECT COUNT(*) FROM show_cmts c WHERE c.user_id = u.id) AS nc,
             (SELECT updated FROM sync y WHERE y.user_id = u.id) AS synced
-          FROM users u ORDER BY u.created`).bind(since).all();
+          FROM users u WHERE u.login NOT LIKE '~%' ORDER BY u.created`).bind(since).all();
         return json({ users: r.results.map(x => ({ ...pub(x), seen: Math.max(x.seen || 0, x.lastv || 0), banned: !!x.banned, d30: x.d30, posts: x.np, shows: x.ns, cmts: x.nc, synced: x.synced || 0 })) });
       }
       if(m === "GET" && (pm = /^admin\/users\/([A-Za-z0-9_-]{6,24})$/.exec(path))){

@@ -5087,7 +5087,7 @@ function openProfile(){
     ${fruitPick(u.fruit)}
     <div id="pf-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="pf-ok">저장하기</button><button class="pill ghost" type="button" id="pf-no">그만두기</button></div>
-    <div class="leave"><h4>계정 지우기</h4><p>계정과 서버에 맞춰 둔 기록이 지워져요. 이 기기의 체크 기록은 그대로 남아요.</p>
+    <div class="leave"><h4>계정 지우기</h4><p>계정과 서버에 맞춰 둔 기록이 지워져요. 쓴 글과 댓글은 '탈퇴한 친구'로 남아요.</p>
       <div class="acts2"><button class="pill danger" type="button" id="pf-del">계정 지우기</button></div><div id="pf-del-box"></div></div>`);
   const q = id => sh.el.querySelector(id), fruit = wireForm(sh), islandVal = islandWire(sh, "pf-island");
   q("#pf-no").addEventListener("click", () => sh.close());
