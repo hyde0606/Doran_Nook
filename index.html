@@ -1749,25 +1749,23 @@ html.lscB .vcnt{transform:scale(.72); transform-origin:100% 100%}
 @media (prefers-reduced-motion:reduce){ #btn-lsc.lsc-hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
 /* 두 칸 보기: 폰은 두 칸, 넓은 화면(PC)은 칸 너비를 220px 안팎으로 두고 칸 수를 늘림 (링크님 2026-11-26 "PC에서 두 칸 보기가 여백이 너무 심해서") */
 @media (min-width:600px){ html.lscB .grid.list{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
-
-/* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-25, 시안 E 선택): 폰(560px 아래)에서
-   아이콘+이름이 한 줄, 아래 줄에 개수와 막대. 300px 아래(한 칸씩 쌓임)는 아이콘·이름·개수 한 줄 + 막대. */
-@media (max-width:560px){
-  .cbtn.top{display:grid; grid-template-columns:auto minmax(0, 1fr); grid-template-rows:auto auto; align-items:center; column-gap:4px; row-gap:7px; padding:9px 7px 10px}
-  .cbtn.top .ct{display:contents}
-  .cbtn.top .pic{--t:18px; border-radius:6px; grid-row:1; grid-column:1}
-  .cbtn.top .pic.ph svg{width:12px; height:12px}
-  .cbtn.top .cn{grid-row:1; grid-column:2; min-width:0}
-  .cbtn.top b{font-size:clamp(12px, 3.6vw, 14.5px); line-height:1.25}
-  .cbtn.top .num{grid-row:2; grid-column:1 / -1; font-size:11.5px}
-  .cbtn.top > .ct > i{grid-row:2; grid-column:1 / -1; align-self:center; margin-left:auto; width:38%; height:4px}
+/* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-26 시안 A): 폰·PC 같은 짜임.
+   첫 줄 작은 아이콘 + 이름, 둘째 줄 개수, 막대는 칸 맨 아래 가장자리. (이전 시안 E는 숫자가 커지면 막대가 개수를 덮었음) */
+.cbtn.top{display:grid; grid-template-columns:auto minmax(0, 1fr); align-items:center; column-gap:5px; row-gap:7px; padding:9px 8px 13px; position:relative; overflow:hidden}
+.cbtn.top .ct{display:contents}
+.cbtn.top .pic{--t:18px; border-radius:6px; grid-row:1; grid-column:1}
+.cbtn.top .pic.ph svg{width:12px; height:12px}
+.cbtn.top .cn{grid-row:1; grid-column:2; min-width:0}
+.cbtn.top b{font-size:clamp(12px, 3.6vw, 15.5px); line-height:1.25}
+.cbtn.top .num{grid-row:2; grid-column:1 / -1; font-size:clamp(10.5px, 3.2vw, 13px); overflow:visible; text-overflow:clip}
+.cbtn.top > .ct > i{position:absolute; left:0; right:0; bottom:0; width:auto; height:4px; margin:0; border-radius:0}
+@media (min-width:561px){
+  .cbtn.top{padding:12px 14px 15px; column-gap:9px}
+  .cbtn.top .pic{--t:28px; border-radius:8px}
+  .cbtn.top .pic.ph svg{width:17px; height:17px}
 }
-@media (max-width:300px){
-  .cbtn.top{grid-template-columns:auto minmax(0, 1fr) auto; padding:8px 10px; row-gap:5px; column-gap:8px}
-  .cbtn.top .pic{--t:22px}
-  .cbtn.top .num{grid-row:1; grid-column:3}
-  .cbtn.top > .ct > i{grid-row:2; grid-column:1 / -1; width:auto; margin-left:0}
-}
+@media (max-width:340px){ .cbtn.top{padding-left:6px; padding-right:6px; column-gap:4px} .cbtn.top b{font-size:11.5px} }
+@media (max-width:300px){ .cbtn.top{padding:9px 12px 13px} .cbtn.top .pic{--t:22px} .cbtn.top b{font-size:14.5px} }
 
 /* v48 자랑 글 목록 카드 (링크님 2026-11-25 시안 D "세로로 너무 길어, 제목이 위에"): 글 상자 없이 사진 위에 겹침.
    위: 분류 표·아이템 수, 그 아래 제목 / 아래: 과일·이름·섬 (왼쪽), 추천·댓글·조회 (오른쪽). 사진 위아래는 어둡게 깔아 글이 보이게. */
@@ -2815,7 +2813,7 @@ function catBtn(i, cls){
   const ico = i >= 0 ? catIcon(i === FAKE_CAT ? 23 : i) : `<span class="pic ph${i===-3?" lkph":""}"><svg><use href="#${i===-1?(ui.tab==="museum"?"i-museum":"i-grid"):i===-2?"i-book":i===-4?"i-box":"i-heart"}"/></svg></span>`;
   const done = all.length && o === all.length && i !== -3;
   const num = i === -3 ? `${fmt(all.length)}개${all.length ? ` · ${fmt(o)}개 체크` : ""}` : `${fmt(o)} / ${fmt(all.length)}`;
-  const topName = typeof cls === "string" && cls.startsWith("top") && ui.tab === "item" ? {"-1":"모든 아이템", "-2":"카탈로그", "-4":"카탈로그 X"}[i] : "";
+  const topName = typeof cls === "string" && cls.startsWith("top") && ui.tab === "item" ? {"-1":"모든 아이템", "-2":"카탈로그", "-4":"카탈로그 X"}[i] : "";
   return catBtnHTML(i, topName || catLabel(i), ico, o, all.length, done, num, cls);
 }
 function vilCatBtn(i, cls){
