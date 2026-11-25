@@ -775,12 +775,42 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .vrib .vrbs{display:flex; gap:8px; flex:0 0 auto; flex-wrap:wrap}
 .vrib .pill{flex:none}
 .vscope{margin-top:-6px}
-.vjump{position:sticky; top:-16px; z-index:3; display:flex; gap:8px; flex-wrap:wrap; margin:-6px calc(-1 * max(18px, env(safe-area-inset-left, 0px))) 0; padding:10px max(18px, env(safe-area-inset-left, 0px)); background:var(--paper); border-bottom:2px dashed var(--paper2)}
-.vjump[hidden]{display:none}
-.vjump button{border:0; background:var(--paper2); color:var(--ink); border-radius:999px; padding:6px 16px; font-family:var(--f-display); font-size:15px}
-.vjump button b{font-weight:400; color:var(--berry)}
-.vjump button[aria-current="true"]{background:var(--leaf); color:var(--leaf-ink)}
-.vjump button[aria-current="true"] b{color:inherit}
+.vtabs{flex:1; min-width:0; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:6px}
+.vtabs button{border:0; background:rgba(255,248,232,.92); color:#5b4126; border-radius:12px; padding:9px 4px; min-height:42px; font-family:var(--f-display); font-size:16px; white-space:nowrap; box-shadow:0 3px 0 rgba(0,0,0,.22)}
+.vtabs button b{font-weight:400; color:#c0482f}
+.vtabs button[aria-selected="true"]{background:var(--leaf); color:var(--leaf-ink)}
+.vtabs button[aria-selected="true"] b{color:inherit}
+.vsec[hidden]{display:none}
+.vhint{margin:0}
+.vfoot{display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center; padding:12px max(18px, env(safe-area-inset-left, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); background:var(--paper); border-top:2px dashed var(--paper2)}
+.vfoot[hidden]{display:none}
+.vfoot .pill{flex:0 0 auto; min-height:46px}
+.vfoot #v-apply{flex:1 1 170px; font-size:16.5px; white-space:normal; line-height:1.25}
+.vfoot #v-apply.ready{box-shadow:0 3px 0 rgba(0,0,0,.18), 0 0 0 3px var(--sun)}
+.vsheet .bd{padding-bottom:16px; padding-top:12px; gap:12px}
+.sheet.vsheet .hd{padding-top:8px; padding-bottom:8px}
+.sheet.vsheet .hd h3{font-size:20px}
+.sheet.vsheet{height:min(90vh, 900px)}
+.vlist{display:grid; gap:8px}
+.vlist button{display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:56px; padding:8px 14px 8px 18px; border:0; border-radius:14px; background:var(--paper2); color:var(--ink); font-family:var(--f-display); font-size:17px; text-align:left}
+.vlist button::after{content:""; flex:none; width:26px; height:26px; border-radius:50%; box-shadow:inset 0 0 0 2px var(--card-line, rgba(0,0,0,.18)); font:16px/26px var(--f-display); text-align:center}
+.vlist button[aria-checked="true"]{background:var(--sprout); box-shadow:inset 0 0 0 2px var(--leaf)}
+.vlist button[aria-checked="true"]::after{content:"✓"; background:var(--leaf); color:var(--leaf-ink); box-shadow:none}
+@media (min-width:900px){
+  /* PC: the window hangs from a fixed top and is only as tall as its page, so the tabs never move and 정렬 is short */
+  .ov.vov{align-items:flex-start; padding-top:6vh}
+  .sheet.vsheet{height:auto; max-height:88vh}
+  .vlist{grid-template-columns:repeat(3, minmax(0,1fr))}
+}
+.vsheet .bd{flex:1 1 auto}
+@media (max-width:300px){ .vtabs{gap:4px} .vtabs button{font-size:14.5px} }
+@media (max-width:300px){ .vsheet .sbox input::placeholder{font-size:13px} }
+.vcats .cgrid .cbtn[aria-current="true"]::after{content:"✓"; position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; background:var(--leaf); color:var(--leaf-ink); font:15px/22px var(--f-display); text-align:center; box-shadow:0 0 0 2px var(--paper)}
+.cbtn.top .cn b{white-space:normal; overflow:visible; word-break:keep-all}
+.cbtn.top.nc{background:var(--nc-bg); box-shadow:inset 0 0 0 2px var(--nc-line)}
+.cbtn.top.nc .pic.ph{background:var(--nc); color:var(--nc-ink)}
+.cbtn.top.nc i u{background:var(--nc)}
+.cbtn.top.nc[aria-current="true"], .cbtn.top.cat[aria-current="true"]{background:var(--sprout); box-shadow:inset 0 0 0 3px var(--leaf)}
 .vwbody{display:grid; gap:18px}
 .vside{display:grid; gap:18px; align-content:start; min-width:0}
 .vsec{display:grid; gap:10px; min-width:0; scroll-margin-top:60px}
@@ -798,12 +828,6 @@ html.srv .tabbar [data-tab="dream"] .tic{background-position:-196px 0}
 .vchit{margin-bottom:6px}
 .tdrow.tflash{animation:tflash 1.8s ease}
 @keyframes tflash{0%,100%{box-shadow:none} 15%,70%{box-shadow:0 0 0 3px var(--sun)}}
-@media (min-width:900px){
-  .sheet.vsheet.vwide{width:min(1040px, calc(100vw - 48px))}
-  .vwide .vwbody{grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr); gap:28px; align-items:start}
-  .vwide .vjump{display:none}
-  .vsheet .vwbody > .vside:only-child{grid-column:1 / -1}
-}
 /* 댓글 and 답글 */
 .cth{display:grid; gap:6px}
 .cmt p{overflow-wrap:anywhere}
@@ -1330,6 +1354,7 @@ body.isl-on .vsb{display:none}
   .vq{font-size:13.5px}
   .sheet .bd{padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px))}
   .sheet .hd{padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px))}
+  .vfoot{padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px))}
 }
 @media (max-width:360px){
   .tabs button{font-size:12.5px; padding:0 3px}
@@ -1589,11 +1614,10 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
   <div class="plank kk" id="kakao" role="region" aria-label="카카오톡 안내" hidden>
     <p>카카오톡 안에서는 화면이 좁게 보여요. <b>브라우저</b>로 열면 넓고 편하게 쓸 수 있어요.</p>
     <div class="kk-btns"><button class="pill sun" type="button" id="kk-open"><svg><use href="#i-out"/></svg>브라우저로 열기</button><button class="pill ghost" type="button" id="kk-copy"><svg><use href="#i-copy"/></svg>주소 복사</button></div>
-    <p class="kk-tip">안 열리면 카카오톡 메뉴(⋮ 또는 공유 버튼)에서 <b>다른 브라우저로 열기</b>를 눌러 주세요. 기록은 브라우저마다 따로 저장되니 옮길 땐 백업 코드를 써 주세요.</p>
     <button class="x" type="button" id="kk-x" aria-label="카카오톡 안내 닫기"><svg><use href="#i-x"/></svg></button>
   </div>
   <div class="plank" id="welcome" hidden>
-    <p>아이템을 누르면 <b>체크</b>돼요. 색이 여러 개면 <b>일부 보유</b>로 표시되고, <b>⋯</b>(자세히)에서 가진 색을 고를 수 있어요. 위쪽 탭으로 미보유, 보유(일부 보유와 완료), 일부 보유, 완료만 모아 볼 수 있어요. 기록은 이 기기에 저장돼요.</p>
+    <p>누르면 <b>체크</b>, <b>⋯</b>에서 색 고르기</p>
     <button class="x" type="button" id="welcome-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button>
   </div>
   <div class="vrib" id="vrib" role="status" hidden></div>
@@ -1675,16 +1699,29 @@ const CAT_IS_CATALOG = BY_CAT.map(list => list.some(it => it.st <= 2));
 const ORDER = new Map(ITEMS.map((it,i) => [it.id, i]));
 const TAB_ITEMS = {item: ITEMS.filter(it => tabOfCat(it.lc) === "item"),
   museum: MUSEUM_CATS.flatMap(c => BY_CAT[c])};
-// Special views: -1 = everything in this tab, -2 = every catalog category, -3 = "좋아요" list
+// Special views: -1 = everything in this tab, -2 = every catalog item, -3 = old "좋아요" list, -4 = every item the catalog
+// doesn't register, -5 = several categories at once (ui.cats)
 const ALL_CATALOG = TAB_ITEMS.item.filter(it => it.st <= 2);   // items the in-game catalog registers (same count as the "카탈로그" stat)
+const ALL_NC = TAB_ITEMS.item.filter(it => it.st > 2);         // the rest: 카탈로그 + 카탈로그 아님 = 모든 아이템
+let MULTI = {k: "", L: []};
 function listFor(c){
   if(c === -1) return TAB_ITEMS[ui.tab] || TAB_ITEMS.item;
   if(c === -2) return ALL_CATALOG;
+  if(c === -4) return ALL_NC;
+  if(c === -5){ const k = ui.cats.join("."); if(MULTI.k !== k) MULTI = {k, L: ui.cats.flatMap(i => BY_CAT[i] || []).sort((a,b) => ORDER.get(a.id) - ORDER.get(b.id))}; return MULTI.L; }
   if(c === -3) return [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && tabOfCat(it.lc) === ui.tab).sort((a,b) => ORDER.get(a.id) - ORDER.get(b.id));
   return BY_CAT[c];
 }
-function catLabel(c){ return c === -1 ? (ui.tab === "museum" ? "박물관 전체" : "모든 아이템") : c === -2 ? "카탈로그" : c === -3 ? "좋아요" : CATS[c][0]; }
-function catIsCatalog(c){ return c === -2 ? true : c < 0 ? null : CAT_IS_CATALOG[c]; }
+function catLabel(c){ return c === -1 ? (ui.tab === "museum" ? "박물관 전체" : "모든 아이템") : c === -2 ? "카탈로그" : c === -3 ? "좋아요" : c === -4 ? "카탈로그 아님" : c === -5 ? multiLabel(i => CATS[i][0]) : CATS[c][0]; }
+function catIsCatalog(c){
+  if(c === -5){ const k = new Set(ui.cats.map(i => CAT_IS_CATALOG[i])); return k.size === 1 ? [...k][0] : null; }
+  return c === -2 ? true : c === -4 ? false : c < 0 ? null : CAT_IS_CATALOG[c];
+}
+const multiLabel = name => ui.cats.length ? `${name(ui.cats[0])} 외 ${ui.cats.length - 1}개` : "";
+// a card is picked when it is the view, or one of several picked categories
+const catOn = i => ui.cat === i || (ui.cat === -5 && i >= 0 && ui.cats.includes(i));
+// several picks become -5, one pick is that category, none is the whole tab
+function setCats(L){ L = [...new Set(L)].sort((a, b) => a - b); if(!L.length){ ui.cat = -1; ui.cats = []; } else if(L.length === 1){ ui.cat = L[0]; ui.cats = []; } else { ui.cat = -5; ui.cats = L; } }
 // Creature months: D.cm = {id: [north mask, south mask]}, bit 0 = January.
 const CM = D.cm || {};
 const NOW_M = new Date().getMonth();
@@ -1807,12 +1844,12 @@ if(window.DN_SERVER) document.documentElement.classList.add("srv");   // own ser
 const SRV = !!window.DN_SERVER;
 if(SRV) document.querySelector(".tl-dream").textContent = "자랑";
 /* ---------- View state (kept per device) ---------- */
-const ui = { tab:"item", cat:0, fo:"all", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1, liked:false, view:"list", sort:"base", limit:0,
+const ui = { tab:"item", cat:0, cats:[], fo:"all", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1, liked:false, view:"list", sort:"base", limit:0,
   mmon:"all", msort:"base", vpers:-1, vgen:-1, vbm:false, vsort:"name", q:"" };
 // Each bottom tab remembers its own category, status tab and 좋아요 switch.
 const TABS = ["item", "museum", "villager", "dream", "trade", "todo", "island"];
 const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:SRV ? "all" : "new"}, trade:{cat:-1, fo:"all"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
-const mem = {}; TABS.forEach(t => mem[t] = {...TAB_DEF[t], liked:false});
+const mem = {}; TABS.forEach(t => mem[t] = {...TAB_DEF[t], liked:false, cats:[]});
 const SORTS = {base:"기본 순서", name:"이름 순", buyD:"구매가 높은 순", buyA:"구매가 낮은 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
 const MSORTS = {base:"기본 순서", name:"이름 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
 const VSORTS = {name:"이름 순", bday:"생일 순", species:"종족 순"};
@@ -1829,12 +1866,18 @@ const TAB_FO = {
 const FO_LABEL = {all:"전체", done:"완료", none:"미보유", part:"일부 보유", have:"보유"};
 const UIKEY = KEY + ":view";
 try{ const v = JSON.parse(localStorage.getItem(UIKEY) || "null"); if(v){
-  if(v.mem) TABS.forEach(t => { const m = v.mem[t]; if(m){ if(Number.isInteger(m.cat)) mem[t].cat = m.cat; if(TAB_FO[t].some(f => f[0] === m.fo)) mem[t].fo = m.fo; mem[t].liked = !!m.liked; } });
+  if(v.mem) TABS.forEach(t => { const m = v.mem[t]; if(m){ if(Number.isInteger(m.cat)) mem[t].cat = m.cat; if(TAB_FO[t].some(f => f[0] === m.fo)) mem[t].fo = m.fo; mem[t].liked = !!m.liked; if(Array.isArray(m.cats)) mem[t].cats = m.cats.filter(Number.isInteger); } });
   else { if(Number.isInteger(v.cat)) mem.item.cat = v.cat; const fo = {no:"none", yes:"done", nopart:"all"}[v.fo] || v.fo; if(FO_LABEL[fo]) mem.item.fo = fo; mem.item.liked = !!v.liked; }
   // a category saved before the museum split moves to its tab
   if(mem.item.cat >= 0 && tabOfCat(mem.item.cat) === "museum"){ mem.museum.cat = mem.item.cat; mem.item.cat = 0; }
-  if(!(mem.item.cat >= -3 && mem.item.cat < CATS.length)) mem.item.cat = 0;
-  if(!(mem.museum.cat === -1 || mem.museum.cat === -3 || MUSEUM_CATS.includes(mem.museum.cat))) mem.museum.cat = -1;
+  if(!(mem.item.cat >= -5 && mem.item.cat < CATS.length)) mem.item.cat = 0;
+  if(!(mem.museum.cat === -1 || mem.museum.cat === -3 || mem.museum.cat === -5 || MUSEUM_CATS.includes(mem.museum.cat))) mem.museum.cat = -1;
+  // v48: several picked categories (-5) keep only the ones that belong to the tab
+  const okCat = {item: i => i >= 0 && i < CATS.length && tabOfCat(i) === "item", museum: i => MUSEUM_CATS.includes(i), villager: i => i >= 0 && i < (D.vsp || []).length};
+  TABS.forEach(t => { const m = mem[t], ok = okCat[t];
+    m.cats = ok && m.cat === -5 ? [...new Set(m.cats.filter(ok))].sort((a, b) => a - b) : [];
+    if(m.cat === -5){ if(m.cats.length === 1){ m.cat = m.cats[0]; m.cats = []; } else if(m.cats.length < 2){ m.cat = -1; m.cats = []; } }
+  });
   if(TABS.includes(v.tab) && (v.tab !== "trade" || window.DN_SERVER)) ui.tab = v.tab;
   // only the three "what to show" switches survive a reload; 3.0 신규, DIY, 리폼, 얻는 법, every sort and the museum and villager filters start fresh
   ui.buyable=!!v.buyable; ui.showNS=v.showNS!==false; ui.showNC=v.showNC!==false;
@@ -1843,8 +1886,8 @@ try{ const v = JSON.parse(localStorage.getItem(UIKEY) || "null"); if(v){
   // v45: like every other sort and 내 글만, the 자랑 order and both 내 글만 start fresh
   mem.dream.cat = TAB_DEF.dream.cat; mem.trade.cat = TAB_DEF.trade.cat;
 } }catch(e){}
-Object.assign(ui, {cat:mem[ui.tab].cat, fo:mem[ui.tab].fo, liked:mem[ui.tab].liked});
-function saveView(){ mem[ui.tab] = {cat:ui.cat, fo:ui.fo, liked:ui.liked}; try{ localStorage.setItem(UIKEY, JSON.stringify({tab:ui.tab, mem, buyable:ui.buyable, showNS:ui.showNS, showNC:ui.showNC, new3:ui.new3, diy:ui.diy, remake:ui.remake, src:ui.src, sort:ui.sort, mmon:ui.mmon, msort:ui.msort, vpers:ui.vpers, vgen:ui.vgen, vbm:ui.vbm, vsort:ui.vsort})); }catch(e){} }
+Object.assign(ui, {cat:mem[ui.tab].cat, cats:mem[ui.tab].cats.slice(), fo:mem[ui.tab].fo, liked:mem[ui.tab].liked});
+function saveView(){ mem[ui.tab] = {cat:ui.cat, fo:ui.fo, liked:ui.liked, cats:ui.cat === -5 ? ui.cats.slice() : []}; try{ localStorage.setItem(UIKEY, JSON.stringify({tab:ui.tab, mem, buyable:ui.buyable, showNS:ui.showNS, showNC:ui.showNC, new3:ui.new3, diy:ui.diy, remake:ui.remake, src:ui.src, sort:ui.sort, mmon:ui.mmon, msort:ui.msort, vpers:ui.vpers, vgen:ui.vgen, vbm:ui.vbm, vsort:ui.vsort})); }catch(e){} }
 const PAGE = 360;
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -2193,13 +2236,13 @@ function openSheet(html, onClose, opt){
   ov.addEventListener("input", e => { if(e.target.matches && e.target.matches(TYPED)) typed = true; });
   ov.addEventListener("change", e => { if(e.target.type === "file" && e.target.files && e.target.files.length) kept = true; });
   ov._keep = () => { kept = true; };
-  const unsaved = () => kept || (typed && [...ov.querySelectorAll(TYPED)].some(f => f.value.trim()));
+  const unsaved = () => kept || !!(ov._dirty && ov._dirty()) || (typed && [...ov.querySelectorAll(TYPED)].some(f => f.value.trim()));
   ov.addEventListener("click", e => {
     if(e.target === ov){
       const ok = downOv; downOv = false;
       if(!ok || Date.now() - born < 600) return;
       if(unsaved()){
-        toast("적던 내용이 있어서 닫지 않았어요. 닫으려면 오른쪽 위 X를 눌러 주세요");
+        toast(ov._keepMsg || "적던 내용이 있어서 닫지 않았어요. 닫으려면 오른쪽 위 X를 눌러 주세요");
         const x = ov.querySelector(".hd .x"); if(x && !REDUCED){ x.classList.remove("nudge"); void x.offsetWidth; x.classList.add("nudge"); }
         return;
       }
@@ -2224,7 +2267,7 @@ document.addEventListener("keydown", e => { if(e.key !== "Escape") return; const
 const BK = (() => {
   let armed = false, restoring = false, warned = false; const more = [];
   const NAV = {v: null, i: 0, limit: 0};
-  const snapV = () => ({t: ui.tab, c: ui.cat, f: ui.tab === "island" ? "" : ui.fo});
+  const snapV = () => ({t: ui.tab, c: ui.cat === -5 ? "m" + ui.cats.join(".") : ui.cat, f: ui.tab === "island" ? "" : ui.fo});
   const sameV = (a, b) => !!a && !!b && a.t === b.t && a.c === b.c && a.f === b.f;
   const entry = (extra) => Object.assign({dn: 1, v: NAV.v, i: NAV.i, y: 0, limit: 0}, extra);
   const arm = () => { if(armed || !NAV.v) return; try{ history.pushState(entry({spare: 1, y: $("page").scrollTop, limit: ui.limit}), ""); armed = true; }catch(e){} };
@@ -2251,7 +2294,8 @@ const BK = (() => {
     try{
       saveView();
       if(t !== ui.tab){ ui.tab = t; Object.assign(ui, {fo: mem[t].fo, liked: mem[t].liked}); if(t === "dream") dreamLock(); }
-      ui.cat = Number.isInteger(v.c) ? v.c : mem[t].cat;
+      if(typeof v.c === "string" && v.c[0] === "m") setCats(v.c.slice(1).split(".").map(Number).filter(Number.isInteger));
+      else { ui.cat = Number.isInteger(v.c) ? v.c : mem[t].cat; ui.cats = ui.cat === -5 ? (mem[t].cats || []).slice() : []; if(ui.cat === -5 && ui.cats.length < 2) setCats(ui.cats); }
       if(t !== "island" && TAB_FO[t].some(f => f[0] === v.f)) ui.fo = v.f;
       ui.limit = st.limit || 0;
       saveView(); renderTotals(); render();
@@ -2333,7 +2377,7 @@ function acqHTML(it, info){
   if(!lines.length && CR_HOW[it.cat]) lines.push(`<li>${CR_HOW[it.cat]}</li>`);
   if(info.cs) lines.push(`<li>${esc(info.cs)}</li>`);
   if(cd) lines.push(`<li>고를 수 있는 기간: ${esc(cd[0])} ~ ${esc(cd[1])} (북반구 기준)</li>`);
-  if(!lines.length && !note) return `<div class="acq"><div class="shd">${ico("pin")}<b>얻는 법</b></div><p class="acq-note">얻는 방법 자료를 아직 찾지 못했어요.</p></div>`;
+  if(!lines.length && !note) return `<div class="acq"><div class="shd">${ico("pin")}<b>얻는 법</b></div><p class="acq-note">—</p></div>`;
   return `<div class="acq"><div class="shd">${ico("pin")}<b>얻는 법</b></div>${lines.length ? `<ul>${lines.join("")}</ul>` : ""}${note ? `<p class="acq-note">${esc(note)}</p>` : ""}</div>`;
 }
 function seasonHTML(cr){
@@ -2395,7 +2439,7 @@ function openDetail(it, startSel){
         ${n ? `<div class="dcap num" id="d-cap"></div>` : ""}
       </div>
       ${n ? `<div class="vgrid" id="d-strip">${it.vs.map((v,i) => `<div class="vc"><button class="vt" type="button" data-own="${i}" aria-label="${esc(v)} 체크" title="${esc(v)}">${nf > 1 ? framePic(it, i, 48) : `<span class="vn">${esc(v)}</span>`}</button><button class="vh" type="button" data-like="${i}" aria-label="${esc(v)} 좋아요"><svg><use href="#i-heart"/></svg></button></div>`).join("")}</div>
-      <p class="sub hint">${own.has(it.id) && !(vmask.get(it.id)) ? "목록에서 체크해서 일부 보유로 표시돼 있어요. 가진 색을 눌러 주세요. " : ""}색 그림을 누르면 그 색이 체크돼요. 하트는 그 색의 좋아요예요.</p>` : ""}
+      ${own.has(it.id) && !(vmask.get(it.id)) ? `<p class="sub hint">가진 색을 눌러 주세요</p>` : ""}` : ""}
       <div class="prices"><div class="pr">${ico("bag")}<div><span>구매가</span><b>${b ? bells(b) : "살 수 없어요"}</b></div></div><div class="pr">${ico("coin")}<div><span>판매가</span><b>${it.sell ? bells(it.sell) : "팔 수 없어요"}</b></div></div></div>
       ${artBox(it)}
       ${quick.length ? `<div class="qgrid">${quick.map(tile).join("")}</div>` : ""}
@@ -2444,11 +2488,11 @@ function openDetail(it, startSel){
 const catIcon = i => `<span class="pic" style="background-image:url(img/cats.webp?v=2a89c76c);--cols:11;--x:${i % 11};--y:${Math.floor(i / 11)}" aria-hidden="true"></span>`;
 function catBtnHTML(i, label, ico, o, total, done, numText, cls){
   const pct = total ? o/total*100 : 0;
-  return `<button class="cbtn${cls ? " " + cls : ""}${done?" done":""}" type="button" data-c="${i}" aria-current="${ui.cat===i}">${ico}<span class="ct"><span class="cn"><b>${esc(label)}</b></span><span class="num">${done ? `<em class="done-mark">완성</em>` : numText}</span><i><u style="width:${pct}%"></u></i></span></button>`;
+  return `<button class="cbtn${cls ? " " + cls : ""}${done?" done":""}" type="button" data-c="${i}" aria-current="${catOn(i)}">${ico}<span class="ct"><span class="cn"><b>${esc(label)}</b></span><span class="num">${done ? `<em class="done-mark">완성</em>` : numText}</span><i><u style="width:${pct}%"></u></i></span></button>`;
 }
 function catBtn(i, cls){
   const all = listFor(i); const o = ownedIn(all);
-  const ico = i >= 0 ? catIcon(i === FAKE_CAT ? 23 : i) : `<span class="pic ph${i===-3?" lkph":""}"><svg><use href="#${i===-1?(ui.tab==="museum"?"i-museum":"i-grid"):i===-2?"i-book":"i-heart"}"/></svg></span>`;
+  const ico = i >= 0 ? catIcon(i === FAKE_CAT ? 23 : i) : `<span class="pic ph${i===-3?" lkph":""}"><svg><use href="#${i===-1?(ui.tab==="museum"?"i-museum":"i-grid"):i===-2?"i-book":i===-4?"i-box":"i-heart"}"/></svg></span>`;
   const done = all.length && o === all.length && i !== -3;
   const num = i === -3 ? `${fmt(all.length)}개${all.length ? ` · ${fmt(o)}개 체크` : ""}` : `${fmt(o)} / ${fmt(all.length)}`;
   return catBtnHTML(i, catLabel(i), ico, o, all.length, done, num, cls);
@@ -2468,15 +2512,15 @@ function catsHTML(){
   if(ui.tab === "museum"){
     const grp = (label, cs) => `<div class="grp">${label}</div><div class="cgrid">${cs.map(catBtn).join("")}</div>`;
     return `<div class="ctop" style="--n:1">${catBtn(-1, "top")}</div>
-      <section class="kind"><h4>박물관</h4><p>박물관에 기증할 수 있는 것들이에요. 체크하면 기증한 걸로 쳐요. 가짜 미술품은 기증할 수 없어서 아이템 탭의 '가짜 미술품'에 따로 모여 있어요.</p>${grp("도감", [28, 29, 30])}${grp("화석과 미술품", [22, 23])}</section>`;
+      <section class="kind"><h4>박물관</h4>${grp("도감", [28, 29, 30])}${grp("화석과 미술품", [22, 23])}</section>`;
   }
   const groups = (isCat, labels) => {
     const order = []; CATS.forEach((c,i) => { if(CAT_IS_CATALOG[i]===isCat && tabOfCat(i)==="item"){ const g=c[1]; let e=order.find(x=>x.g===g); if(!e){ e={g, list:[]}; order.push(e); } e.list.push(i); } });
     return order.map(e => `<div class="grp">${labels[e.g] || e.g}</div><div class="cgrid">${e.list.map(catBtn).join("")}</div>`).join("");
   };
-  return `<div class="ctop" style="--n:2">${catBtn(-1, "top")}${catBtn(-2, "top cat")}</div>
-    <section class="kind cat"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-book"/></svg></span>카탈로그 <span class="k">다시 주문 가능</span></h4><p>너굴 쇼핑 카탈로그에 등록되는 종류예요. 비매품도 여기 들어 있어요.</p>${groups(true, GROUP_LABEL)}</section>
-    <section class="kind nc"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-box"/></svg></span>카탈로그 아님 <span class="k">주문 불가</span></h4><p>카탈로그에는 없지만 모아 두는 것들이에요.</p>${groups(false, NC_GROUP_LABEL)}</section>`;
+  return `<div class="ctop" style="--n:3">${catBtn(-1, "top")}${catBtn(-2, "top cat")}${catBtn(-4, "top nc")}</div>
+    <section class="kind cat"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-book"/></svg></span>카탈로그 <span class="k">다시 주문 가능</span></h4>${groups(true, GROUP_LABEL)}</section>
+    <section class="kind nc"><h4><span class="kic" aria-hidden="true"><svg><use href="#i-box"/></svg></span>카탈로그 아님 <span class="k">주문 불가</span></h4>${groups(false, NC_GROUP_LABEL)}</section>`;
 }
 
 /* ---------- v45: 보기 창 = 검색 + 분류 + 필터 + 정렬 ----------
@@ -2506,7 +2550,7 @@ function viewSpec(T){
     liked("좋아요만", "♡를 누른 것만 보여요. 위쪽 하트 버튼과 같아요.");
     rd("mmon", "이번 달", `${NOW_M + 1}월 기준이에요. 화석과 미술품은 이 필터를 켜면 빠져요.`, Object.entries(MMON), () => ui.mmon, v => { ui.mmon = v; });
     sort = {d:"가격이 없는 것은 맨 뒤로 가요.", opts:Object.entries(MSORTS), get:() => ui.msort, set:v => { ui.msort = v; }};
-    setting = {k:"hemi", t:"반구", d:"섬이 있는 반구에 따라 생물이 나오는 달이 달라요. 필터가 아니라 내 섬 설정이라 원래대로를 눌러도 그대로예요.", opts:[["n", "북반구"], ["s", "남반구"]], get:() => HEMI, set:v => { HEMI = v; try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} }};
+    setting = {k:"hemi", t:"반구", d:"섬이 있는 반구에 따라 생물이 나오는 달이 달라요. 필터가 아니라 내 섬 설정이라 초기화를 눌러도 그대로예요.", opts:[["n", "북반구"], ["s", "남반구"]], get:() => HEMI, set:v => { HEMI = v; }};
   } else if(T === "villager"){
     liked("좋아하는 주민만", "♡를 누른 주민만 보여요. 위쪽 하트 버튼과 같아요.");
     rd("vpers", "성격", "", [["-1", "전부"], ...PERS_KO.map((p, i) => [String(i), p])], () => ui.vpers, v => { ui.vpers = +v; });
@@ -2555,6 +2599,13 @@ function viewReset(T){
   else if(T === "dream") ui.cat = 0;
   else if(T === "trade") ui.cat = -1;
 }
+// how many the current choices show: "1,234개" / "56명", or "" while posts are still loading
+function viewNum(T){
+  if(T === "villager") return `${fmt(vilList().filter(v => passVil(v) && vilIn(v, ui.fo)).length)}명`;
+  if(T === "dream") return SH.ready ? `${fmt((ui.liked ? SH.list.filter(x => SH.liked(x.id)) : SH.list).length)}개` : "";
+  if(T === "trade") return TS.ready ? `${fmt(tradeShown().length)}개` : "";
+  return `${fmt(listFor(ui.cat).filter(matchesFilters).length)}개`;
+}
 // how many are on screen with the current choices
 function viewCount(T){
   if(T === "villager") return `${fmt(vilList().filter(v => passVil(v) && vilIn(v, ui.fo)).length)}명이 보여요`;
@@ -2564,18 +2615,18 @@ function viewCount(T){
 }
 const PIN = `<span class="vpin">${ico("pin")}다시 열어도 남아요</span>`;
 function viewRowsHTML(V){
-  const row = r => r.kind === "note" ? `<p class="sub vnote2">${r.t}</p>`
-    : r.kind === "sw" ? `<div class="opt" data-row="${r.k}"><div class="tx"><b>${r.t}</b><span>${r.d}</span>${r.pin ? PIN : ""}</div><button class="sw" type="button" role="switch" data-vk="${r.k}" aria-label="${r.t}"></button></div>`
-    : r.kind === "src" ? `<div class="opt" data-row="src"><div class="tx"><b>${r.t}</b><span>${r.d}</span></div><button class="pill ghost sm vsrc" type="button" id="v-src">${ico("search")}<span></span></button></div>`
-    : `<div class="opt vstack" data-row="${r.k}"><div class="tx"><b>${r.t}</b>${r.d ? `<span>${r.d}</span>` : ""}${r.pin ? PIN : ""}</div><div class="radios" role="radiogroup" aria-label="${r.t}" data-vg="${r.k}">${r.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+  const row = r => r.kind === "note" ? ""
+    : r.kind === "sw" ? `<div class="opt" data-row="${r.k}"><div class="tx"><b>${r.t}</b>${r.pin ? PIN : ""}</div><button class="sw" type="button" role="switch" data-vk="${r.k}" aria-label="${r.t}"></button></div>`
+    : r.kind === "src" ? `<div class="opt" data-row="src"><div class="tx"><b>${r.t}</b></div><button class="pill ghost sm vsrc" type="button" id="v-src">${ico("search")}<span></span></button></div>`
+    : `<div class="opt vstack" data-row="${r.k}"><div class="tx"><b>${r.t}</b>${r.pin ? PIN : ""}</div><div class="radios" role="radiogroup" aria-label="${r.t}" data-vg="${r.k}">${r.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
   return V.filt.map(row).join("");
 }
 function viewSortHTML(V){
-  return `<p class="sub">${V.sort.d}</p><div class="radios" role="radiogroup" aria-label="정렬" data-vg="_sort">${V.sort.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div>`;
+  return `<div class="vlist" role="radiogroup" aria-label="정렬" data-vg="_sort">${V.sort.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div>`;
 }
 function viewSettingHTML(V){
   const x = V.setting;
-  return `<div class="opt vstack"><div class="tx"><b>${x.t}</b><span>${x.d}</span>${PIN}</div><div class="radios" role="radiogroup" aria-label="${x.t}" data-vg="_set">${x.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+  return `<div class="opt vstack"><div class="tx"><b>${x.t}</b>${PIN}</div><div class="radios" role="radiogroup" aria-label="${x.t}" data-vg="_set">${x.opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}">${l}</button>`).join("")}</div></div>`;
 }
 // The box pill, the ribbon over the list, and the right-hand button that only stays where it does something else.
 function viewDecor(){
@@ -2587,7 +2638,7 @@ function viewDecor(){
   const c = $("pick-cnt"); c.querySelectorAll(".vf").forEach(x => x.remove());
   if(A.f.length) c.insertAdjacentHTML("beforeend", `<span class="vf">필터 ${A.f.length}</span>`);
   if(A.s) c.insertAdjacentHTML("beforeend", `<span class="vf vso">정렬</span>`);
-  if(!A.f.length && !A.s){ rib.hidden = true; rib.innerHTML = ""; return; }
+  rib.hidden = true; rib.innerHTML = ""; return;   // v48: no ribbon over the list; the box's 필터 n·정렬 pills say it
   const words = [...A.f.map(esc), ...(A.s ? [`정렬: ${esc(A.s)}`] : [])].join(" · ");
   rib.innerHTML = `<div class="vrt"><b>${A.f.length ? `필터 ${A.f.length}개가 걸려 있어요` : "정렬을 바꿨어요"}</b><span>${words}</span></div><div class="vrbs"><button class="pill sm ghost" type="button" data-vr="edit">${ico("sliders")}바꾸기</button><button class="pill sm ghost" type="button" data-vr="reset">${ico("refresh")}원래대로</button></div>`;
   rib.hidden = false;
@@ -2602,7 +2653,7 @@ function openSrcPick(done){
   const cnt = SOURCES.map(() => 0); ITEMS.forEach(it => it.src.forEach(i => cnt[i]++));
   const ord = SOURCES.map((t, i) => i).filter(i => cnt[i]).sort((a, b) => cnt[b] - cnt[a]);
   sheetOver = true;
-  const s = openSheet(`<div class="hd"><div><h3>얻는 법 고르기</h3><p class="sub">얻는 곳이나 방법으로 아이템을 걸러요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>얻는 법 고르기</h3></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="src-q" placeholder="얻는 법 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="res" id="src-res"></div>`);
   const inp = s.el.querySelector("#src-q"), out = s.el.querySelector("#src-res");
@@ -2617,13 +2668,12 @@ function openSrcPick(done){
 }
 // 할 일 찾기: the big box on the 할 일 tab (the four lists are already the tabs under it)
 function openTodoFind(){
-  const s = openSheet(`<div class="hd"><div><h3>할 일 찾기</h3><p class="sub">매일·매주 할 일에서 찾아요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>할 일 찾기</h3></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="할 일 이름 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
-    <p class="sub" id="tdf-hint">ㅅㅁ처럼 초성만 넣어도 돼요. 시즌과 무트코인은 위쪽 탭에서 골라요.</p>
     <div class="res" id="s-res"></div>`);
   const inp = s.el.querySelector("#s-q"), out = s.el.querySelector("#s-res"), hint = s.el.querySelector("#tdf-hint");
   const paint = () => {
-    const q = inp.value.trim(); hint.hidden = !!q;
+    const q = inp.value.trim();
     if(!q){ out.innerHTML = ""; return; }
     const m = KS.matcher(q), hits = [];
     [["d", "day", "매일 할 일"], ["w", "week", "매주 할 일"]].forEach(([t, fo, lab]) => tdShown(t).forEach(x => {
@@ -2631,7 +2681,7 @@ function openTodoFind(){
       if(best >= 0) hits.push([best, t, fo, lab, x]);
     }));
     hits.sort((a, b) => a[0] - b[0]);
-    out.innerHTML = hits.length ? `<p class="sub">누르면 그 할 일로 가요.</p>` + hits.map(([, t, fo, lab, x]) => { const on = tdDone(t, x.id); return `<button class="srow" type="button" data-tfo="${fo}" data-tid="${esc(x.id)}" aria-pressed="${on}">${x.ic ? tIco(x.ic, 42) : `<span class="pic ph" style="--t:42px"><svg style="width:20px;height:20px"><use href="#i-todo"/></svg></span>`}<span class="tx"><b>${esc(x.n)}</b><span>${lab} · ${on ? "했어요" : "아직 안 했어요"}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`; }).join("")
+    out.innerHTML = hits.length ? hits.map(([, t, fo, lab, x]) => { const on = tdDone(t, x.id); return `<button class="srow" type="button" data-tfo="${fo}" data-tid="${esc(x.id)}" aria-pressed="${on}">${x.ic ? tIco(x.ic, 42) : `<span class="pic ph" style="--t:42px"><svg style="width:20px;height:20px"><use href="#i-todo"/></svg></span>`}<span class="tx"><b>${esc(x.n)}</b><span>${lab} · ${on ? "했어요" : "아직 안 했어요"}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`; }).join("")
       : `<p class="sub">"${esc(q)}"에 맞는 할 일이 없어요.</p>`;
   };
   let t = 0; inp.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 120); });
@@ -2642,81 +2692,121 @@ function openTodoFind(){
     if(row){ row.scrollIntoView({block:"center", behavior: REDUCED ? "auto" : "smooth"}); row.classList.add("tflash"); setTimeout(() => row.classList.remove("tflash"), 1800); }
   });
 }
-// One sheet for everything: type to search this tab, or leave the box empty and pick a category, filters and order.
+/* v48: 보기 창 = 검색 + [분류][필터][정렬] 화면. 고른 것은 아래 "적용"을 눌러야 목록에 반영되고,
+   X·뒤로 가기·Esc로 닫으면 연 때 그대로 돌아가요. 분류는 여러 개를 함께 고를 수 있어요. */
+const VKEYS = ["cat", "cats", "liked", "sort", "buyable", "showNS", "showNC", "new3", "diy", "remake", "src", "mmon", "msort", "vpers", "vgen", "vbm", "vsort"];
 function openFind(jump){
   const T = ui.tab;
   const what = T === "villager" ? "주민 이름" : T === "dream" ? (SRV ? "제목, 이름, 섬 이름, 아이템" : "제목, 섬 이름, 대표 이름") : T === "trade" ? "아이템, 주민, 이름, 섬 이름" : T === "museum" ? "생물, 화석, 미술품 이름" : "아이템 이름";
   const sub = T === "villager" ? "종족을 고르거나 이름으로 찾아요. 영어·일본어 이름도 돼요" : T === "dream" ? (SRV ? "자랑 글을 찾아요" : "꿈번지를 찾아요") : T === "trade" ? "거래 글을 찾아요" : "카테고리를 고르거나 이름으로 찾아요";
   const V = viewOn(T) ? viewSpec(T) : null;
+  // what the window opened with: closing without 적용 puts it back
+  const take = () => { const o = {hemi: HEMI}; VKEYS.forEach(k => o[k] = Array.isArray(ui[k]) ? ui[k].slice() : ui[k]); return o; };
+  const snap = take(), sig = JSON.stringify(snap);
+  const dirty = () => !!V && JSON.stringify(take()) !== sig;
+  const restore = () => { VKEYS.forEach(k => ui[k] = Array.isArray(snap[k]) ? snap[k].slice() : snap[k]); HEMI = snap.hemi; };
+  let applied = false, s, first = "";
+  const done = () => {
+    if(!V || applied){ renderTotals(); render(); if(applied) $("page").scrollTo({top:0}); return; }
+    const was = dirty(); restore(); renderTotals(); render();
+    if(was) toast("바꾼 것은 적용하지 않았어요");
+  };
   if(!V){   // 꿈번지 without the server: search only, as before
-    var s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
+    s = openSheet(`<div class="hd"><div><h3>찾기</h3><p class="sub">${sub}</p></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="bd-in" id="f-cats"><p class="sub">찾을 말을 넣어 주세요. ㅂㄲ처럼 초성만 넣어도 돼요.</p></div>
-    <div class="res" id="s-res" hidden></div>`, () => { renderTotals(); render(); });
+    <div class="res" id="s-res" hidden></div>`, done);
   } else {
     const scope = T === "villager" ? "모든 주민에서 찾아요. 영어·일본어 이름도 돼요." : T === "museum" ? "박물관 전체에서 찾아요. 분류 이름도 찾아져요." : T === "item" ? "모든 아이템에서 찾아요. 분류 이름도 찾아져요." : `모든 ${T === "dream" ? "자랑" : "거래"} 글에서 찾아요. ${T === "trade" ? "ㅊㄹ" : "ㅂㄲ"}처럼 초성만 넣어도 돼요.`;
-    const secs = [V.cat && ["cat", "분류"], V.filt.length && ["filt", "필터"], V.sort && ["sort", "정렬"]].filter(Boolean);
-    const pinNote = T === "museum" ? "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지 필터와 정렬은 처음으로 돌아가요. 고른 분류도 그대로 남아요." : V.cat ? "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지 필터와 정렬은 처음으로 돌아가요. 고른 분류도 그대로 남아요." : "핀이 붙은 것만 사이트를 다시 열어도 남고, 나머지는 처음으로 돌아가요.";
-    var s = openSheet(`<div class="hd"><div><h3>보기</h3><p class="sub" id="v-cnt"></p></div>${XBTN}</div>
-    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${what} (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
-    <p class="sub vscope" id="v-scope">${scope}</p>
-    ${secs.length > 1 ? `<div class="vjump" role="group" aria-label="구역으로 가기">${secs.map(([k, l]) => `<button type="button" data-jump="${k}">${l}<b class="num"></b></button>`).join("")}</div>` : ""}
-    <div class="bd-in vwbody" id="f-cats">
-      ${V.cat ? `<section class="vsec vcat" id="vs-cat"><h4 class="vwh">분류</h4><div class="vcats">${catsHTML()}</div></section>` : ""}
-      <div class="vside">
-        ${V.filt.length ? `<section class="vsec" id="vs-filt"><h4 class="vwh">필터</h4>${viewRowsHTML(V)}</section>` : ""}
-        ${V.sort ? `<section class="vsec" id="vs-sort"><h4 class="vwh">정렬</h4>${viewSortHTML(V)}</section>` : ""}
-        ${V.setting ? `<section class="vsec" id="vs-set"><h4 class="vwh">내 섬 설정</h4>${viewSettingHTML(V)}</section>` : ""}
-        <div class="vreset"><button class="pill ghost" type="button" id="f-reset">${ico("refresh")}${V.sort ? "필터와 정렬 원래대로" : "필터 원래대로"}</button><p class="sub">${V.cat ? "분류와 체크한 기록은 그대로 두고 필터와 정렬만 되돌려요." : V.sort ? "글은 그대로 두고 필터와 정렬만 되돌려요." : "글은 그대로 두고 필터만 되돌려요."}</p><p class="sub">${pinNote}</p></div>
-      </div>
+    const ph = T === "item" ? "아이템·분류 이름 (초성도 돼요)" : T === "museum" ? "생물·화석·미술품·분류 이름" : T === "villager" ? "주민·종족 이름 (초성도 돼요)" : `${what} (초성도 돼요)`;
+    const pages = [V.cat && ["cat", "분류"], V.filt.length && ["filt", "필터"], V.sort && ["sort", "정렬"]].filter(Boolean);
+    first = pages.some(p => p[0] === jump) ? jump : pages[0][0];
+    // v48: no second line under the title and no scope line: the list keeps the room (the count is on the 적용 button)
+    const tabsHTML = `<div class="vtabs" role="tablist" aria-label="보기 화면">${pages.map(([k, l]) => `<button type="button" role="tab" data-pg="${k}" aria-selected="${k === first}">${l}<b class="num"></b></button>`).join("")}</div>`;
+    s = openSheet(`<div class="hd">${pages.length > 1 ? tabsHTML : `<div><h3>보기</h3></div>`}${XBTN}</div>
+    <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="s-q" placeholder="${ph}" aria-label="${scope}" autocomplete="off" enterkeyhint="search"></label>
+    <div class="vwbody" id="f-cats">
+      ${V.cat ? `<section class="vsec" data-page="cat" role="tabpanel" aria-label="분류"><div class="vcats">${catsHTML()}</div></section>` : ""}
+      ${V.filt.length ? `<section class="vsec" data-page="filt" role="tabpanel" aria-label="필터"><div>${viewRowsHTML(V)}</div>${V.setting ? `<h4 class="vwh">내 섬 설정</h4>${viewSettingHTML(V)}` : ""}</section>` : ""}
+      ${V.sort ? `<section class="vsec" data-page="sort" role="tabpanel" aria-label="정렬">${viewSortHTML(V)}</section>` : ""}
     </div>
-    <div class="res" id="s-res" hidden></div>`, () => { renderTotals(); render(); });
-    s.el.classList.add("vsheet"); if(V.cat) s.el.classList.add("vwide");
+    <div class="res" id="s-res" hidden></div>`, done);
+    s.el.classList.add("vsheet"); s.ov.classList.add("vov");
+    s.el.insertAdjacentHTML("beforeend", `<div class="vfoot"><button class="pill ghost" type="button" id="v-reset">${ico("refresh")}<span></span></button><button class="pill leaf" type="button" id="v-apply"></button></div>`);
+    s.ov._dirty = dirty;
+    s.ov._keepMsg = "고른 것을 아직 적용하지 않았어요. 아래 적용을 누르거나, 그냥 닫으려면 오른쪽 위 X를 눌러 주세요";
+    const drop = s.ov._drop; s.ov._drop = () => { if(!applied) restore(); drop(); };   // another window took its place
   }
   const inp = s.el.querySelector("#s-q"), out = s.el.querySelector("#s-res"), cats = s.el.querySelector("#f-cats");
-  const jumpBar = s.el.querySelector(".vjump"), scopeP = s.el.querySelector("#v-scope"), bd = s.el.querySelector(".bd");
-  // keep every switch, radio, count and the 분류 highlight in step with ui
+  const tabs = s.el.querySelector(".vtabs"), scopeP = s.el.querySelector("#v-scope"), bd = s.el.querySelector(".bd"), foot = s.el.querySelector(".vfoot");
+  const PNAME = {cat: "분류", filt: "필터", sort: "정렬"};
+  let page = first;
+  const showPage = k => {
+    page = k;
+    s.el.querySelectorAll("[data-page]").forEach(x => { x.hidden = x.dataset.page !== k; });
+    if(tabs) tabs.querySelectorAll("[data-pg]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.pg === k)));
+    s.el.querySelector("#v-reset span").textContent = PNAME[k] + " 초기화";
+    if(bd) bd.scrollTop = 0;
+  };
+  // the 초기화 button clears only the page you are on
+  const resetPage = () => {
+    if(page === "cat"){ ui.cat = -1; ui.cats = []; }
+    else if(page === "filt"){
+      ui.liked = false;
+      if(T === "item") Object.assign(ui, {buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1});
+      else if(T === "museum") ui.mmon = "all";
+      else if(T === "villager") Object.assign(ui, {vpers:-1, vgen:-1, vbm:false});
+      else if(T === "dream") ui.cat = shCat() % 10;
+      else if(T === "trade") ui.cat = -1;
+    } else {
+      if(T === "item") ui.sort = "base"; else if(T === "museum") ui.msort = "base"; else if(T === "villager") ui.vsort = "name"; else if(T === "dream") ui.cat = shCat() >= 10 ? 10 : 0;
+    }
+    toast(`${PNAME[page]}${page === "cat" ? "를" : "을"} 처음으로 돌렸어요. 적용을 눌러야 목록이 바뀌어요`);
+  };
+  const josa = n => /명$/.test(n) ? "이" : "가";
+  const vcount = () => {
+    const n = viewNum(T), ch = dirty();
+    const vc = s.el.querySelector("#v-cnt"); if(vc) vc.textContent = ch ? (n ? `적용하면 ${n}${josa(n)} 보여요` : "고른 뒤 아래 적용을 눌러 주세요") : (n ? `지금 ${n}${josa(n)} 보여요` : "글을 불러오는 중이에요");
+    const ap = s.el.querySelector("#v-apply"); ap.textContent = n ? `적용 · ${n} 보기` : "적용"; ap.classList.toggle("ready", ch);
+  };
+  // keep every switch, radio, count and the 분류 picks in step with ui (the list behind waits for 적용)
   const vsync = () => {
     if(!V) return;
-    const one = r => r.get();
     V.filt.forEach(r => {
-      if(r.kind === "sw"){ const b = s.el.querySelector(`[data-vk="${r.k}"]`), dis = !!(r.dis && r.dis()); b.setAttribute("aria-checked", !!one(r)); b.disabled = dis; b.closest(".opt").classList.toggle("off", dis); }
-      else if(r.kind === "radio") s.el.querySelectorAll(`[data-vg="${r.k}"] button`).forEach(b => b.setAttribute("aria-checked", String(one(r)) === b.dataset.v));
+      if(r.kind === "sw"){ const b = s.el.querySelector(`[data-vk="${r.k}"]`), dis = !!(r.dis && r.dis()); b.setAttribute("aria-checked", !!r.get()); b.disabled = dis; b.closest(".opt").classList.toggle("off", dis); }
+      else if(r.kind === "radio") s.el.querySelectorAll(`[data-vg="${r.k}"] button`).forEach(b => b.setAttribute("aria-checked", String(r.get()) === b.dataset.v));
       else if(r.kind === "src"){ const b = s.el.querySelector("#v-src span"); b.textContent = SRC_NAME(ui.src); }
     });
     if(V.sort) s.el.querySelectorAll('[data-vg="_sort"] button').forEach(b => b.setAttribute("aria-checked", String(V.sort.get()) === b.dataset.v));
     if(V.setting) s.el.querySelectorAll('[data-vg="_set"] button').forEach(b => b.setAttribute("aria-checked", String(V.setting.get()) === b.dataset.v));
-    s.el.querySelectorAll(".vcats .cbtn").forEach(b => b.setAttribute("aria-current", String(+b.dataset.c === ui.cat)));
+    s.el.querySelectorAll(".cbtn[data-c]").forEach(b => b.setAttribute("aria-current", String(catOn(+b.dataset.c))));
     const A = viewActive(T);
-    if(jumpBar){ const fb = jumpBar.querySelector('[data-jump="filt"] b'); if(fb) fb.textContent = A.f.length ? " " + A.f.length : ""; const sb = jumpBar.querySelector('[data-jump="sort"] b'); if(sb) sb.textContent = A.s ? " 1" : ""; }
-    s.el.querySelector("#v-cnt").textContent = viewCount(T) + " · 바꾸면 바로 적용돼요";
+    if(tabs){
+      const put = (k, t) => { const b = tabs.querySelector(`[data-pg="${k}"] b`); if(b) b.textContent = t; };
+      put("cat", ui.cat === -5 ? " " + ui.cats.length : ""); put("filt", A.f.length ? " " + A.f.length : ""); put("sort", A.s ? " 1" : "");
+    }
+    vcount();
   };
-  const vapply = () => { ui.limit = 0; saveView(); renderTotals(); render(); vsync(); };
-  const vjump = k => { const sec = s.el.querySelector("#vs-" + k); if(!sec || !bd) return; const off = jumpBar && getComputedStyle(jumpBar).display !== "none" ? jumpBar.offsetHeight + 8 : 8; bd.scrollTo({top: Math.max(0, sec.offsetTop - bd.offsetTop - off), behavior: REDUCED ? "auto" : "smooth"}); };
-  const vspy = () => { if(!jumpBar || !bd) return; let cur = null; jumpBar.querySelectorAll("[data-jump]").forEach(b => { const sec = s.el.querySelector("#vs-" + b.dataset.jump); if(sec && sec.offsetTop - bd.offsetTop - bd.scrollTop <= jumpBar.offsetHeight + 40) cur = b.dataset.jump; }); if(!cur) cur = jumpBar.querySelector("[data-jump]").dataset.jump; if(bd.scrollTop + bd.clientHeight >= bd.scrollHeight - 4) cur = jumpBar.querySelector("[data-jump]:last-child").dataset.jump; jumpBar.querySelectorAll("[data-jump]").forEach(b => b.setAttribute("aria-current", String(b.dataset.jump === cur))); };
+  const apply = () => { applied = true; ui.limit = 0; if(HEMI !== snap.hemi){ try{ localStorage.setItem(KEY + ":hemi", HEMI); }catch(e){} } saveView(); s.close(); };
   if(V){
-    vsync(); if(bd) bd.addEventListener("scroll", vspy, {passive:true}); vspy();
+    showPage(page); vsync();
     s.ov._reveal = () => { vsync(); if(inp.value.trim()) paint(); };
-    if(jump) requestAnimationFrame(() => vjump(jump));
     // the list behind changes when 자랑·거래 글 arrive: keep the count right
-    const tick = setInterval(() => { if(!s.ov.isConnected) return clearInterval(tick); if(!inp.value.trim()) s.el.querySelector("#v-cnt").textContent = viewCount(T) + " · 바꾸면 바로 적용돼요"; }, 1500);
+    const tick = setInterval(() => { if(!s.ov.isConnected) return clearInterval(tick); vcount(); }, 1500);
   }
   const LIM = 80;
-  const row = it => { const on = own.has(it.id); return `<button class="srow" type="button" data-id="${it.id}" aria-pressed="${on}">${picHTML(it)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])} · ${T === "museum" ? "박물관" : CAT_IS_CATALOG[it.lc] ? "카탈로그" : "카탈로그 아님"}${T === "museum" ? "" : it.st===1?" · 비매품":it.st===2?" · 시즌":it.st===3?" · 카탈로그 외":""}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`; };
-  const vrow = v => `<button class="srow" type="button" data-v="${v.f}" aria-pressed="${hasPhoto(v)}">${vilPic(v, 42)}<span class="tx"><b>${esc(v.ko)}</b><span>${esc(vSub(v))} · ${bdText(v)}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`;
-  const drow = x => `<button class="srow" type="button" data-dream="${esc(x.id)}">${x.thumb ? `<img src="${esc(x.thumb)}" alt="" style="width:64px;height:36px;object-fit:cover;border-radius:8px;flex:none">` : `<span class="pic ph" style="--t:42px"><svg style="width:20px;height:20px"><use href="#i-moon"/></svg></span>`}<span class="tx"><b>${esc(x.title || islandText(x.island))}</b><span>${esc([islandText(x.island), x.owner, x.code].filter(Boolean).join(" · "))}</span></span></button>`;
   const searchIn = (L, names, q) => { const m = KS.matcher(q), hits = []; L.forEach(x => { let best = -1; names(x).forEach(n => { if(!n) return; const r = m(KS.norm(n), "", {}); if(r >= 0 && (best < 0 || r < best)) best = r; }); if(best >= 0) hits.push([best, x]); }); return hits.sort((a, b) => a[0] - b[0]).map(h => h[1]); };
   let t = 0, sfo = "all";
   const paint = () => {
     const q = inp.value.trim();
-    cats.hidden = !!q; out.hidden = !q; if(jumpBar) jumpBar.hidden = !!q; if(scopeP) scopeP.hidden = false;
+    cats.hidden = !!q; out.hidden = !q; if(tabs) tabs.querySelectorAll("[data-pg]").forEach(b => b.setAttribute("aria-selected", String(!q && b.dataset.pg === page))); if(foot) foot.hidden = !!q; if(scopeP) scopeP.hidden = false;
     if(!q){ out.innerHTML = ""; return; }
     let list, html, wrap, hint;
-    if(T === "villager"){ list = searchIn(VIL, v => [v.ko, v.en, v.ja], q); html = vilCardHTML; wrap = "grid list vgrid"; hint = "누르면 사진 받은 걸로 체크돼요. ⋯를 누르면 자세히 보여요."; }
+    if(T === "villager"){ list = searchIn(VIL, v => [v.ko, v.en, v.ja], q); html = vilCardHTML; wrap = "grid list vgrid"; hint = ""; }
     else if(T === "dream" && SRV){ list = searchIn(SH.list, showNames, q); html = x => showCardHTML(x); wrap = "dgrid"; hint = "누르면 자세히 보여요."; }
     else if(T === "dream"){ list = searchIn(DS.list, x => [x.title, x.island, x.owner, x.text], q); html = x => dreamCardHTML(x); wrap = "dgrid"; hint = "누르면 자세히 보여요."; }
     else if(T === "trade"){ list = searchIn(tradeAll(), tradeNames, q); html = x => tradeCardHTML(x); wrap = "tgrid"; hint = "누르면 자세히 보여요."; }
-    else { list = searchList(q); html = cardHTML; wrap = "grid list"; hint = (T === "museum" ? "누르면 기증한 걸로 체크돼요." : "누르면 바로 체크돼요.") + " ⋯를 누르면 자세히 보여요."; }
+    else { list = searchList(q); html = cardHTML; wrap = "grid list"; hint = ""; }
     let chips = "";
     if(html === cardHTML && list.length){
       const c = {all:list.length, none:0, part:0, done:0}; list.forEach(it => c[ownState(it)]++); c.have = c.part + c.done;
@@ -2726,9 +2816,9 @@ function openFind(jump){
       if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return sfo === "have" ? st !== "none" : st === sfo; });
     }
     let catHits = "";
-    if(T === "item" || T === "museum"){ const cs = T === "museum" ? MUSEUM_CATS : CATS.map((c, i) => i).filter(i => tabOfCat(i) === "item"); const h = searchIn(cs, i => [CATS[i][0]], q).slice(0, 6); if(h.length) catHits = `<p class="sub">분류로 가기</p><div class="cgrid vchit">${h.map(i => catBtn(i)).join("")}</div>`; }
-    else if(T === "villager"){ const h = searchIn(VSP.map((n, i) => i), i => [VSP[i]], q).slice(0, 6); if(h.length) catHits = `<p class="sub">종족으로 가기</p><div class="cgrid vchit">${h.map(i => vilCatBtn(i)).join("")}</div>`; }
-    out.innerHTML = catHits + (list.length ? `<p class="sub">${hint}</p>${chips}<div class="${wrap} sgrid">${list.slice(0, LIM).map(x => html(x)).join("")}</div>` + (list.length > LIM ? `<p class="sub">${fmt(list.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : catHits ? "" : `<p class="sub">"${esc(q)}"에 맞는 것이 없어요.</p>`);
+    if(T === "item" || T === "museum"){ const cs = T === "museum" ? MUSEUM_CATS : CATS.map((c, i) => i).filter(i => tabOfCat(i) === "item"); const h = searchIn(cs, i => [CATS[i][0]], q).slice(0, 6); if(h.length) catHits = `<div class="cgrid vchit">${h.map(i => catBtn(i)).join("")}</div>`; }
+    else if(T === "villager"){ const h = searchIn(VSP.map((n, i) => i), i => [VSP[i]], q).slice(0, 6); if(h.length) catHits = `<div class="cgrid vchit">${h.map(i => vilCatBtn(i)).join("")}</div>`; }
+    out.innerHTML = catHits + (list.length ? `${hint ? `<p class="sub">${hint}</p>` : ""}${chips}<div class="${wrap} sgrid">${list.slice(0, LIM).map(x => html(x)).join("")}</div>` + (list.length > LIM ? `<p class="sub">${LIM}개까지 보여요</p>` : "") : catHits ? "" : `<p class="sub">"${esc(q)}"에 맞는 것이 없어요.</p>`);
   };
   inp.addEventListener("input", () => { clearTimeout(t); t = setTimeout(paint, 140); });
   if(!V) s.ov._reveal = () => { if(inp.value.trim()) paint(); };   // back from a detail opened here: show its new check state
@@ -2755,24 +2845,26 @@ function openFind(jump){
       else if(a === "v"){ const i = +ab.dataset.i; const m = (vmask.get(id) || 0) ^ (1 << i); if(m){ vmask.set(id, m); own.add(id); } else vmask.delete(id); save(); }
       redo(card, cardHTML(it)); return;
     }
-    if(V){
-      const j = e.target.closest("[data-jump]"); if(j) return vjump(j.dataset.jump);
-      const w = e.target.closest("[data-vk]"); if(w){ const r = V.filt.find(x => x.k === w.dataset.vk); if(r && !w.disabled){ r.set(!r.get()); vapply(); } return; }
-      const rb = e.target.closest("[data-vg] button"); if(rb){ const g = rb.closest("[data-vg]").dataset.vg, v = rb.dataset.v;
-        if(g === "_sort") V.sort.set(v); else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
-        vapply(); return; }
-      if(e.target.closest("#v-src")) return openSrcPick(vapply);
-      if(e.target.closest("#f-reset")){ viewReset(T); vapply(); toast("필터와 정렬을 원래대로 돌렸어요"); return; }
-    }
-    const b = e.target.closest(".cbtn"); if(!b) return;
-    ui.cat = +b.dataset.c; ui.limit = 0; saveView();
-    if(V && viewWide() && !b.closest("#s-res")){ renderTotals(); render(); vsync(); return; }   // a wide screen keeps the window open
-    s.close(); render(); $("page").scrollTo({top:0});
+    if(!V) return;
+    const pg = e.target.closest("[data-pg]"); if(pg){ if(inp.value){ inp.value = ""; paint(); } return showPage(pg.dataset.pg); }
+    const w = e.target.closest("[data-vk]"); if(w){ const r = V.filt.find(x => x.k === w.dataset.vk); if(r && !w.disabled){ r.set(!r.get()); vsync(); } return; }
+    const rb = e.target.closest("[data-vg] button"); if(rb){ const g = rb.closest("[data-vg]").dataset.vg, v = rb.dataset.v;
+      if(g === "_sort") V.sort.set(v); else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
+      vsync(); return; }
+    if(e.target.closest("#v-src")) return openSrcPick(vsync);
+    if(e.target.closest("#v-reset")){ resetPage(); vsync(); return; }
+    if(e.target.closest("#v-apply")) return apply();
+    const b = e.target.closest(".cbtn[data-c]"); if(!b) return;
+    const c = +b.dataset.c;
+    if(b.closest("#s-res")){ setCats([c]); return apply(); }   // a category found by search: go there now
+    if(c < 0){ ui.cat = c; ui.cats = []; }                          // 모든 아이템·카탈로그·카탈로그 아님: the whole list, on its own
+    else { const L = ui.cat === -5 ? ui.cats.slice() : ui.cat >= 0 ? [ui.cat] : []; const k = L.indexOf(c); if(k >= 0) L.splice(k, 1); else L.push(c); setCats(L); }
+    vsync();
   });
 }
-$("btn-pick").addEventListener("click", () => ui.tab === "island" ? openIslandMenu() : ui.tab === "todo" ? openTodoFind() : openFind());
+$("btn-pick").addEventListener("click", e => { const vf = e.target.closest(".vf"); ui.tab === "island" ? openIslandMenu() : ui.tab === "todo" ? openTodoFind() : openFind(vf ? (vf.classList.contains("vso") ? "sort" : "filt") : undefined); });
 // Leaf logo = home: first category, 전체 tab, 좋아요만 off, back to the top. Filters, sort and view stay as chosen.
-$("btn-home").addEventListener("click", () => { saveView(); ui.tab = "item"; ui.cat = 0; ui.fo = "all"; ui.liked = false; ui.limit = 0; saveView(); renderTotals(); render(); $("page").scrollTo({top:0, behavior: REDUCED ? "auto" : "smooth"}); });
+$("btn-home").addEventListener("click", () => { saveView(); ui.tab = "item"; ui.cat = 0; ui.cats = []; ui.fo = "all"; ui.liked = false; ui.limit = 0; saveView(); renderTotals(); render(); $("page").scrollTo({top:0, behavior: REDUCED ? "auto" : "smooth"}); });
 
 /* ---------- Filter popup ---------- */
 let SRC_OPTS = null;
@@ -2868,7 +2960,7 @@ function switchTab(t){
   if(!TABS.includes(t) || (t === "trade" && !window.DN_SERVER)) return;
   if(t === ui.tab){ $("page").scrollTo({top:0, behavior: REDUCED ? "auto" : "smooth"}); return; }
   saveView();
-  ui.tab = t; Object.assign(ui, {cat:mem[t].cat, fo:mem[t].fo, liked:mem[t].liked, limit:0});
+  ui.tab = t; Object.assign(ui, {cat:mem[t].cat, cats:(mem[t].cats || []).slice(), fo:mem[t].fo, liked:mem[t].liked, limit:0});
   if(t === "dream") dreamLock();
   saveView(); renderTotals(); render(); $("page").scrollTo({top:0});
 }
@@ -2885,8 +2977,8 @@ const vSub = v => `${VSP[v.sp] || ""} · ${PERS_KO[v.pe] || ""}`;
 // 종족 as plain text, 성격 as a pill in its own colour, so the two never read as one phrase
 const spIco = (sp, cls) => `<i class="vsi${cls ? " " + cls : ""}" style="--sx:${sp % 7};--sy:${Math.floor(sp / 7)}" aria-hidden="true"></i>`;
 const vSubHTML = v => `<span class="vsp">${spIco(v.sp)}${esc(VSP[v.sp] || "")}</span><span class="vpe p${v.pe}">${esc(PERS_KO[v.pe] || "")}</span>`;
-function vilList(){ return ui.cat === -3 ? VIL.filter(v => vlike.has(v.f)) : ui.cat >= 0 && VBY_SP[ui.cat] ? VBY_SP[ui.cat] : VIL; }
-function vilLabel(c){ return c === -3 ? "좋아하는 주민" : c >= 0 && VSP[c] ? VSP[c] : "주민 전체"; }
+function vilList(){ return ui.cat === -3 ? VIL.filter(v => vlike.has(v.f)) : ui.cat === -5 ? VIL.filter(v => ui.cats.includes(v.sp)) : ui.cat >= 0 && VBY_SP[ui.cat] ? VBY_SP[ui.cat] : VIL; }
+function vilLabel(c){ return c === -3 ? "좋아하는 주민" : c === -5 ? multiLabel(i => VSP[i] || "") : c >= 0 && VSP[c] ? VSP[c] : "주민 전체"; }
 function vilFiltersActive(){ return (ui.vpers >= 0 ? 1 : 0) + (ui.vgen >= 0 ? 1 : 0) + (ui.vbm ? 1 : 0); }
 function passVil(v){
   if(ui.liked && !vlike.has(v.f)) return false;
@@ -2970,11 +3062,9 @@ function openVillager(v){
         ${tile(ico("bag"), "옷 스타일", `<span class="vcols">${stys}</span>`)}
       </div>
       ${v.sy ? `<div class="quote"><div class="shd">${ico("chat")}<b>좌우명</b></div><p>${esc(v.sy)}</p></div>` : ""}
-      ${gifts.length ? `<div class="acq"><div class="shd">${tIco("wrap", 28)}<b>어울리는 선물</b></div><p class="sub">좋아하는 스타일과 색이 맞는 옷이에요. 같은 옷도 색이 다르면 덜 좋아할 수 있어요.</p>
+      ${gifts.length ? `<div class="acq"><div class="shd">${tIco("wrap", 28)}<b>어울리는 선물</b></div>
         <div class="ggrid">${gifts.map(([it, n]) => `<button type="button" data-open-item="${it.id}" data-var="${n}" class="${own.has(it.id) ? "on" : ""}">${framePic(it, n, 56)}<b>${esc(it.ko)}</b><span>${esc(it.vs[n] || "")}</span></button>`).join("")}</div></div>` : ""}
-      <div class="acq"><div class="shd">${ico("house")}<b>집</b></div>${v.hh
-        ? `<div class="vhouse"><span class="vhimg" role="img" aria-label="${esc(v.ko)}의 집" style="background-image:url(img/vh-${hk}.webp);--x:${hl % 2};--y:${hl >> 1}"></span></div>`
-        : `<p class="sub">이 주민의 집 겉모습 그림은 아직 구하지 못했어요.</p>`}</div>
+      ${v.hh ? `<div class="acq"><div class="shd">${ico("house")}<b>집</b></div><div class="vhouse"><span class="vhimg" role="img" aria-label="${esc(v.ko)}의 집" style="background-image:url(img/vh-${hk}.webp);--x:${hl % 2};--y:${hl >> 1}"></span></div></div>` : ""}
       ${inside.length || furn.length ? `<div class="acq"><div class="shd">${ico("sofa")}<b>집 안</b><span class="sub" style="margin-left:auto">누르면 자세히 보여요</span></div>
         ${inside.length ? `<div class="qgrid">${inside.map(([k, it]) => `<button type="button" class="qf qb${own.has(it.id) ? " on" : ""}" data-open-item="${it.id}">${framePic(it, 0, 44)}<div><span>${k}</span><b>${esc(it.ko)}</b></div></button>`).join("")}</div>` : ""}
         ${furn.length ? `<div class="fgrid">${furn.map(it => `<button type="button" data-open-item="${it.id}" class="${own.has(it.id) ? "on" : ""}" title="${esc(it.ko)}">${framePic(it, 0, 52)}<span>${esc(it.ko)}</span></button>`).join("")}</div>` : ""}</div>` : ""}
@@ -3162,7 +3252,7 @@ function openDream(id){
   function drawPane(){
     const el = body.querySelector("#dd-pane");
     if(pane === "info"){
-      el.innerHTML = `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code || "")}</b><span>꿈에서 이 번호를 넣으면 놀러 갈 수 있어요</span></span><button class="cp" type="button" data-copy="${esc(x.code || "")}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>
+      el.innerHTML = `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code || "")}</b></span><button class="cp" type="button" data-copy="${esc(x.code || "")}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>
         ${x.text ? `<div class="shd">${ico("chat")}<b>섬 소개</b></div><div class="dtext">${esc(x.text)}</div>` : ""}
         <p class="sub">${x.at ? `${dateText(x.at)}에 올렸어요` : ""}${x.up && x.at && x.up - x.at > 60000 ? ` · ${dateText(x.up)}에 고쳤어요` : ""}</p>`;
       return;
@@ -3235,7 +3325,7 @@ function openDreamForm(x){
   const v0 = x || {title:"", island:"", owner:"", code:"", text:""};
   const s = openSheet(`<div class="hd"><div><h3>${edit ? "꿈번지 고치기" : "꿈번지 등록"}</h3><p class="sub">${can ? (edit ? "고치면 바로 바뀌어요" : "올리면 바로 목록에 보여요") : "아래 미리보기로 어떻게 보일지 확인할 수 있어요"}</p></div>${XBTN}</div>
     ${can ? "" : `<p class="note">지금은 이 사이트를 만든 사람만 바로 올릴 수 있어요. 내용을 채운 뒤 "내용 복사하기"를 눌러, 이 사이트를 알려 준 사람에게 보내 주세요.</p>`}
-    <div class="fld"><span>섬 사진</span><label class="imgpick" id="f-pick"><input type="file" accept="image/*" id="f-file" hidden><span class="ip" id="f-ph">${ico("image")}<span>눌러서 사진 고르기<br><small>게임 스크린샷이 잘 어울려요</small></span></span></label></div>
+    <div class="fld"><span>섬 사진</span><label class="imgpick" id="f-pick"><input type="file" accept="image/*" id="f-file" hidden><span class="ip" id="f-ph">${ico("image")}<span>눌러서 사진 고르기</span></span></label></div>
     <label class="fld"><span>제목 <em>*</em><i id="n-title">0/40</i></span><input id="f-title" maxlength="40" placeholder="예) 벚꽃 가득한 봄 섬" value="${esc(v0.title || "")}"></label>
     <label class="fld"><span>섬 이름 <em>*</em></span><input id="f-island" maxlength="20" placeholder="예) 너굴" value="${esc(v0.island || "")}"></label>
     <label class="fld"><span>꿈번지 <em>*</em></span><input id="f-code" class="code num" inputmode="numeric" autocomplete="off" placeholder="DA-0000-0000-0000" value="${esc(v0.code || "")}"><span class="bad" id="b-code" hidden></span></label>
@@ -3479,7 +3569,7 @@ function seasonHTML(){
     <div class="qgrid">
       <button class="qf qb" type="button" data-mmon="new"${isNow ? "" : " disabled"}>${tIco("bug", 40)}<div><span>이번 달 새로 나와요</span><b><span class="num">${nw.length}</span>종</b><span>미기증 <span class="num">${left(nw)}</span></span></div></button>
       <button class="qf qb" type="button" data-mmon="last"${isNow ? "" : " disabled"}>${tIco("fish", 40)}<div><span>이번 달이 마지막이에요</span><b><span class="num">${ls.length}</span>종</b><span>미기증 <span class="num">${left(ls)}</span></span></div></button>
-    </div>${isNow ? `<p class="sub">누르면 박물관에서 그 생물만 모아 봐요.</p>` : ""}</div>`;
+    </div></div>`;
   // residents' birthdays this month
   const bd = VIL.filter(v => res.has(v.f) && Math.floor(v.bd / 100) === M + 1).sort((a, b) => a.bd - b.bd);
   const bday = `<div class="tcard"><div class="shd">${tIco("cake", 26)}<b>${M + 1}월 생일인 우리 섬 주민</b></div>${!res.size ? `<p class="sub">주민 탭에서 우리 섬 주민을 표시하면 생일을 알려 드려요.</p>`
@@ -3492,8 +3582,7 @@ function seasonHTML(){
     ${sec("cr", `${ico("leaf")}<b>재료 시즌</b>`, "다 모았으면 눌러 두세요")}
     ${crit}
     ${sec("zod", `${tIco("star", 26)}<b>별자리 조각</b>`, "주웠으면 눌러 두세요")}
-    ${bday}
-    <p class="sub tfoot">날짜는 게임 속 규칙으로 계산했어요. 행사 시간은 섬의 시계 기준이에요.</p>`;
+    ${bday}`;
 }
 function renderTodoHead(){
   const sub = {day:"매일", week:"매주", season:"시즌", turnip:"무트코인"}[ui.fo] || "매일";
@@ -3507,13 +3596,13 @@ function renderTodoHead(){
 function openTodoPick(){
   const [dn, da] = tdProgress("d"), [wn, wa] = tdProgress("w"), w = tkWeeks[thisWeek()];
   const rows = [["day", "turnip", "매일 할 일", `오늘 ${dn}/${da}`], ["week", "npc:tkkA", "매주 할 일", `이번 주 ${wn}/${wa}`], ["season", "maple", "시즌", `${gameNow().getMonth() + 1}월의 행사와 재료`], ["turnip", "npc:boc", "무트코인", w && w.buy ? `이번 주 산 값 ${w.buy}벨` : "무 가격 예측"]];
-  const s = openSheet(`<div class="hd"><div><h3>할 일</h3><p class="sub">보고 싶은 목록을 골라요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>할 일</h3></div>${XBTN}</div>
     <div class="res">${rows.map(([fo, ic, n, sub]) => `<button class="srow" type="button" data-fo="${fo}" aria-pressed="${ui.fo === fo}">${tIco(ic, 42)}<span class="tx"><b>${n}</b><span class="num">${sub}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`).join("")}</div>`);
   s.el.addEventListener("click", e => { const b = e.target.closest("[data-fo]"); if(!b) return; ui.fo = b.dataset.fo; saveView(); s.close(); render(); $("page").scrollTo({top:0}); });
 }
 function openTodoEdit(){
   const t = ui.fo === "week" ? "w" : "d";
-  const s = openSheet(`<div class="hd"><div><h3>${t === "d" ? "매일" : "매주"} 할 일 고치기</h3><p class="sub">안 하는 일은 끄고, 필요한 일은 추가해요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>${t === "d" ? "매일" : "매주"} 할 일 고치기</h3></div>${XBTN}</div>
     <div id="te-list"></div>
     <div class="tadd"><label class="fld" style="flex:1"><span>새 할 일</span><input id="te-new" maxlength="40" placeholder="예) 친구 섬에 놀러 가기" enterkeyhint="done"></label><button class="pill leaf" type="button" id="te-add">추가</button></div>`, () => render());
   const box = s.el.querySelector("#te-list");
@@ -3653,7 +3742,7 @@ function renderTurnip(grid){
     <div class="tcard">
       <div class="weeknav"><button class="ib2" type="button" data-wk="-1" aria-label="지난주"><svg><use href="#i-down"/></svg></button><div><b>${isNow ? "이번 주" : "지난 기록"}</b><span>${weekLabel(tkCur)}</span></div><button class="ib2 nx" type="button" data-wk="1" aria-label="다음 주"${isNow ? " disabled" : ""}><svg><use href="#i-down"/></svg></button></div>
       <div class="tbuy">${tIco("npc:boc", 52)}<label class="fld"><span>일요일에 무파니에게 산 값</span><input class="num" id="tk-buy" inputmode="numeric" enterkeyhint="next" placeholder="90~110" value="${w.buy || ""}" autocomplete="off"></label><label class="fld"><span>산 개수</span><input class="num" id="tk-qty" inputmode="numeric" enterkeyhint="next" placeholder="예) 1000" value="${w.qty || ""}" autocomplete="off"></label></div>
-      <div class="opt" style="display:grid; gap:8px; padding-bottom:0; border:0"><div class="tx"><b>지난주 무 가격 패턴</b><span id="tk-pnote">알면 예측이 더 정확해져요.</span></div>
+      <div class="opt" style="display:grid; gap:8px; padding-bottom:0; border:0"><div class="tx"><b>지난주 무 가격 패턴</b><span id="tk-pnote"></span></div>
         <div class="radios" role="radiogroup" aria-label="지난주 패턴" data-g="tkprev">${radio(-1, "모름")}${TK_PAT.map((n, i) => radio(i, n)).join("")}${radio("first", "무를 처음 사요")}</div></div>
     </div>
     <div class="tcard">
@@ -3661,12 +3750,11 @@ function renderTurnip(grid){
       <div class="tgrid">${TK_DAYS.map((d, di) => `<div class="tday${isNow && di === ns >> 1 ? " today" : ""}"><span class="dn">${d}${isNow && di === ns >> 1 ? `<i>오늘</i>` : ""}</span>${[0, 1].map(h => { const i = di * 2 + h;
           return `<label class="tslot${isNow && i === ns ? " now" : ""}"><span class="hl">${h ? "오후" : "오전"}</span><input class="num" inputmode="numeric" enterkeyhint="next" data-slot="${i}" value="${w.p[i] || ""}" autocomplete="off" aria-label="${slotName(i)} 가격"><span class="rg num" data-rg="${i}"></span></label>`; }).join("")}</div>`).join("")}</div>
       <div class="tsell"><label class="fld"><span>판 값 (팔았다면)</span><input class="num" id="tk-sold" inputmode="numeric" enterkeyhint="done" placeholder="벨" value="${w.sold || ""}" autocomplete="off"></label><div class="tpl" id="tk-pl"></div></div>
-      <p class="sub">칸 아래 작은 숫자는 나올 수 있는 가격이에요. 무는 다음 일요일이 되면 썩어요.</p>
     </div>
     <div id="tk-sum"></div>
     <div class="tcard" id="tk-chartcard"><div class="shd">${ico("cal")}<b>요일별 예상 범위</b></div><div class="tchart" id="tk-chart"></div>
-      <p class="sub">막대는 나올 수 있는 가격, 점은 적은 가격, 점선은 산 값이에요. 막대를 누르면 숫자가 보여요.</p></div>
-    <div class="acts2" style="justify-content:space-between; align-items:center"><p class="sub tfoot" style="flex:1; min-width:200px">예측은 커뮤니티가 밝혀낸 게임 속 무 가격 규칙으로 계산해요. 3기형·4기형은 큰 폭등·작은 폭등을 부르는 이름이에요.</p><button class="pill sm danger" type="button" id="tk-clear">이 주 기록 지우기</button></div>`;
+      <p class="sub">막대 나올 수 있는 가격 · 점 적은 가격 · 점선 산 값</p></div>
+    <div class="acts2" style="justify-content:space-between; align-items:center"><span style="flex:1"></span><button class="pill sm danger" type="button" id="tk-clear">이 주 기록 지우기</button></div>`;
 }
 // Refresh everything that depends on the prediction without touching the inputs (so typing and focus aren't interrupted).
 function tkUpdate(){
@@ -3674,7 +3762,7 @@ function tkUpdate(){
   const grid = $("grid"), w = tkWeek(tkCur), pr = tkPredict(w), ns = nowSlot(tkCur), isNow = tkCur === thisWeek();
   grid.querySelectorAll("[data-rg]").forEach(el => { const i = +el.dataset.rg; el.textContent = pr && !(w.p[i] > 0) ? (pr.lo[i] === pr.hi[i] ? pr.lo[i] : `${pr.lo[i]}~${pr.hi[i]}`) : ""; });
   const pw = tkWeeks[shiftWeek(tkCur, -1)], ppr = pw && pw.p.some(x => x > 0) ? tkPredict(pw) : null, note = $("tk-pnote");
-  if(note){ const pg = ppr ? ppr.pat.indexOf(Math.max(...ppr.pat)) : -1; note.innerHTML = pg >= 0 && ppr.pat[pg] > .8 && w.prev < 0 && !w.first ? `알면 예측이 더 정확해져요. 지난주 기록으로 보면 <b>${TK_PAT[pg]}</b>이었을 거예요.` : "알면 예측이 더 정확해져요."; }
+  if(note){ const pg = ppr ? ppr.pat.indexOf(Math.max(...ppr.pat)) : -1; note.innerHTML = pg >= 0 && ppr.pat[pg] > .8 && w.prev < 0 && !w.first ? `지난주 기록으로 보면 <b>${TK_PAT[pg]}</b>이었을 거예요.` : ""; }
   const buy = w.buy > 0 ? w.buy : 0, qty = w.qty > 0 ? w.qty : 0;
   const money = v => `${v >= 0 ? "+" : "−"}${fmt(Math.abs(v))}`;
   const pl = $("tk-pl"); if(pl) pl.innerHTML = buy && qty && w.sold > 0 ? `<span>판 돈 <b class="num">${fmt(w.sold * qty)}</b>벨</span><span class="${w.sold >= buy ? "gain" : "loss"}">${w.sold >= buy ? "벌었어요" : "손해예요"} <b class="num">${money((w.sold - buy) * qty)}</b>벨</span>` : buy && qty ? `<span>산 돈 <b class="num">${fmt(buy * qty)}</b>벨</span>` : "";
@@ -3760,7 +3848,7 @@ function openTurnipWeeks(){
     const pl = w.buy && w.qty && w.sold ? (w.sold - w.buy) * w.qty : null; if(pl != null){ total += pl; counted++; }
     return `<button class="srow" type="button" data-week="${k}" aria-pressed="${k === tkCur}">${tIco("turnip", 42)}<span class="tx"><b>${k === thisWeek() ? "이번 주 · " : ""}${weekLabel(k)}</b><span class="num">산 값 ${w.buy || "—"} · 최고 ${mx || "—"}${top >= 0 ? ` · ${TK_PAT[top]} ${tkPct(pr.pat[top])}%` : ""}${pl != null ? ` · ${pl >= 0 ? "+" : "−"}${fmt(Math.abs(pl))}벨` : ""}</span></span></button>`; };
   const rows = keys.map(row).join("");
-  const s = openSheet(`<div class="hd"><div><h3>무트코인 기록</h3><p class="sub">누르면 그 주로 가요. 최근 26주까지 남아요.</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>무트코인 기록</h3></div>${XBTN}</div>
     ${counted ? `<div class="sumline num" style="grid-template-columns:repeat(2,minmax(0,1fr))"><span>판 값을 적은 주 <b>${counted}주</b></span><span>모두 합친 손익 <b>${total >= 0 ? "+" : "−"}${fmt(Math.abs(total))}벨</b></span></div>` : ""}
     <div class="res">${rows || `<p class="sub">아직 적은 기록이 없어요.</p>`}</div>
     <div class="acts2"><button class="pill ghost" type="button" data-week="${thisWeek()}">이번 주로 가기</button></div>`);
@@ -4073,7 +4161,7 @@ function renderTrades(){
   const grid = $("grid"); grid.className = "tr-grid";
   cycReset(); $("more").hidden = true;
   let hello = true; try{ hello = !localStorage.getItem(KEY + ":tradehello"); }catch(e){}
-  const intro = hello ? `<div class="plank" style="grid-column:1/-1; margin:0"><p>친구들과 아이템·주민을 주고받는 곳이에요. 글은 누구나 볼 수 있고, 글쓰기와 댓글은 로그인하고 해요. 현금·상품권 거래는 할 수 없어요.</p><button class="x" type="button" id="trade-hello-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button></div>` : "";
+  const intro = hello ? `<div class="plank" style="grid-column:1/-1; margin:0"><p>현금·상품권 거래는 안 돼요</p><button class="x" type="button" id="trade-hello-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button></div>` : "";
   const L = tradeShown();
   let body;
   if(!TS.ready) body = `<div class="empty"><b>거래 글을 불러오는 중이에요</b>잠시만 기다려 주세요.</div>`;
@@ -4112,7 +4200,7 @@ $("layer").addEventListener("click", e => {
 function openTradeFind(x){
   const e = tEntry(x, 44), who = x.k === "v" ? "주민" : "아이템";
   sheetOver = true;
-  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>${esc(e.name)} 거래</h3><p class="sub">이 ${who}이 들어간 거래 글이에요</p></div>${XBTN}</div><div class="tr-grid" id="tfd"><div class="empty"><b>불러오는 중이에요</b>잠시만 기다려 주세요.</div></div>`);
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>${esc(e.name)} 거래</h3></div>${XBTN}</div><div class="tr-grid" id="tfd"><div class="empty"><b>불러오는 중이에요</b>잠시만 기다려 주세요.</div></div>`);
   const box = s.el.querySelector("#tfd"), a = `data-tk="${x.k}" data-tid="${esc(x.id)}"`;
   const paint = () => {
     if(!box.isConnected) return;
@@ -4215,7 +4303,7 @@ function openTrade(id, p0, opt){
     head();
     const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
     body.innerHTML = `
-      <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span>${p.type === "free" ? `<span class="sm">대가 없이 나눠 드려요</span>` : ""}</div><div class="res">${p.items.map(row).join("")}</div></section>
+      <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span></div><div class="res">${p.items.map(row).join("")}</div></section>
       ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
       ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
       <section class="tr-sec by"><div class="tr-sh"><span class="lb">작성자</span></div><div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div></section>
@@ -4305,8 +4393,7 @@ function openTradeForm(p, preset){
     </div>
     <label class="fld"><span><b class="tr-fh">하고 싶은 말</b><i id="tf-cnt">0/500</i></span><textarea id="tf-body" maxlength="500" placeholder="언제 비행장을 여는지, 어떻게 주고받을지 적어 주세요"></textarea></label>
     <div id="tf-msg"></div>
-    <div class="acts2"><button class="pill leaf big" type="button" id="tf-ok">${edit ? "고친 대로 올리기" : "올리기"}</button></div>
-    <p class="note">현금, 계좌, 상품권으로 사고파는 글과 댓글은 올라가지 않아요.</p>`, () => { if(ui.tab === "trade") render(); });
+    <div class="acts2"><button class="pill leaf big" type="button" id="tf-ok">${edit ? "고친 대로 올리기" : "올리기"}</button></div>`, () => { if(ui.tab === "trade") render(); });
   const q = sel => sh.el.querySelector(sel);
   if(edit){ q("#tf-body").value = p.body || ""; q("#tf-cnt").textContent = `${(p.body || "").length}/500`; }
   function rowEdit(x, i){
@@ -4316,7 +4403,7 @@ function openTradeForm(p, preset){
     return `<div class="srow tr-frow">${e.pic}<span class="tx">${x.k === "t" ? `<input class="tr-own" data-tt="${i}" maxlength="30" value="${esc(x.id)}" aria-label="직접 적은 것" placeholder="이름을 적어 주세요">` : `<b>${esc(e.name)}</b>`}${x.k === "i" ? "" : `<span>${esc(e.sub)}</span>`}${colors || qty ? `<span class="tr-fo">${colors}${qty}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(e.name)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
   }
   function drawItems(){
-    q("#tf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">아직 고른 게 없어요. 아래 버튼으로 고르고, 목록에 없으면 거기서 직접 적어 주세요.</p>`;
+    q("#tf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">아직 고른 게 없어요</p>`;
     q("#tf-in").textContent = `${st.items.length}/20`;
   }
   function drawSwap(){
@@ -4390,15 +4477,15 @@ function openTradePick(chosen, done, opt){
     if(!qv){
       const li = [...like.keys()].map(id => BY_ID.get(id)).filter(it => it && inPool.has(it)).slice(0, 60), lv = only ? [] : VIL.filter(v => vlike.has(v.f)).slice(0, 30);
       const picked = only ? chosen.map(x => BY_ID.get(x.id)).filter(Boolean) : [];
-      out.innerHTML = `<p class="sub">이름을 넣어 찾아요. ㅊㄹ처럼 초성만 넣어도 돼요.</p>` + (only ? sec(`${ico("check")}<b>고른 아이템</b>`, picked.map(irow)) : sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).filter(k => k !== "help").map(srow)))
-        + (own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-ownhint="1"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>목록에 없으면 직접 적어요</b><span>위 검색창에 이름을 적으면 '직접 적어 넣기'가 나와요</span></span></button>`]) : "")
+      out.innerHTML = (only ? sec(`${ico("check")}<b>고른 아이템</b>`, picked.map(irow)) : sec(`${ico("island")}<b>섬에서 도와주기</b>`, Object.keys(SERVICE).filter(k => k !== "help").map(srow)))
+        + (own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-ownhint="1"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>목록에 없으면 직접 적어요</b></span></button>`]) : "")
         + sec(`${ico("heart")}<b>좋아요한 아이템</b>`, li.map(irow)) + sec(`${ico("heart")}<b>좋아하는 주민</b>`, lv.map(vrow));
       return;
     }
     const iv = kSearch(POOL, it => [it.ko, it.en], qv), vv = only ? [] : kSearch(VIL, v => [v.ko, v.en, v.ja], qv), LIM = 60;
-    const ownRow = own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-own="1" aria-pressed="${has("t", qv.slice(0, 30)) >= 0}"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>"${esc(qv.slice(0, 30))}" 직접 적어 넣기</b><span>목록에서 못 찾았을 때만 써 주세요</span></span>${ck}</button>`]) : "";
+    const ownRow = own ? sec(`${ico("pen")}<b>직접 적기</b>`, [`<button class="srow" type="button" data-own="1" aria-pressed="${has("t", qv.slice(0, 30)) >= 0}"><span class="pic ph tr-svc" style="--t:42px"><svg aria-hidden="true"><use href="#i-pen"/></svg></span><span class="tx"><b>"${esc(qv.slice(0, 30))}" 직접 적어 넣기</b></span>${ck}</button>`]) : "";
     out.innerHTML = ((iv.length || vv.length) ? sec(`${ico("face")}<b>주민</b>`, vv.slice(0, 20).map(vrow)) + sec(`${ico("box")}<b>아이템</b>`, iv.slice(0, LIM).map(irow))
-      + (iv.length > LIM ? `<p class="sub">${fmt(iv.length)}개 중 ${LIM}개만 보여요. 조금 더 입력해 보세요.</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`) + ownRow;
+      + (iv.length > LIM ? `<p class="sub">${LIM}개까지 보여요</p>` : "") : `<p class="sub">"${esc(qv)}"에 맞는 것이 없어요.</p>`) + ownRow;
   }
   let tm = 0; inp.addEventListener("input", () => { clearTimeout(tm); tm = setTimeout(paint, 140); });
   s.el.addEventListener("click", e => {
@@ -4474,7 +4561,7 @@ function renderShows(){
   const grid = $("grid"); grid.className = "dgrid";
   cycReset(); $("more").hidden = true;
   let hello = true; try{ hello = !localStorage.getItem(KEY + ":showhello"); }catch(e){}
-  const intro = hello ? `<div class="plank" style="grid-column:1/-1; margin:0"><p>꿈번지, 섬 구역, 패션을 사진으로 자랑하는 곳이에요. 쓰인 아이템을 골라 두면 친구들이 바로 찾아볼 수 있어요. 보기는 누구나, 올리기·추천·댓글은 로그인하고 해요.</p><button class="x" type="button" id="show-hello-x" aria-label="도움말 닫기"><svg><use href="#i-x"/></svg></button></div>` : "";
+  const intro = "";   // v48: 소개 판 없앰 (설명 줄이기)
   const c = shCat(), sort = c % 10, mine = c >= 10;
   let L = SH.list; if(ui.liked) L = L.filter(x => SH.liked(x.id));
   const kn = ui.fo === "all" ? "자랑" : KIND[ui.fo][0];
@@ -4486,7 +4573,7 @@ function renderShows(){
     : `<div class="empty"><b>${mine ? `아직 올린 ${kn} 글이 없어요` : `아직 ${kn} 글이 없어요`}</b>위쪽 + 버튼을 눌러 첫 글을 올려 보세요.</div>`;
   else body = L.map(showCardHTML).join("");
   const bar = SH.ready ? `<div class="tr-bar"><button class="pill ghost sm" type="button" id="sh-re">${ico("refresh")}새로 보기</button></div>` : "";
-  grid.innerHTML = intro + bar + body + (SH.more ? `<p class="sub" style="grid-column:1/-1; text-align:center">최근 60개까지 보여요. 찾기로 더 찾아보세요.</p>` : "");
+  grid.innerHTML = intro + bar + body;
   const on = (sel, f) => grid.querySelectorAll(sel).forEach(b => b.addEventListener("click", f));
   on("#show-hello-x", () => { try{ localStorage.setItem(KEY + ":showhello", "1"); }catch(e){} render(); });
   on("#sh-re", e => { e.currentTarget.disabled = true; SH.load(true); });
@@ -4542,8 +4629,8 @@ function openShow(id, x0, opt){
     body.innerHTML = `
       ${picHTML2()}
       <div class="dstat num" id="sh-stat">${statHTML({...x, id: x.id})}</div>
-      <button class="likebar" type="button" id="sh-like" aria-pressed="${liked}"><span class="hb"><svg aria-hidden="true"><use href="#i-heart"/></svg></span><span>${liked ? "추천했어요" : me() ? "마음에 들면 추천해 주세요" : "로그인하면 추천할 수 있어요"}</span><span class="n num">${fmt(x.likes || 0)}</span></button>
-      ${x.kind === "dream" && x.code ? `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b><span>꿈에서 이 번호를 넣으면 놀러 갈 수 있어요</span></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>` : ""}
+      <button class="likebar" type="button" id="sh-like" aria-pressed="${liked}"><span class="hb"><svg aria-hidden="true"><use href="#i-heart"/></svg></span><span>${liked ? "추천했어요" : me() ? "추천" : "로그인하면 추천할 수 있어요"}</span><span class="n num">${fmt(x.likes || 0)}</span></button>
+      ${x.kind === "dream" && x.code ? `<div class="codebox"><span class="mo2"><svg aria-hidden="true"><use href="#i-moon"/></svg></span><span class="cv"><b class="num">${esc(x.code)}</b></span><button class="cp" type="button" data-copy="${esc(x.code)}" aria-label="꿈번지 복사"><svg><use href="#i-copy"/></svg></button></div>` : ""}
       ${x.body ? `<div class="dtext">${esc(x.body)}</div>` : ""}
       ${x.items.length ? `<div class="shd">${ico("box")}<b>쓰인 아이템 ${fmt(x.items.length)}개</b></div><div class="res">${x.items.map(itemRow).join("")}</div>` : ""}
       <div class="who tr-auth"><span class="fr">${fruitPic(x.author.fruit)}</span><div class="wt"><b>${esc(x.author.name)}</b><span>${esc(islandText(x.author.island))} · ${ago(x.created)}에 올림${x.updated - x.created > 60000 ? ` · ${ago(x.updated)} 고침` : ""}</span></div></div>
@@ -4628,7 +4715,7 @@ const NT = (() => {
 })();
 function openNotifs(){
   if(!AUTH.me){ openSignin("in"); return; }
-  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>알림</h3><p class="sub">내 글에 달린 댓글과 내 댓글에 달린 답글이에요</p></div>${XBTN}</div><div class="bd-in nt-wrap"><section class="pucard" id="nt-push" hidden></section><div id="nt-body"><p class="sub">알림을 불러오는 중이에요…</p></div></div>`);
+  const s = openSheet(`<div class="hd"><div style="min-width:0"><h3>알림</h3></div>${XBTN}</div><div class="bd-in nt-wrap"><section class="pucard" id="nt-push" hidden></section><div id="nt-body"><p class="sub">알림을 불러오는 중이에요…</p></div></div>`);
   const body = s.el.querySelector("#nt-body");
   PUSH.card(s.el.querySelector("#nt-push"));
   let list = [];
@@ -4636,7 +4723,7 @@ function openNotifs(){
   const row = (n, i) => `<button class="nrow${n.seen ? "" : " new"}" type="button" data-ni="${i}"><span class="fr">${fruitPic(n.actor.fruit)}</span><span class="tx"><b><em>${esc(n.actor.name || "친구")}</em> 님이 ${NT_TEXT[n.kind] || "댓글을 달았어요"}</b><span class="nw">${esc(where(n))}</span><span class="nb">“${esc(n.body)}”</span><span class="nt">${ago(n.created)}</span></span>${n.seen ? "" : `<i class="dot" title="새 알림"></i>`}</button>`;
   AUTH.api("notifs").then(j => {
     list = j.notifs;
-    body.innerHTML = list.length ? `<div class="nlist">${list.map(row).join("")}</div><p class="note">알림은 60일 동안 남아요.</p>`
+    body.innerHTML = list.length ? `<div class="nlist">${list.map(row).join("")}</div>`
       : `<div class="empty"><b>아직 알림이 없어요</b>내 글에 댓글이 달리거나 내 댓글에 답글이 달리면 여기에 모여요.</div>`;
     NT.show(0);
     if(list.some(n => !n.seen)) AUTH.api("notifs/read", {method: "POST", body: "{}"}).catch(() => {});
@@ -4730,14 +4817,14 @@ const PUSH = (() => {
   function html(st){
     const head = (label, cls) => `<div class="pu-hd"><svg class="pu-ic" aria-hidden="true"><use href="#i-bell"/></svg><h4>휴대폰 알림</h4><span class="pu-st ${cls || ""}">${label}</span></div>`;
     const msg = `<div class="msg" aria-live="polite"></div>`;
-    if(st === "on") return head("켜짐", "on") + `<p>이 기기로 댓글·답글 알림이 와요. 사이트를 닫아 두어도 와요.</p><div class="acts2"><button class="pill leaf sm" type="button" data-pu="test">시험 알림 보내기</button><button class="pill ghost sm" type="button" data-pu="off">이 기기에서 끄기</button></div>` + msg;
-    if(st === "off") return head("꺼짐") + `<p>켜 두면 사이트를 닫아 두어도 내 글에 댓글이, 내 댓글에 답글이 달릴 때 이 기기로 알려 드려요.</p><div class="acts2"><button class="pill leaf" type="button" data-pu="on">이 기기에서 알림 켜기</button></div><p class="pu-sm">누르면 알림을 허용할지 물어봐요. '허용'을 눌러 주세요.</p>` + msg;
+    if(st === "on") return head("켜짐", "on") + `<p>사이트를 닫아도 댓글·답글 알림이 와요</p><div class="acts2"><button class="pill leaf sm" type="button" data-pu="test">시험 알림 보내기</button><button class="pill ghost sm" type="button" data-pu="off">이 기기에서 끄기</button></div>` + msg;
+    if(st === "off") return head("꺼짐") + `<p>사이트를 닫아도 댓글·답글 알림이 와요</p><div class="acts2"><button class="pill leaf" type="button" data-pu="on">이 기기에서 알림 켜기</button></div>` + msg;
     if(st === "denied") return head("막힘", "bad") + `<p>이 기기에서 이 사이트의 알림이 막혀 있어요. ${ios ? "아이폰 설정 → 알림 → 도란도란에서 '알림 허용'을 켠 뒤 이 창을 다시 열어 주세요."
       : android ? "주소창 왼쪽의 버튼 → 권한(또는 사이트 설정) → 알림을 '허용'으로 바꾼 뒤 이 창을 다시 열어 주세요."
       : "주소창 왼쪽의 사이트 정보(자물쇠) 버튼 → 알림을 '허용'으로 바꾼 뒤 이 창을 다시 열어 주세요."}</p>`;
     if(st === "ioshome") return head("준비 필요") + `<p>아이폰은 이 사이트를 홈 화면에 추가해서 열어야 알림을 받을 수 있어요.</p>
       <ol class="pu-steps"><li><span>화면 아래(또는 주소창 옆)의 공유 버튼${SHARE}을 눌러요.</span></li><li><span>'홈 화면에 추가'를 눌러요. 안 보이면 목록을 아래로 내려 보세요.</span></li><li><span>홈 화면에 생긴 '도란도란' 아이콘으로 열고, 로그인한 뒤 여기서 알림을 켜요.</span></li></ol>
-      <p class="pu-sm">홈 화면 앱은 Safari와 따로 열려서 처음 한 번은 다시 로그인해야 해요. 로그인하면 체크 기록도 그대로 따라와요. iOS 16.4 이상에서 돼요.</p>`;
+      <p class="pu-sm">처음 한 번은 다시 로그인해요</p>`;
     if(st === "iosold") return head("안 됨", "bad") + `<p>아이폰은 iOS 16.4 이상에서만 사이트 알림을 받을 수 있어요. 설정 → 일반 → 소프트웨어 업데이트에서 올린 뒤 다시 해 주세요.</p>`;
     if(st === "inapp") return head("준비 필요") + `<p>카카오톡 같은 앱 안에서 연 창에서는 알림을 받을 수 없어요. ${ios
       ? "메뉴에서 'Safari로 열기'를 누른 뒤, 홈 화면에 추가해서 열어 주세요."
@@ -4797,7 +4884,7 @@ function openShowForm(x){
   const edit = !!x;
   const st = {kind: edit ? x.kind : (ui.fo !== "all" && KIND[ui.fo] ? ui.fo : "area"), items: edit ? x.items.map(y => ({...y})) : [],
     pics: edit ? x.imgs.map(im => ({...im, prev: imgUrl(im.t)})) : []};   // a new picture: {full, thumb, w, h, prev}
-  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "자랑 글 고치기" : "자랑 올리기"}</h3><p class="sub">${edit && AUTH.me.id !== x.author.id ? `${esc(x.author.name)} 님의 글을 관리자로 고쳐요` : "사진은 이 기기에서 작게 줄여서 올려요"}</p></div>${XBTN}</div>
+  const sh = openSheet(`<div class="hd"><div><h3>${edit ? "자랑 글 고치기" : "자랑 올리기"}</h3><p class="sub">${edit && AUTH.me.id !== x.author.id ? `${esc(x.author.name)} 님의 글을 관리자로 고쳐요` : ""}</p></div>${XBTN}</div>
     <div class="fld"><span>무엇을 자랑할까요?</span><div class="tr-seg" role="radiogroup" aria-label="자랑 종류">${Object.keys(KIND).map(k => `<button type="button" role="radio" class="sh-${k}" data-kd="${k}">${KIND[k][0]}</button>`).join("")}</div></div>
     <div class="fld"><span><b class="tr-fh">사진</b><i id="sf-pn"></i></span><div class="sh-pics" id="sf-pics"></div>
       <label class="pill sun sh-add" id="sf-addl"><input type="file" accept="image/*" multiple id="sf-file" hidden>${ico("image")}<span>사진 고르기</span></label><div id="sf-pmsg"></div></div>
@@ -4826,7 +4913,7 @@ function openShowForm(x){
     const colors = it.vs.length ? `<select data-c="${i}" aria-label="${esc(it.ko)} 색"><option value="">색 상관없음</option>${it.vs.map((v, j) => `<option value="${j}"${y.c === j ? " selected" : ""}>${esc(v)}</option>`).join("")}</select>` : "";
     return `<div class="srow tr-frow">${framePic(it, nf > 1 && Number.isInteger(y.c) && y.c < nf ? y.c : 0, 44)}<span class="tx"><b>${esc(it.ko)}</b><span>${esc(CATS[it.lc][0])}</span>${colors ? `<span class="tr-fo">${colors}</span>` : ""}</span><button class="tr-rm" type="button" data-rm="${i}" aria-label="${esc(it.ko)} 빼기"><svg><use href="#i-x"/></svg></button></div>`;
   }
-  function drawItems(){ q("#sf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : `<p class="sub">게임 속 이름으로 찾아서 골라요. 안 골라도 돼요.</p>`; q("#sf-in").textContent = `${st.items.length}/40`; }
+  function drawItems(){ q("#sf-items").innerHTML = st.items.length ? st.items.map(rowEdit).join("") : ""; q("#sf-in").textContent = `${st.items.length}/40`; }
   counts(); drawPics(); drawItems();
   sh.el.addEventListener("input", e => {
     if(e.target.id === "sf-code"){ const el = e.target, f = dreamCode(el.value); if(el.value !== f && (el.value.replace(/\D/g, "").length || !el.value.trim())) el.value = f; }
@@ -4884,7 +4971,7 @@ function syncLine(){
 function acctHTML(){
   const u = AUTH.me;
   if(!u) return `<div class="acct"><h4>로그인</h4>
-      <p>로그인하면 폰과 PC의 체크 기록이 저절로 같아져요. 보기와 체크는 로그인 없이도 그대로 쓸 수 있어요.</p>
+      <p>로그인하면 폰과 PC의 체크 기록이 저절로 같아져요.</p>
       <div class="acts2"><button class="pill leaf" type="button" id="ac-in">로그인</button><button class="pill sun" type="button" id="ac-up">처음이에요 (가입하기)</button></div></div>`;
   const btns = [`<button class="pill ghost" type="button" id="ac-prof">${ico("pen")}<span>프로필</span></button>`,
     `<button class="pill ghost" type="button" id="ac-pw">${ico("lock")}<span>비밀번호</span></button>`,
@@ -4925,14 +5012,14 @@ async function busyRun(btn, msg, f, ef){
 function openSignin(mode){
   const up = mode === "up";
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div><h3>${up ? "가입하기" : "로그인"}</h3><p class="sub">${up ? "이메일이나 전화번호는 받지 않아요" : "가입할 때 정한 아이디로 들어와요"}</p></div>${XBTN}</div>
+  const sh = openSheet(`<div class="hd"><div><h3>${up ? "가입하기" : "로그인"}</h3></div>${XBTN}</div>
     <label class="fld"><span>아이디${up ? "<i>2~16자, 한글·영문 소문자·숫자·_</i>" : ""}</span><input id="si-id" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${up ? "예) dorandoran" : "아이디"}"></label>
     ${pwField("si-pw", up ? "비밀번호<i>8자 이상</i>" : "비밀번호", up ? "new-password" : "current-password", up ? "8자 이상" : "비밀번호")}
     ${up ? `<label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="si-name" maxlength="10" placeholder="예) 링크"></label>
     ${islandField("si-island", "")}${fruitPick("")}` : ""}
     <div id="si-msg"></div>
     <div class="acts2"><button class="pill leaf" type="button" id="si-ok">${up ? "가입하기" : "로그인"}</button><button class="pill ghost" type="button" id="si-sw">${up ? "이미 계정이 있어요" : "처음이에요 (가입하기)"}</button></div>
-    <p class="note">${up ? "비밀번호는 알아볼 수 없게 바꿔서 저장해요. 잊어버리면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받을 수 있어요." : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
+    <p class="note">${up ? "비밀번호를 잊으면 관리자에게 물어봐요" : "비밀번호를 잊었으면 이 사이트를 알려 준 사람(관리자)에게 임시 비밀번호를 받아 주세요."}</p>`);
   const q = id => sh.el.querySelector(id), fruit = wireForm(sh), islandVal = up ? islandWire(sh, "si-island") : null;
   q("#si-sw").addEventListener("click", () => { sh.close(); setTimeout(() => openSignin(up ? "in" : "up"), 0); });
   const go = () => busyRun(q("#si-ok"), q("#si-msg"), async () => {
@@ -4950,7 +5037,7 @@ function openSignin(mode){
 function openProfile(){
   const u = AUTH.me; if(!u) return;
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div><h3>프로필 고치기</h3><p class="sub">거래할 때 친구들에게 보여요</p></div>${XBTN}</div>
+  const sh = openSheet(`<div class="hd"><div><h3>프로필 고치기</h3></div>${XBTN}</div>
     <label class="fld"><span>대표 이름<i>게임 속 내 이름</i></span><input id="pf-name" maxlength="10" value="${esc(u.name)}"></label>
     ${islandField("pf-island", u.island)}
     ${fruitPick(u.fruit)}
@@ -4991,7 +5078,7 @@ function openPassword(forced){
 }
 function openAdmin(){
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div><h3>친구 관리</h3><p class="sub">관리자만 볼 수 있어요</p></div>${XBTN}</div><div id="fm-list"><p>불러오는 중…</p></div>`);
+  const sh = openSheet(`<div class="hd"><div><h3>친구 관리</h3></div>${XBTN}</div><div id="fm-list"><p>불러오는 중…</p></div>`);
   const box = sh.el.querySelector("#fm-list");
   async function load(){
     let j; try{ j = await AUTH.api("admin/users"); }catch(e){ box.innerHTML = `<p class="err">${authErr(e)}</p>`; return; }
@@ -5023,7 +5110,7 @@ function openAdmin(){
 // One friend, for the admin: everything the server keeps about them.
 function openAdminUser(id){
   sheetOver = true;
-  const sh = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="au-t">친구 정보</h3><p class="sub" id="au-s">관리자만 볼 수 있어요</p></div>${XBTN}</div><div class="bd-in" id="au-body"><p class="sub">불러오는 중이에요…</p></div>`);
+  const sh = openSheet(`<div class="hd"><div style="min-width:0"><h3 id="au-t">친구 정보</h3><p class="sub" id="au-s"></p></div>${XBTN}</div><div class="bd-in" id="au-body"><p class="sub">불러오는 중이에요…</p></div>`);
   const body = sh.el.querySelector("#au-body");
   const tile = (ic, k, v) => `<div class="qf">${ic}<div><span>${k}</span><b>${v}</b></div></div>`;
   const hm = ms => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -5070,7 +5157,7 @@ function openAdminUser(id){
         tile(ico("spark"), "상태", [u.admin ? "관리자" : "친구", u.mustChange ? "임시 비밀번호 받음" : "", u.locked ? "비밀번호 틀려서 잠김" : "", u.banned ? "막힘" : ""].filter(Boolean).join(" · ")),
       ].join("")}</div>`)}
       ${sec(ico("cal"), `접속 기록 <span class="fm-n">최근 30일 중 ${fmt(d30)}일</span>`, j.visits.length
-        ? `<div class="fm-vis">${j.visits.map(v => `<div class="fm-v"><b>${dayText(v.day)}</b><span>${fmt(v.n)}번 · ${hm(v.first)}${v.last - v.first > 60000 ? `~${hm(v.last)}` : ""}</span><span>${esc(v.dev)}</span></div>`).join("")}</div><p class="sub">한국 시간 기준, 하루에 한 줄이에요. 사이트를 열 때마다 횟수가 늘어요.</p>`
+        ? `<div class="fm-vis">${j.visits.map(v => `<div class="fm-v"><b>${dayText(v.day)}</b><span>${fmt(v.n)}번 · ${hm(v.first)}${v.last - v.first > 60000 ? `~${hm(v.last)}` : ""}</span><span>${esc(v.dev)}</span></div>`).join("")}</div>`
         : `<p class="sub">아직 접속 기록이 없어요. 접속 기록은 2026년 11월 10일부터 남아요.</p>`)}
       ${sec(ico("book"), "체크 기록", rec)}
       ${sec(itemPic(7731, 24), `거래 글 <span class="fm-n">${fmt(posts.length)}개</span>`, posts.length
@@ -5100,7 +5187,7 @@ function openAdminUser(id){
 function openBackup(){
   const s = openSheet(`<div class="hd"><h3>${AUTH.live ? "내 계정·기록" : "기록 옮기기"}</h3>${XBTN}</div>
     ${AUTH.live ? `<div id="acct-box"></div><h4 class="bk-h">코드로 옮기기</h4>` : ""}
-    <p class="sub">다른 기기에서 이어 하려면 아래 코드를 복사해서, 그 기기에서 이 페이지를 열고 "코드 붙여넣기"에 넣으세요.</p>
+    <p class="sub">다른 기기의 코드 붙여넣기에 넣으세요</p>
     <textarea id="bk-out" readonly aria-label="내 백업 코드">코드를 만드는 중…</textarea>
     <div class="acts2"><button class="pill leaf" type="button" id="bk-copy">코드 복사</button></div>
     <p class="sub" style="margin-top:6px">코드 붙여넣기</p>
@@ -6241,12 +6328,12 @@ const kindName = (T) => T === "path" ? (isl.path ? PATHS[isl.path][0] : "지우�
 function panelBody(T){
   if(T === "hand"){
     const back = isl.prevTool && TOOL_N[isl.prevTool];
-    return (back ? `<button type="button" class="iback" data-tool="${back[0]}">${sprHTML(back[3], 26)}<span><b>${back[1]}</b>${euro(back[1])} 돌아가기</span></button><p class="ipt">손을 한 번 더 눌러도 돌아가요.</p>` : "")
-      + `<p class="ipt">건물, 다리, 비탈길을 누르면 골라져요. 끌어서 옮기고, 빈 곳을 끌면 지도가 움직여요.</p><div class="icount" id="isl-count"></div>`;
+    return (back ? `<button type="button" class="iback" data-tool="${back[0]}">${sprHTML(back[3], 26)}<span><b>${back[1]}</b>${euro(back[1])} 돌아가기</span></button>` : "")
+      + `<div class="icount" id="isl-count"></div>`;
   }
   const opt = (list, key, label) => list.map(([v, l]) => sw(isl[key] === v, `data-${key}="${v}"`, `<i class="sq" style="background:${TCOL[v]}"></i>${lbl(l)}`, label(l))).join("");
   if(T === "cliff") return sec("땅 높이", grid(3, "땅 높이", opt(CLIFF_OPT.slice(0, 3), "cliff", l => l + " 땅"), "txt"))
-    + sec("해안", grid(4, "해안", opt(CLIFF_OPT.slice(3), "cliff", l => l), "txt2")) + `<p class="ipt sm">해안은 게임에선 섬을 고른 뒤 못 바꿔요.</p>`
+    + sec("해안", grid(4, "해안", opt(CLIFF_OPT.slice(3), "cliff", l => l), "txt2"))
     + brushHTML(T);
   if(T === "water") return sec("물", grid(2, "물", sw(isl.water === "dig", `data-water="dig"`, `<i class="sq" style="background:${TCOL[6]}"></i>${lbl("물 파기")}`, "물 파기: 그 높이의 강이나 연못이 돼요")
     + sw(isl.water === "fill", `data-water="fill"`, `<i class="sq" style="background:${TCOL[4]}"></i>${lbl("물 메우기")}`, "물 메우기: 같은 높이의 땅이 돼요"), "txt")) + brushHTML(T);
@@ -6262,10 +6349,9 @@ function panelBody(T){
       + sec(`비탈길 <small class="num">${objCount("slope")}/8</small>`, grid(4, "비탈길 종류", SLOPES.map(([id, l], n) => sw(!bm && isl.st === n, `data-st="${n}"`, sprHTML("i_" + id, 38), l)).join(""), "kp"), bm ? null : SLOPES[isl.st][1])
       + `<section class="ibr" aria-label="방향과 폭"><h5>${bm ? "다리" : "비탈길"} 방향${bm ? "과 강 폭" : ""}</h5><div class="ibrow"><span class="ibl">방향</span><div class="iseg" style="--n:4" role="group" aria-label="방향">${(bm ? BR_DIRS : SL_DIRS).map(([r, l, deg]) => bb((bm ? isl.br : isl.sr) === r, `data-dir="${r}"`, DIR_SVG(deg), l)).join("")}</div></div>`
       + (bm ? `<div class="ibrow"><span class="ibl">강 폭</span><div class="iseg" style="--n:3" role="group" aria-label="강 폭">${[3, 4, 5].map(n => bb(isl.bn === n, `data-len="${n}"`, `<b class="num">${n}칸</b>`, `강 폭 ${n}칸`)).join("")}</div></div>` : "") + `</section>`
-      + `<p class="ipt">${selB ? "고른 " + (selB.k === "bridge" ? "다리" : "비탈길") + "에 바로 적용돼요." : (bm ? "강 위를 누르면 강을 가로지르는 방향과 길이로 알아서 놓여요." : "절벽 옆을 누르면 오르는 방향을 알아서 맞춰요.") + " 끌어서 옮기고, R 키나 방향 버튼으로 돌려요."}</p>`;
+      + `<p class="ipt">${selB ? "고른 " + (selB.k === "bridge" ? "다리" : "비탈길") + "에 바로 적용돼요." : (bm ? "강 위를 눌러 놓아요" : "절벽 옆을 눌러 놓아요")}</p>`;
   }
-  if(T === "bld") return sec("건물", grid(3, "건물", BLD_ORDER.map(k => { const b = BLD[k], n = objCount(k); return sw(isl.bld === k, `data-bld="${k}"`, sprHTML(b.pic, 44) + (b.max ? `<span class="cnt num">${n}/${b.max}</span>` : ""), b.n, "bld"); }).join(""), "kp"), BLD[isl.bld].n)
-    + `<p class="ipt">지도를 누르면 그 자리에 지어요. 안내소, 비행장, 박물관, 상점, 에이블, 캠핑장은 하나씩이라 누르면 옮겨져요. 주민 집은 고른 뒤 주민을 정할 수 있어요.</p>`;
+  if(T === "bld") return sec("건물", grid(3, "건물", BLD_ORDER.map(k => { const b = BLD[k], n = objCount(k); return sw(isl.bld === k, `data-bld="${k}"`, sprHTML(b.pic, 44) + (b.max ? `<span class="cnt num">${n}/${b.max}</span>` : ""), b.n, "bld"); }).join(""), "kp"), BLD[isl.bld].n);
   return "";
 }
 const bushSw = v => `<canvas class="mini" width="80" height="80" data-bush="${v}" aria-hidden="true"></canvas>`;
@@ -6497,7 +6583,7 @@ BK.add(() => {
 /* ----- 섬 메뉴 (the header button) ----- */
 function openIslandMenu(){
   const row = (a, ic, t, d) => `<button class="srow imrow" type="button" data-m="${a}">${ic}<span class="tx"><b>${t}</b><span>${d}</span></span></button>`;
-  const s = openSheet(`<div class="hd"><div><h3>섬 메뉴</h3><p class="sub">섬 지도는 이 기기에 저절로 저장돼요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>섬 메뉴</h3></div>${XBTN}</div>
     <div class="res">${row("new", sprHTML("u_new", 34), "새 섬", "게임 시작 섬 중에서 고르거나, 해안을 골라 직접 만들어요")}
     ${row("trace", sprHTML("u_trace", 34), "캡처 불러오기", "게임에서 찍은 섬 지도 캡처를 깔고 그대로 따라 그려요")}
     ${row("share", sprHTML("u_save", 34), "저장·공유", "그림으로 저장하고, 코드로 친구와 나눠요")}
@@ -6514,7 +6600,7 @@ function useIsland(g, msg){ pushUndo(); islSet(g); ISL.e = 1; islSave(true); pai
 async function openIslandNew(mode){
   const D = await needData(); if(!D) return;
   if(mode === "pick" || mode === "make") isl.newMode = mode;
-  const s = openSheet(`<div class="hd"><div><h3>새 섬</h3><p class="sub">지금 섬은 되돌리기로 다시 불러올 수 있어요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>새 섬</h3></div>${XBTN}</div>
     <div class="radios nmode" role="radiogroup" aria-label="새 섬 고르는 방법"><button type="button" role="radio" data-v="pick">게임 섬에서 고르기</button><button type="button" role="radio" data-v="make">직접 만들기</button></div>
     <div id="nw-host" class="nhost"></div>`);
   const host = s.el.querySelector("#nw-host"), sw = s.el.querySelector(".nmode");
@@ -6530,14 +6616,14 @@ const openIslandPick = () => openIslandNew("pick");
 let newC = null;
 function newMakeBody(D, s, el){
   if(!newC) newC = newCfg(["w", "s", "e"][Math.floor(Math.random() * 3)]);
-  el.innerHTML = `<p class="sub">게임 섬과 같은 해안 조각으로 만들어요. 고르는 대로 바로 미리 보여요.</p>
+  el.innerHTML = `
     <div class="nprev"><canvas id="nw-cv" aria-label="새 섬 미리 보기"></canvas></div>
     <div id="nw-opts" class="nopts"></div>
     <div class="acts2 nacts"><button class="pill sun" type="button" data-n="all"><svg><use href="#i-dice"/></svg>전부 무작위</button><button class="pill ghost" type="button" data-n="mix"><svg><use href="#i-refresh"/></svg>나머지 해안 다시 섞기</button></div>
     <div class="acts2 nacts"><button class="pill leaf big" type="button" data-n="go">이 섬으로 시작하기</button></div>
     <section class="ptips"><h4>다른 방법</h4>
       <div class="acts2"><button class="pill ghost" type="button" data-n="flat"><svg><use href="#i-erase"/></svg>지금 섬 평평하게 비우기</button><button class="pill ghost" type="button" data-n="sea">빈 바다에서 시작</button></div>
-      <p class="sub">평평하게 비우기는 해안, 강 하구, 안내소, 비행장처럼 게임에서 못 바꾸는 것만 남겨요.</p></section>`;
+      <p class="sub">해안·안내소·비행장은 남아요</p></section>`;
   const cn = el.querySelector("#nw-cv"), opts = el.querySelector("#nw-opts");
   const C = () => newC;
   const R3 = (g, cur, list) => `<div class="radios" role="radiogroup" data-g="${g}">${list.map(([v, l]) => `<button type="button" role="radio" data-v="${v}" aria-checked="${String(cur) === String(v)}">${l}</button>`).join("")}</div>`;
@@ -6603,11 +6689,11 @@ function pickPool(D){ return D.v1.filter(m => m.o.length >= 2).map(v1Map).filter
 function rollPick(D){ const pool = pickPool(D).slice(); for(let i = pool.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; } pickSet = pool.slice(0, 4); isl.rolls++; islPrefsSave(); }
 const PLAZA_N = {l: "왼쪽", m: "가운데", r: "오른쪽"}, PEN_N = {l: "서쪽", r: "동쪽", "": "없음"};
 function newPickBody(D, s, el){
-  el.innerHTML = `<p class="note">게임을 시작할 때처럼 섬 네 개 중에서 골라요. 게임의 시작 섬 후보 75개를 따라 그린 지도에서 뽑아요. 안내소, 비행장, 강 하구, 반도, 해안은 섬을 고른 뒤 바꿀 수 없으니, 이것들을 보고 리세마라 목표를 정해 보세요.</p>
+  el.innerHTML = `
     <div id="pk-f"></div>
     <div class="pgrid" id="pk-grid"></div>
     <div class="acts2"><button class="pill sun" type="button" id="pk-roll"><svg><use href="#i-dice"/></svg><span>다시 뽑기</span></button></div>
-    <section class="ptips"><h4>추천 조합</h4><p class="sub">누르면 그 조합으로 네 개를 뽑아요. 절벽과 강 안쪽은 나중에 바꿀 수 있어요.</p>${PICK_TIPS.map((t, k) => `<button type="button" class="tip" data-tip="${k}"><b>${esc(t.n)}</b><span class="gd"><i>좋은 점</i><span>${esc(t.good)}</span></span><span class="bd2"><i>아쉬운 점</i><span>${esc(t.bad)}</span></span></button>`).join("")}</section>`;
+    <section class="ptips"><h4>추천 조합</h4>${PICK_TIPS.map((t, k) => `<button type="button" class="tip" data-tip="${k}"><b>${esc(t.n)}</b><span class="gd"><i>좋은 점</i><span>${esc(t.good)}</span></span><span class="bd2"><i>아쉬운 점</i><span>${esc(t.bad)}</span></span></button>`).join("")}</section>`;
   const fEl = el.querySelector("#pk-f"), gridEl = el.querySelector("#pk-grid");
   const grp = (g, label, opts) => optBlock(label, "", `<div class="radios" role="radiogroup" aria-label="${label}" data-g="${g}">${[["", "아무거나"], ...opts].map(([v, l]) => `<button type="button" role="radio" data-v="${v}" aria-checked="${pickF[g] === v}">${l}</button>`).join("")}</div>`);
   const paint = () => {
@@ -6651,14 +6737,14 @@ const GRIDPTS = [[16, 16], [96, 16], [16, 80], [96, 80]];
 function openIslandTrace(){
   traceLoad();
   const has = !!trace.cv;
-  const s = openSheet(`<div class="hd"><div><h3>게임 지도 캡처 불러오기</h3><p class="sub">게임에서 찍은 섬 지도를 깔고 그대로 따라 그려요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>게임 지도 캡처 불러오기</h3></div>${XBTN}</div>
     <ol class="steps"><li>게임에서 NookPhone의 <b>지도</b>를 열고, 스위치의 <b>캡처 버튼</b>(왼쪽 조이콘의 네모 버튼)을 눌러요.</li>
       <li>스위치 <b>앨범</b>에서 그 캡처를 골라 폰으로 보내요 (공유 및 편집 → 스마트폰으로 보내기).</li>
       <li>여기서 <b>캡처 고르기</b>를 누르고, 사진 위 네 점을 구역 선에 맞추면 섬 지도 밑에 깔려요.</li></ol>
     <div class="acts2"><label class="pill leaf filebtn"><svg><use href="#i-photo"/></svg>${has ? "다른 캡처 고르기" : "캡처 고르기"}<input type="file" accept="image/*" id="tr-file" hidden></label>${has ? `<button class="pill ghost" type="button" data-t="again">다시 맞추기</button><button class="pill danger" type="button" data-t="del">캡처 지우기</button>` : ""}</div>
     ${has ? optBlock("캡처 보이기", "", `<div class="radios" role="radiogroup" data-g="on"><button type="button" role="radio" data-v="1" aria-checked="${isl.traceOn}">보이기</button><button type="button" role="radio" data-v="0" aria-checked="${!isl.traceOn}">숨기기</button></div>`)
       + optBlock("진하기", "", `<input type="range" id="tr-op" min="10" max="100" step="5" value="${Math.round(isl.trace * 100)}" aria-label="캡처 진하기">`)
-      + `<section class="ptips"><h4>캡처대로 지형 칠하기</h4><p class="sub">캡처의 색을 읽어 땅 높이, 물, 모래사장, 바위, 도로를 한 번에 칠해요. 건물과 나무는 직접 놓아 주세요. 되돌리기로 돌아갈 수 있어요.</p><div class="acts2"><button class="pill sun" type="button" data-t="auto">캡처대로 지형 칠하기</button></div></section>` : ""}`);
+      + `<section class="ptips"><h4>캡처대로 지형 칠하기</h4><p class="sub">건물과 나무는 직접 놓아요</p><div class="acts2"><button class="pill sun" type="button" data-t="auto">캡처대로 지형 칠하기</button></div></section>` : ""}`);
   const f = s.el.querySelector("#tr-file");
   f.addEventListener("change", () => { const file = f.files && f.files[0]; if(!file) return; const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { trace.src = im; trace.pts = null; s.close(); openAlign(); }; im.onerror = () => toast("캡처를 열지 못했어요"); im.src = u; });
   s.el.addEventListener("click", e => {
@@ -6764,7 +6850,7 @@ function traceToTerrain(){
 function openIslandView(){
   traceLoad();
   const rad = (g, cur, opts) => `<div class="radios" role="radiogroup" data-g="${g}">${opts.map(([v, l]) => `<button type="button" role="radio" data-v="${v}" aria-checked="${String(cur) === String(v)}">${l}</button>`).join("")}</div>`;
-  const s = openSheet(`<div class="hd"><div><h3>보기</h3><p class="sub">바꾸면 바로 지도에 보여요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>보기</h3></div>${XBTN}</div>
     ${optBlock("건물·다리·도로", "그림으로 보거나, 게임 지도처럼 아이콘과 색으로 봐요", rad("style", isl.style, [["pic", "그림으로"], ["map", "게임 지도처럼"]]))}
     ${optBlock("칸 선과 구역 이름", "G 키로도 켜고 꺼요", rad("grid", isl.grid ? 1 : 0, [[1, "보이기"], [0, "숨기기"]]))}
     ${optBlock("건물 이름과 주민 이름", "가까이 볼 때 건물 아래에 보여요", rad("names", isl.names ? 1 : 0, [[1, "보이기"], [0, "숨기기"]]))}
@@ -6776,8 +6862,8 @@ function openIslandView(){
 
 /* ----- 도움말 ----- */
 function openIslandHelp(){
-  const s = openSheet(`<div class="hd"><div><h3>섬 꾸미기 도움말</h3><p class="sub">게임 지도와 같은 모양, 같은 규칙으로 그려요</p></div>${XBTN}</div>
-    <button class="srow imrow hbtn" type="button" data-tips>${tIco("bee", 34)}<span class="tx"><b>꿀팁 보기</b><span>단축키와 손가락 조작은 꿀팁에 모아 뒀어요</span></span></button>
+  const s = openSheet(`<div class="hd"><div><h3>섬 꾸미기 도움말</h3></div>${XBTN}</div>
+    <button class="srow imrow hbtn" type="button" data-tips>${tIco("bee", 34)}<span class="tx"><b>꿀팁 보기</b></span></button>
     <section class="hsec"><h4>종류와 붓</h4><p>위에서 <b>무엇을</b> 칠할지(땅 높이, 도로 종류, 나무…)를 고르고, 아래 붓 칸에서 <b>어떻게</b> 칠할지(모양, 크기)를 골라요.</p></section>
     <section class="hsec"><h4>붓</h4><p><b>네모·둥근</b>은 그 모양으로 칠하고, <b>반 칸</b>은 칸을 대각선으로 반만 칠해요. <b>다듬기</b>로 문지르면 각진 모서리가 게임처럼 대각선이 되고, <b>채우기</b>는 이어진 같은 땅을 한 번에 바꿔요.</p></section>
     <section class="hsec"><h4>새 섬과 캡처</h4><p><b>새 섬</b>에서 게임 시작 섬 75개 중에서 고르거나 해안을 골라 직접 만들어요. 내 섬을 그대로 옮기고 싶으면 <b>캡처 불러오기</b>로 게임에서 찍은 지도 캡처를 깔고 따라 그려요.</p></section>
@@ -6851,10 +6937,9 @@ async function islPng(){
 }
 let pngUrl = "";
 function openIslandShare(){
-  const s = openSheet(`<div class="hd"><div><h3>저장·공유</h3><p class="sub">섬 지도는 이 기기에 저절로 저장돼요</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>저장·공유</h3></div>${XBTN}</div>
     <div class="ishot"><img id="sh-img" alt="내 섬 지도 그림"></div>
-    <p class="sub">그림을 길게 누르면(PC는 오른쪽 클릭) 사진으로 저장할 수 있어요. 이 그림 파일 안에 섬 코드가 들어 있어서, 아래 <b>그림 파일로 열기</b>로 다시 열 수 있어요.</p>
-    <p class="sub">공유 코드를 친구에게 보내면 친구 화면에서 같은 지도가 열려요. 기록 옮기기의 백업 코드에도 섬 지도가 같이 들어가요.</p>
+    <p class="sub">그림이나 코드를 보내면 친구도 같은 지도를 열 수 있어요</p>
     <textarea id="sh-out" readonly aria-label="섬 공유 코드">코드를 만드는 중…</textarea>
     <div class="acts2"><button class="pill leaf" type="button" id="sh-copy"><svg><use href="#i-copy"/></svg>코드 복사</button></div>
     <p class="sub" style="margin-top:6px">받은 코드나 그림으로 지도 열기</p>
@@ -6877,7 +6962,7 @@ function openHousePick(n){
   const used = new Set(ISL.o.filter((x, j) => j !== n && x.k === "house").map(x => x.v).filter(Boolean));
   const row = v => `<button class="srow" type="button" data-v="${v.f}" aria-pressed="${o.v === v.f}">${vilPic(v, 42)}<span class="tx"><b>${esc(v.ko)}</b><span>${esc(vSub(v))}${used.has(v.f) ? " · 이미 집이 있어요" : ""}</span></span><span class="ck"><svg><use href="#i-check"/></svg></span></button>`;
   const mine = VIL.filter(v => res.has(v.f)), start = () => (mine.length ? mine : VIL.slice(0, 30)).map(row).join("");
-  const s = openSheet(`<div class="hd"><div><h3>누구의 집?</h3><p class="sub">${mine.length ? "우리 섬 주민이 먼저 보여요" : "주민 탭에서 우리 섬 주민을 고르면 먼저 보여요"}</p></div>${XBTN}</div>
+  const s = openSheet(`<div class="hd"><div><h3>누구의 집?</h3></div>${XBTN}</div>
     <label class="sbox"><svg><use href="#i-search"/></svg><input type="search" id="hv-q" placeholder="주민 이름 (초성도 돼요)" autocomplete="off" enterkeyhint="search"></label>
     <div class="res" id="hv-res">${start()}</div>
     <div class="acts2"><button class="pill ghost" type="button" id="hv-none">주민 안 정하기</button></div>`);
@@ -7550,9 +7635,9 @@ async function claudeRead(file, sp){
 
 function openPhoto(){
   const s = openSheet(`<div class="hd"><h3>사진으로 체크</h3>${XBTN}</div>
-    <ol class="steps"><li>게임의 너굴 쇼핑 카탈로그나, 다른 앱의 체크 목록을 띄워요.</li><li>화면을 찍어요. 여러 장 찍어도 되고, 화면 기록(영상)을 켜고 목록을 천천히 끝까지 내려도 돼요.</li><li>찍은 사진이나 영상을 아래에 올려요.</li></ol>
+    <p class="sub">카탈로그 화면을 찍거나 화면 기록해서 올려요</p>
     <div id="ph-claude"></div>
-    <label class="drop" id="ph-drop"><b>사진·영상 고르기</b><span class="sub">여러 개를 한 번에 골라도 돼요. 사진과 영상은 이 기기 안에서만 읽어요.</span><input id="ph-file" type="file" accept="image/*,video/*" multiple hidden></label>
+    <label class="drop" id="ph-drop"><b>사진·영상 고르기</b><input id="ph-file" type="file" accept="image/*,video/*" multiple hidden></label>
     <div id="ph-stat" hidden><p class="sub" id="ph-txt"></p><div class="pbar"><i id="ph-bar"></i></div></div>
     <div id="ph-res"></div>`);
   const el = s.el, stat = el.querySelector("#ph-stat"), txt = el.querySelector("#ph-txt"), bar = el.querySelector("#ph-bar"), res = el.querySelector("#ph-res");
