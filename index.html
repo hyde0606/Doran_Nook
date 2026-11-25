@@ -1764,6 +1764,8 @@ html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100
 html.lscC .card.li .tx, html.lscC .card.li .tx:has(> .pl){display:flex; align-items:center; justify-content:center; min-height:32px}
 html.lscC .card.li .nm{line-height:16px}
 html.lscC .card.li{contain-intrinsic-size:auto 104px}
+/* 두 칸 보기: 폰은 두 칸, 넓은 화면(PC)은 칸 너비를 220px 안팎으로 두고 칸 수를 늘림 (링크님 2026-11-26 "PC에서 두 칸 보기가 여백이 너무 심해서") */
+@media (min-width:600px){ html.lscB .grid.list{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
 
 /* v48 보기 창 분류 맨 위 큰 칸 (링크님 2026-11-25, 시안 E 선택): 폰(560px 아래)에서
    아이콘+이름이 한 줄, 아래 줄에 개수와 막대. 300px 아래(한 칸씩 쌓임)는 아이콘·이름·개수 한 줄 + 막대. */
@@ -2134,7 +2136,7 @@ const KS = (() => {
 
 /* ---------- State ---------- */
 const KEY = "acnh-catalog-check-v1";
-const LSC_MODES = {item:["", "B", "C"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"두 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
+const LSC_MODES = {item:["", "B", "C"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"작은 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
 let lsMode = (() => { try{ const o = JSON.parse(localStorage.getItem(KEY + ":lsc") || "{}"); return o && typeof o === "object" ? o : {}; }catch(e){ return {}; } })();
 function lscApply(tab){
   const L = LSC_MODES[tab], m = L && L.includes(lsMode[tab]) ? lsMode[tab] : "", h = document.documentElement;
