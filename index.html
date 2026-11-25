@@ -1518,6 +1518,60 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
 /* iPhone (WebKit) measured the villager name before its container-relative font size was known and cut it:
    the box gets its width from the name's length instead (Jua Hangul is at most 1em; --ems carries .4em spare) */
 .card.li.vb .vn .nm{width:calc((var(--ems, 1) - .25) * 1em); max-width:100%}
+/* v48 거래 글 자세히 (링크님 고름: 이름표 위 색 글씨 + 색 점과 줄, 댓글 판, 말풍선, 버튼 한 묶음) */
+#tr-s{display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px}
+#tr-s > span + span::before{content:"·"; margin-right:8px; opacity:.7}
+#tr-s .tr-hau, #tr-s .tr-hag{display:none}
+.tr-meta{display:flex; align-items:center; flex-wrap:wrap; gap:2px 8px; min-width:0; font-size:13px; color:var(--muted); padding-bottom:10px}
+.tr-meta .fr{width:26px; height:26px; border-radius:50%; background:var(--paper2); display:grid; place-items:center; flex:none} .tr-meta .fr .pic{--t:20px}
+.tr-meta b{font-family:var(--f-display); font-weight:400; font-size:15px; color:var(--ink)}
+.tr-card{display:grid; gap:0; min-width:0; background:var(--card); border-radius:20px; padding:12px 14px; box-shadow:0 3px 0 var(--card-line)}
+.tr-card .tr-sec{background:transparent; border-radius:0; padding:10px 0; border-top:1px dashed var(--card-line); grid-template-columns:minmax(0,1fr); row-gap:6px}
+.tr-card .tr-sec .res{display:grid; gap:6px}
+.tr-card .tr-sh .lb{background:none; padding:0; font-size:14px}
+.tr-card .tr-sec.tk .lb{color:var(--plum)} .tr-card .tr-sec.gv .lb{color:var(--sun-ink, #b9851a)} .tr-card .tr-sec.fr .lb{color:var(--leaf)} .tr-card .tr-sec.tx .lb{color:var(--muted)}
+.tr-card .dtext{background:transparent; padding:2px 0; line-height:1.65; white-space:pre-wrap}
+.tr-card .tr-pay.tr-big{row-gap:6px}
+:root{--sun-ink:#b9851a; --cbox:rgba(122,90,58,.10); --cbox-hd:rgba(122,90,58,.10)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--sun-ink:var(--sun); --cbox:rgba(0,0,0,.16); --cbox-hd:rgba(0,0,0,.12)} }
+:root[data-theme="dark"]{--sun-ink:var(--sun); --cbox:rgba(0,0,0,.16); --cbox-hd:rgba(0,0,0,.12)}
+
+/* 버튼 한 묶음, 오른쪽 */
+.tr-acts{justify-self:end; display:inline-flex; margin:-2px 0 0; border-radius:12px; overflow:hidden; background:var(--chip); box-shadow:inset 0 0 0 1px var(--card-line)}
+.tr-acts button{border:0; background:transparent; color:var(--muted); font-family:var(--f-display); font-size:14px; padding:8px 14px; min-height:38px; white-space:nowrap}
+.tr-acts button + button{box-shadow:inset 1px 0 0 var(--card-line)}
+.tr-acts .tr-a1{color:var(--leaf)} .tr-acts .tr-a1.on{color:var(--muted)}
+.tr-acts .tr-a3{color:var(--berry, #d0563d)}
+.tr-acts button:disabled{opacity:.55}
+#tr-body{display:grid; gap:12px}
+
+/* 댓글 판 */
+.tr-cbox{display:grid; min-width:0; background:var(--cbox); border-radius:20px; padding:0 10px 10px; gap:10px}
+.tr-cmh{margin:0 -10px; padding:12px 16px; border-bottom:1px solid var(--card-line); border-radius:20px 20px 0 0; background:var(--cbox-hd)}
+.tr-cmh b{font-size:17px; color:var(--h-ink)}
+.tr-cbox .cmts{gap:10px}
+.tr-cbox .cmt{max-width:86%; justify-self:start; border-radius:4px 16px 16px 16px}
+.tr-cbox .cmt.mine{justify-self:end; border-radius:16px 4px 16px 16px; background:var(--sprout)}
+.tr-cbox .reps{border-left:0; padding-left:0; margin-left:22px}
+.tr-cbox .reps .cmt:not(.mine){border-radius:16px 16px 16px 4px}
+.tr-cin{position:sticky; bottom:0; display:flex; align-items:flex-end; gap:6px; border-radius:24px; padding:5px 5px 5px 4px; background:var(--paper2); box-shadow:0 -8px 12px -6px rgba(0,0,0,.25)}
+.tr-cin:focus-within{box-shadow:0 0 0 2px var(--leaf)}
+.tr-cin textarea{flex:1; min-width:0; min-height:44px; height:44px; resize:none; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; font-size:15px; padding:11px 10px}
+.tr-cinb{flex:none; display:flex; align-items:center} .tr-cinb i{display:none}
+.tr-cinb .pill{border-radius:999px; min-height:38px}
+
+/* 구역 나눔: 색 점과 줄 */
+.tr-card .tr-sec{border-top:0; padding:8px 0 12px}
+.tr-card .tr-sh{flex-wrap:nowrap; gap:8px}
+.tr-card .tr-sh::before{content:""; width:10px; height:10px; border-radius:50%; flex:none; background:currentColor}
+.tr-card .tr-sh::after{content:""; flex:1; height:2px; border-radius:2px; background:currentColor; opacity:.35}
+.tr-card .tr-sec.tk .tr-sh{color:var(--plum)} .tr-card .tr-sec.gv .tr-sh{color:var(--sun-ink)} .tr-card .tr-sec.fr .tr-sh{color:var(--leaf)} .tr-card .tr-sec.tx .tr-sh{color:var(--muted)}
+.tr-card .tr-sh .lb{font-size:15px}
+/* 좁은 폰: 말풍선 머리줄이 글자 단위로 꺾이지 않게 */
+.tr-cbox .cmt .ch{flex-wrap:wrap; row-gap:0}
+.tr-cbox .cmt .ch b, .tr-cbox .cmt .ch button{white-space:nowrap}
+@media (max-width:360px){ .tr-cbox .cmt{max-width:100%} .tr-cbox .reps{margin-left:12px} }
+@media (max-width:300px){ .tr-cin textarea{font-size:13.5px; padding:11px 6px} .tr-cinb .pill{padding:7px 10px} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4244,7 +4298,7 @@ function cmtBox(o){
   function one(c, topAuthor){
     if(c.gone) return `<div class="cmt gone" data-cid="${esc(c.id)}"><p>지워진 댓글이에요.</p></div>`;
     const to = c.parent && c.to && c.to.id !== topAuthor ? `<b class="cto">@${esc(c.to.name || "친구")}</b> ` : "";
-    return `<div class="cmt${c.parent ? " rep" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">${o.delLabel ? o.delLabel(c) : "지우기"}</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
+    return `<div class="cmt${c.parent ? " rep" : ""}${o.me() && c.author.id === o.me().id ? " mine" : ""}" data-cid="${esc(c.id)}"><div class="ch"><span class="fr">${fruitPic(c.author.fruit)}</span><b>${esc(c.author.name)}</b><span>${esc(islandText(c.author.island))}${c.author.id === o.owner() ? " · 글쓴이" : ""} · ${ago(c.created)}</span>${o.canDel(c) ? `<button type="button" data-delc="${esc(c.id)}">${o.delLabel ? o.delLabel(c) : "지우기"}</button>` : ""}</div><p>${to}${esc(c.body)}</p>${o.me() ? `<button class="crep" type="button" data-rep="${esc(c.id)}" aria-expanded="${!!rep && rep.id === c.id}">${ico("chat")}답글</button>` : ""}</div>`;
   }
   const box = () => `<div class="rbox"><label class="fld"><span>${esc(rep.name)} 님에게 답글<i id="rp-cnt">${text.length}/300</i></span><textarea id="rp-text" maxlength="300" placeholder="답글을 적어 주세요">${esc(text)}</textarea></label><div id="rp-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="rp-send">답글 달기</button><button class="pill ghost" type="button" id="rp-no">그만두기</button></div></div>`;
   return {
@@ -4306,7 +4360,7 @@ function openTrade(id, p0, opt){
   }
   function head(){
     s.el.querySelector("#tr-t").textContent = tradeTitle(p);
-    s.el.querySelector("#tr-s").textContent = `${TRADE_T[p.type][0]} · ${ago(p.created)}${p.status === "done" ? " · 거래 완료" : ""}`;
+    s.el.querySelector("#tr-s").innerHTML = `<span class="tr-hty">${TRADE_T[p.type][0]}</span><span class="tr-hau"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b>${p.author.island ? `<span>${esc(islandText(p.author.island))}</span>` : ""}</span><span class="tr-hag">${ago(p.created)}</span>${p.status === "done" ? `<span>거래 완료</span>` : ""}`;
   }
   function row(x){
     const e = tEntry(x, 48), tag = e.it || e.v ? "button" : "div";
@@ -4315,20 +4369,23 @@ function openTrade(id, p0, opt){
   function draw(){
     head();
     const typed = body.querySelector("#trc-text"), keep = typed ? typed.value : "";
-    body.innerHTML = `
+    const meta = `<div class="tr-meta"><span class="fr">${fruitPic(p.author.fruit)}</span><b>${esc(p.author.name)}</b><span>${p.author.island ? esc(islandText(p.author.island)) + " · " : ""}${ago(p.created)}${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div>`;
+    body.innerHTML = `<div class="tr-card">${meta}
       <section class="tr-sec ${p.type === "want" ? "tk" : p.type === "sell" ? "gv" : "fr"}"><div class="tr-sh"><span class="lb">${ITEM_HEAD[p.type]}</span></div><div class="res">${p.items.map(row).join("")}</div></section>
       ${p.type === "free" ? "" : `<section class="tr-sec ${p.type === "want" ? "gv" : "tk"}"><div class="tr-sh"><span class="lb">${PAY_HEAD[p.type]}</span></div><div class="tr-pay tr-big">${payHTML(p)}</div></section>`}
       ${p.body ? `<section class="tr-sec tx"><div class="tr-sh"><span class="lb">내용</span></div><div class="dtext">${esc(p.body)}</div></section>` : ""}
-      <section class="tr-sec by"><div class="tr-sh"><span class="lb">작성자</span></div><div class="who tr-auth"><span class="fr">${fruitPic(p.author.fruit)}</span><div class="wt"><b>${esc(p.author.name)}</b><span>${esc(islandText(p.author.island))} · ${ago(p.created)}에 올림${p.updated - p.created > 60000 ? ` · ${ago(p.updated)} 고침` : ""}</span></div></div></section>
+      </div>
       ${reqs.length && me() ? reqs.map(r => rqHTML(r, me().admin, false)).join("") : ""}
-      ${mine() ? `<div class="acts2"><button class="pill ${p.status === "done" ? "sun" : "leaf"}" type="button" id="tr-done">${p.status === "done" ? "다시 거래 중으로" : "거래 완료로 바꾸기"}</button><button class="pill ghost" type="button" id="tr-edit">${tLocked(p) ? "고치기 요청" : "고치기"}</button><button class="pill danger" type="button" id="tr-del"${rqWait("del") ? " disabled" : ""}>${tLocked(p) ? (rqWait("del") ? "지우기 요청함" : "지우기 요청") : "지우기"}</button></div>`
-        : me() && me().admin ? `<div class="acts2"><button class="pill ghost" type="button" id="tr-edit">관리자로 고치기</button><button class="pill danger" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
+      ${mine() ? `<div class="tr-acts"><button class="tr-a1${p.status === "done" ? " on" : ""}" type="button" id="tr-done">${p.status === "done" ? "거래 중으로" : "거래완료"}</button><button type="button" id="tr-edit">${tLocked(p) ? "고치기 요청" : "고치기"}</button><button class="tr-a3" type="button" id="tr-del"${rqWait("del") ? " disabled" : ""}>${tLocked(p) ? (rqWait("del") ? "지우기 요청함" : "지우기 요청") : "지우기"}</button></div>`
+        : me() && me().admin ? `<div class="tr-acts"><button type="button" id="tr-edit">관리자로 고치기</button><button class="tr-a3" type="button" id="tr-del">관리자로 지우기</button></div>` : ""}
       <div id="tr-msg"></div>
+      <div class="tr-cbox">
       <div class="shd tr-cmh">${ico("chat")}<b id="tr-cn">댓글 ${fmt(p.cmts || 0)}</b></div>
       <div class="cmts" id="tr-cl">${cmtsHTML()}</div>
-      ${me() ? `<label class="fld"><span>댓글 달기<i id="trc-cnt">0/300</i></span><textarea id="trc-text" maxlength="300" placeholder="${mine() ? "답을 남겨 주세요" : "거래하고 싶으면 댓글을 남겨 주세요"}"></textarea></label>
-        <div id="trc-msg"></div><div class="acts2"><button class="pill leaf" type="button" id="trc-send">댓글 달기</button></div>`
-        : `<p class="note">댓글은 로그인하고 달 수 있어요.</p>${signinBtns}`}`;
+      ${me() ? `<div class="tr-cin"><textarea id="trc-text" maxlength="300" aria-label="댓글 달기" placeholder="${mine() ? "답을 남겨 주세요" : "거래하고 싶으면 댓글을 남겨 주세요"}"></textarea><div class="tr-cinb"><i id="trc-cnt" class="num">0/300</i><button class="pill leaf sm" type="button" id="trc-send">댓글 달기</button></div></div>
+        <div id="trc-msg"></div>`
+        : `<p class="note">댓글은 로그인하고 달 수 있어요.</p>${signinBtns}`}
+      </div>`;
     const t2 = body.querySelector("#trc-text"); if(t2 && keep){ t2.value = keep; body.querySelector("#trc-cnt").textContent = `${keep.length}/300`; }
   }
   function drawCmts(){ const cl = body.querySelector("#tr-cl"); if(cl) cl.innerHTML = cmtsHTML(); const cn = body.querySelector("#tr-cn"); if(cn) cn.textContent = `댓글 ${fmt(p.cmts || 0)}`; }
