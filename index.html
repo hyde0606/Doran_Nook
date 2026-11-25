@@ -1845,14 +1845,14 @@ const SRV = !!window.DN_SERVER;
 if(SRV) document.querySelector(".tl-dream").textContent = "자랑";
 /* ---------- View state (kept per device) ---------- */
 const ui = { tab:"item", cat:0, cats:[], fo:"all", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1, liked:false, view:"list", sort:"base", limit:0,
-  mmon:"all", msort:"base", vpers:-1, vgen:-1, vbm:false, vsort:"name", q:"" };
+  mmon:"all", msort:"base", vpers:-1, vgen:-1, vbm:false, vsort:"rand", q:"" };
 // Each bottom tab remembers its own category, status tab and 좋아요 switch.
 const TABS = ["item", "museum", "villager", "dream", "trade", "todo", "island"];
 const TAB_DEF = {item:{cat:0, fo:"all"}, museum:{cat:-1, fo:"all"}, villager:{cat:-1, fo:"all"}, dream:{cat:-1, fo:SRV ? "all" : "new"}, trade:{cat:-1, fo:"all"}, todo:{cat:-1, fo:"day"}, island:{cat:-1, fo:"land"}};
 const mem = {}; TABS.forEach(t => mem[t] = {...TAB_DEF[t], liked:false, cats:[]});
-const SORTS = {base:"기본 순서", name:"이름 순", buyD:"구매가 높은 순", buyA:"구매가 낮은 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
-const MSORTS = {base:"기본 순서", name:"이름 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
-const VSORTS = {name:"이름 순", bday:"생일 순", species:"종족 순"};
+const SORTS = {base:"랜덤", name:"이름 순", buyD:"구매가 높은 순", buyA:"구매가 낮은 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
+const MSORTS = {base:"랜덤", name:"이름 순", sellD:"판매가 높은 순", sellA:"판매가 낮은 순"};
+const VSORTS = {rand:"랜덤", name:"이름 순", bday:"생일 순", species:"종족 순"};
 const MMON = {all:"전부", now:"이번 달에 나오는 것", new:"이번 달 새로 나온 것", last:"이번 달이 마지막인 것"};
 const TAB_FO = {
   item: [["all","전체"], ["none","미보유"], ["have","보유"], ["part","일부 보유","일부"], ["done","완료"]],
@@ -2027,9 +2027,12 @@ function searchList(q){
 /* ---------- Rendering ---------- */
 function ownedIn(list){ let n=0; for(const it of list) if(own.has(it.id)) n++; return n; }
 const COLL = new Intl.Collator("ko");
+let RSEED = (Math.random() * 4294967296) >>> 0;   // v48: 랜덤 정렬 씨앗. 열 때마다, 랜덤을 누를 때마다 바뀜
+function rkey(k){ let h = RSEED ^ 2166136261; k = String(k); for(let i = 0; i < k.length; i++){ h ^= k.charCodeAt(i); h = Math.imul(h, 16777619); } h ^= h >>> 15; h = Math.imul(h, 2246822507); h ^= h >>> 13; return h >>> 0; }
+const rsort = (L, id) => L.map(x => [rkey(id(x)), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
 function sortList(list){
   const so = ui.tab === "museum" ? ui.msort : ui.sort;
-  if(so === "base") return list;
+  if(so === "base") return rsort(list, it => it.id);
   if(so === "name") return list.slice().sort((a,b) => COLL.compare(a.ko, b.ko));
   const key = so.startsWith("buy") ? buyPrice : (it => it.sell), d = so.endsWith("D") ? -1 : 1;
   return list.slice().sort((a,b) => { const x = key(a), y = key(b); return !x && !y ? 0 : !x ? 1 : !y ? -1 : d * (x - y); });
@@ -2582,7 +2585,7 @@ function viewActive(T){
     if(ui.msort !== "base") s = MSORTS[ui.msort];
   } else if(T === "villager"){
     if(ui.vpers >= 0) f.push(PERS_KO[ui.vpers]); if(ui.vgen >= 0) f.push(ui.vgen ? "여자" : "남자"); if(ui.vbm) f.push(`${NOW_M + 1}월 생일`);
-    if(ui.vsort !== "name") s = VSORTS[ui.vsort];
+    if(ui.vsort !== "rand") s = VSORTS[ui.vsort];
   } else if(T === "dream"){
     if(shCat() >= 10) f.push("내 글만");
     if(shCat() % 10) s = SH_SORTS[shCat() % 10][1];
@@ -2595,7 +2598,7 @@ function viewReset(T){
   ui.liked = false;
   if(T === "item") Object.assign(ui, {sort:"base", buyable:false, showNS:true, showNC:true, new3:false, diy:false, remake:false, src:-1});
   else if(T === "museum") Object.assign(ui, {msort:"base", mmon:"all"});
-  else if(T === "villager") Object.assign(ui, {vsort:"name", vpers:-1, vgen:-1, vbm:false});
+  else if(T === "villager") Object.assign(ui, {vsort:"rand", vpers:-1, vgen:-1, vbm:false});
   else if(T === "dream") ui.cat = 0;
   else if(T === "trade") ui.cat = -1;
 }
@@ -2759,7 +2762,7 @@ function openFind(jump){
       else if(T === "dream") ui.cat = shCat() % 10;
       else if(T === "trade") ui.cat = -1;
     } else {
-      if(T === "item") ui.sort = "base"; else if(T === "museum") ui.msort = "base"; else if(T === "villager") ui.vsort = "name"; else if(T === "dream") ui.cat = shCat() >= 10 ? 10 : 0;
+      if(T === "item") ui.sort = "base"; else if(T === "museum") ui.msort = "base"; else if(T === "villager") ui.vsort = "rand"; else if(T === "dream") ui.cat = shCat() >= 10 ? 10 : 0;
     }
     toast(`${PNAME[page]}${page === "cat" ? "를" : "을"} 처음으로 돌렸어요. 적용을 눌러야 목록이 바뀌어요`);
   };
@@ -2849,7 +2852,7 @@ function openFind(jump){
     const pg = e.target.closest("[data-pg]"); if(pg){ if(inp.value){ inp.value = ""; paint(); } return showPage(pg.dataset.pg); }
     const w = e.target.closest("[data-vk]"); if(w){ const r = V.filt.find(x => x.k === w.dataset.vk); if(r && !w.disabled){ r.set(!r.get()); vsync(); } return; }
     const rb = e.target.closest("[data-vg] button"); if(rb){ const g = rb.closest("[data-vg]").dataset.vg, v = rb.dataset.v;
-      if(g === "_sort") V.sort.set(v); else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
+      if(g === "_sort"){ if(v === "base" || v === "rand") RSEED = (Math.random() * 4294967296) >>> 0; V.sort.set(v); } else if(g === "_set") V.setting.set(v); else { const r = V.filt.find(x => x.k === g); if(r) r.set(v); }
       vsync(); return; }
     if(e.target.closest("#v-src")) return openSrcPick(vsync);
     if(e.target.closest("#v-reset")){ resetPage(); vsync(); return; }
@@ -2910,7 +2913,7 @@ function openVilFilters(){
     `<p class="sub">사이트를 다시 열면 정렬과 필터는 처음으로 돌아가요.</p>`,
     g => ui[g],
     (g, v) => { ui[g] = g === "vsort" ? v : g === "vbm" ? v === "true" : +v; },
-    () => { ui.vsort = "name"; ui.vpers = -1; ui.vgen = -1; ui.vbm = false; });
+    () => { ui.vsort = "rand"; ui.vpers = -1; ui.vgen = -1; ui.vbm = false; });
 }
 function openFilters(){
   if(ui.tab === "museum") return openMuseumFilters();
@@ -2992,6 +2995,7 @@ function sortVil(L){
   const byName = (a, b) => COLL.compare(a.ko, b.ko);
   if(ui.vsort === "bday"){ const now = (NOW_M + 1) * 100 + new Date().getDate(), k = v => (v.bd - now + 1300) % 1300; return L.slice().sort((a, b) => k(a) - k(b) || byName(a, b)); }
   if(ui.vsort === "species") return L.slice().sort((a, b) => COLL.compare(VSP[a.sp], VSP[b.sp]) || byName(a, b));
+  if(ui.vsort === "rand") return rsort(L, v => v.f);
   return L.slice().sort(byName);
 }
 function vilCardHTML(v){
@@ -3015,7 +3019,7 @@ function renderVillagerHead(){
   base.forEach(v => { if(res.has(v.f)) c.res++; hasPhoto(v) ? c.photo++ : c.nophoto++; });
   const n = L.filter(hasPhoto).length, done = L.length && n === L.length && ui.cat !== -3;
   setPick(vilLabel(ui.cat), "주민", "", done ? `<span class="done-mark">사진 완성</span>` : `사진 ${fmt(n)}/${fmt(L.length)}`);
-  setBadge(vilFiltersActive() + (ui.vsort !== "name" ? 1 : 0));
+  setBadge(vilFiltersActive() + (ui.vsort !== "rand" ? 1 : 0));
   setTabs(c);
 }
 function villagerStats(){ return `<span>주민 사진 <b>${fmt(VIL.filter(hasPhoto).length)}/${fmt(VIL.length)}</b></span><span>우리 섬 <b>${fmt(res.size)}명</b></span><span>좋아하는 주민 <b>${fmt(vlike.size)}명</b></span>`; }
