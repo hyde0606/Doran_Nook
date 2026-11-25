@@ -1717,7 +1717,7 @@ kbd{font-family:var(--f-display); font-size:13.5px; line-height:22px; min-width:
 body{word-break:keep-all; overflow-wrap:break-word; text-wrap-style:pretty}
 h1, h2, h3, h4, h5, h6, b, strong, em, button, label, summary, figcaption, th, .nm, .tag, .pill, .lb, .tx > span{text-wrap-style:balance}
 
-/* v48 목록 작게 보기 (링크님 2026-11-25): 아이템은 기본·두 칸(B)·사진 칸(C), 박물관은 기본·두 칸(B). 주민은 그대로.
+/* v48 목록 작게 보기 (링크님 2026-11-25): 아이템은 기본·작은 칸(B) (사진 칸 C는 2026-11-26 링크님 요청으로 뺌), 박물관은 기본·두 칸(B). 주민은 그대로.
    버튼 #btn-lsc 를 누르면 차례로 바뀌고, 탭마다 KEY+":lsc"에 기억. 지금 탭의 모양을 <html class="lscB|lscC"> 로 표시 (검색 창 결과도 같이). */
 
 /* B 두 칸 */
@@ -1736,21 +1736,8 @@ html.lscB .card.li .side{width:30px}
 html.lscB .card.li .side svg{width:15px; height:15px}
 @media (max-width:300px){ html.lscB .grid.list{grid-template-columns:minmax(0, 1fr)} }
 
-/* C 사진 칸 */
-html.lscC .card.li .pl{display:none}
-html.lscC .card.li .nm{white-space:normal; overflow:visible; text-overflow:clip; word-break:keep-all; overflow-wrap:anywhere}
-html.lscC .grid.list{grid-template-columns:repeat(auto-fill, minmax(84px, 1fr)); gap:6px}
-html.lscC .card.li{position:relative; flex-direction:column; align-items:stretch; height:auto; min-height:0; contain-intrinsic-size:auto 110px; border-radius:14px}
-html.lscC .card.li .tog{flex-direction:column; justify-content:flex-start; gap:4px; padding:10px 4px 8px; text-align:center}
-html.lscC .card.li .pw .pic{--t:50px !important}
-html.lscC .card.li .tx, html.lscC .card.li .tx:has(> .pl){display:block; width:100%}
-html.lscC .card.li .nm{font-size:12.5px; line-height:1.25; width:auto; text-align:center}
-html.lscC .card.li .meta{display:none}
-html.lscC .card.li .side{position:absolute; inset:0 0 auto 0; height:26px; width:auto; flex-direction:row; justify-content:space-between; border:0; pointer-events:none}
-html.lscC .card.li .side .lk, html.lscC .card.li .dt{pointer-events:auto; width:28px; height:26px; border:0; border-radius:0}
-html.lscC .card.li .side svg{width:14px; height:14px}
 
-html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100%}
+html.lscB .vcnt{transform:scale(.72); transform-origin:100% 100%}
 
 /* 버튼 알아보기: 안내 줄 아이콘, 보기 창 목록 모양, 처음 한 번 반짝 */
 .plank p .wi{width:1.1em; height:1.1em; vertical-align:-.18em; margin:0 1px; fill:none; color:inherit}
@@ -1760,10 +1747,6 @@ html.lscB .vcnt, html.lscC .vcnt{transform:scale(.72); transform-origin:100% 100
 @keyframes lscHint{0%, 100%{box-shadow:0 0 0 0 rgba(255, 220, 120, 0)} 50%{box-shadow:0 0 0 5px rgba(255, 220, 120, .55)}}
 #btn-lsc.lsc-hint{animation:lscHint 1.1s ease-in-out 1.2s 2}
 @media (prefers-reduced-motion:reduce){ #btn-lsc.lsc-hint{animation:none; outline:2px solid rgba(255, 220, 120, .8)} }
-/* 사진 칸: 이름이 한 줄이든 두 줄이든 칸 높이를 같게 (링크님 2026-11-26 "높은걸로 통일") — 이름 자리를 두 줄 높이로 잡고 가운데 */
-html.lscC .card.li .tx, html.lscC .card.li .tx:has(> .pl){display:flex; align-items:center; justify-content:center; min-height:32px}
-html.lscC .card.li .nm{line-height:16px}
-html.lscC .card.li{contain-intrinsic-size:auto 104px}
 /* 두 칸 보기: 폰은 두 칸, 넓은 화면(PC)은 칸 너비를 220px 안팎으로 두고 칸 수를 늘림 (링크님 2026-11-26 "PC에서 두 칸 보기가 여백이 너무 심해서") */
 @media (min-width:600px){ html.lscB .grid.list{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
 
@@ -1827,6 +1810,9 @@ html.lscC .card.li{contain-intrinsic-size:auto 104px}
 .tl-pc{background:var(--chip)}
 .tl-pc .pic{--t:30px !important}
 .tl-cnt{font-family:var(--f-display); font-size:14.5px; color:var(--ink); box-shadow:inset 0 0 0 1px var(--card-line)}
+
+/* v48 할 일 작게 보기(칸): PC에서 두 칸은 여백이 많아 칸 너비 220px 안팎으로 칸 수를 늘림 (링크님 2026-11-26 "여기도 여백 너무 많다") */
+@media (min-width:600px){ .tcard.tdc .tdlist{grid-template-columns:repeat(auto-fill, minmax(220px, 1fr))} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2147,7 +2133,7 @@ const KS = (() => {
 
 /* ---------- State ---------- */
 const KEY = "acnh-catalog-check-v1";
-const LSC_MODES = {item:["", "B", "C"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"작은 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
+const LSC_MODES = {item:["", "B"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"작은 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
 let lsMode = (() => { try{ const o = JSON.parse(localStorage.getItem(KEY + ":lsc") || "{}"); return o && typeof o === "object" ? o : {}; }catch(e){ return {}; } })();
 function lscApply(tab){
   const L = LSC_MODES[tab], m = L && L.includes(lsMode[tab]) ? lsMode[tab] : "", h = document.documentElement;
