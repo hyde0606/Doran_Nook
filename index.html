@@ -36,6 +36,23 @@
   transform:rotate(-8deg); pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))}
 .rcpk svg{display:block; width:100%; height:100%}
 .hd h3 .tag.rc{font-family:var(--f-body); font-size:12px; vertical-align:3px; margin-left:6px; white-space:nowrap}
+
+/* v47: 짧은 내 계정 상자 */
+.acct.me{gap:12px; padding-bottom:14px}
+.acct.me .wt{gap:3px}
+.acct.me .wt b{display:flex; align-items:center; flex-wrap:wrap; gap:6px; line-height:1.2}
+.tag.adm{font-family:var(--f-body); font-size:11.5px; background:var(--sun); color:#4a3a1c}
+.acct.me .wt span{line-height:1.35}
+.acct.me .syncst{font-size:13px}
+.acct.me .syncst span{color:inherit}
+.acbtns{display:grid; grid-template-columns:repeat(var(--n), minmax(0, 1fr)); gap:8px}
+.acbtns .pill{min-width:0; padding:10px 8px; font-size:14.5px; white-space:nowrap}
+.acbtns .pill .fi{width:17px; height:17px; flex:none}
+@media (max-width:480px){
+  .acbtns{gap:6px}
+  .acbtns .pill{flex-direction:column; gap:3px; padding:8px 2px 7px; font-size:13.5px}
+  .acbtns .pill .fi{width:19px; height:19px}
+}
 </style>
 <script>window.DN_SERVER = 1;</script>
 </head>
@@ -4858,8 +4875,8 @@ function openShowForm(x){
 }
 function syncLine(){
   const st = SYNC.state;
-  if(st === "busy") return `<p class="syncst">다른 기기와 기록을 맞추는 중이에요…</p>`;
-  if(st === "ok") return `<p class="syncst ok">${ico("check")}<span>다른 기기와 기록이 같아요 · ${ago(SYNC.at)}</span></p>`;
+  if(st === "busy") return `<p class="syncst">다른 기기와 기록 맞추는 중…</p>`;
+  if(st === "ok") return `<p class="syncst ok">${ico("check")}<span>다른 기기와 같아요 · ${ago(SYNC.at)}</span></p>`;
   if(st === "err") return `<p class="syncst bad">인터넷이 불안정해서 아직 못 맞췄어요. 다시 열면 이어서 해요.</p>`;
   if(st === "out") return `<p class="syncst bad">로그인이 풀렸어요. 다시 로그인해 주세요.</p>`;
   return "";
@@ -4869,12 +4886,14 @@ function acctHTML(){
   if(!u) return `<div class="acct"><h4>로그인</h4>
       <p>로그인하면 폰과 PC의 체크 기록이 저절로 같아져요. 보기와 체크는 로그인 없이도 그대로 쓸 수 있어요.</p>
       <div class="acts2"><button class="pill leaf" type="button" id="ac-in">로그인</button><button class="pill sun" type="button" id="ac-up">처음이에요 (가입하기)</button></div></div>`;
-  return `<div class="acct"><h4>내 계정</h4>
-      <div class="who"><span class="fr">${fruitPic(u.fruit)}</span><div class="wt"><b>${esc(u.name)}</b><span>${esc(islandText(u.island))} · 아이디 ${esc(u.login)}${u.admin ? " · 관리자" : ""}</span></div></div>
+  const btns = [`<button class="pill ghost" type="button" id="ac-prof">${ico("pen")}<span>프로필</span></button>`,
+    `<button class="pill ghost" type="button" id="ac-pw">${ico("lock")}<span>비밀번호</span></button>`,
+    u.admin ? `<button class="pill soil" type="button" id="ac-admin">${ico("face")}<span>친구 관리</span></button>` : "",
+    `<button class="pill ghost" type="button" id="ac-out">${ico("out")}<span>로그아웃</span></button>`].filter(Boolean);
+  return `<div class="acct me">
+      <div class="who"><span class="fr">${fruitPic(u.fruit)}</span><div class="wt"><b>${esc(u.name)}${u.admin ? `<span class="tag adm">관리자</span>` : ""}</b><span>${esc(islandText(u.island))} · 아이디 ${esc(u.login)}</span><div id="ac-sync">${syncLine()}</div></div></div>
       ${u.mustChange ? `<p class="err">임시 비밀번호로 들어왔어요. 새 비밀번호로 바꿔 주세요.</p>` : ""}
-      <div id="ac-sync">${syncLine()}</div>
-      <div class="acts2"><button class="pill ghost" type="button" id="ac-prof">프로필 고치기</button><button class="pill ghost" type="button" id="ac-pw">비밀번호 바꾸기</button></div>
-      <div class="acts2">${u.admin ? `<button class="pill soil" type="button" id="ac-admin">친구 관리</button>` : ""}<button class="pill ghost" type="button" id="ac-out">로그아웃</button></div></div>`;
+      <div class="acbtns" style="--n:${btns.length}">${btns.join("")}</div></div>`;
 }
 function mountAcct(box){
   const draw = () => {
