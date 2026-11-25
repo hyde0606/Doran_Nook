@@ -1816,6 +1816,17 @@ html.lscC .card.li{contain-intrinsic-size:auto 104px}
 /* 추천했을 때 글씨가 분홍 바탕에 묻히지 않게 */
 .sh-bar .sh-like[aria-pressed="true"], .sh-bar .sh-like[aria-pressed="true"] b{color:#ff9fb4}
 :root[data-theme=light] .sh-bar .sh-like[aria-pressed="true"], :root[data-theme=light] .sh-bar .sh-like[aria-pressed="true"] b{color:#b83256}
+
+/* v48 거래 목록 카드 높이 맞추기: 첫 아이템 + "+" 작은 그림 줄, 같은 줄 카드는 같은 높이 (링크님 2026-11-26) */
+.tr-grid{align-items:stretch}
+.tr-card.tl{align-content:start; contain-intrinsic-size:auto 140px}
+.tr-card.tl .tr-items{gap:7px}
+.tl-sm{display:flex; align-items:center; gap:5px; padding-left:34px; min-height:36px}
+.tl-plus{width:22px; margin-right:8px; text-align:center; font-family:var(--f-display); font-size:22px; line-height:1; color:var(--muted); flex:none}
+.tl-pc, .tl-cnt{width:36px; height:36px; border-radius:10px; display:grid; place-items:center; flex:none}
+.tl-pc{background:var(--chip)}
+.tl-pc .pic{--t:30px !important}
+.tl-cnt{font-family:var(--f-display); font-size:14.5px; color:var(--ink); box-shadow:inset 0 0 0 1px var(--card-line)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4451,11 +4462,11 @@ function tlToggle(e){
 document.addEventListener("click", tlToggle, true);
 document.addEventListener("keydown", tlToggle, true);
 function tradeCardHTML(p){
-  const ents = p.items.map(x => tEntry(x, 40)), more = ents.length - 3;
+  const e0 = tEntry(p.items[0] || {k:"s", id:"help"}, 40), rest = p.items.slice(1), show = rest.length <= 4 ? rest : rest.slice(0, 3), left = rest.length - show.length;
   const k1 = p.type === "want" ? "k-plum" : p.type === "sell" ? "k-sun" : "k-leaf", k2 = p.type === "want" ? "k-sun" : "k-plum", fold = p.type !== "free";
   return `<button class="tr-card tl${fold ? " hasx" : ""}${p.status === "done" ? " tr-closed" : ""}" type="button" data-trade="${esc(p.id)}">
     <span class="tl-sh ${k1}"><b>${ITEM_HEAD[p.type]}</b>${p.status === "done" ? `<span class="tr-tag tr-fin">거래 완료</span>` : ""}<span class="tl-by"><span class="fr">${fruitPic(p.author.fruit)}</span><span class="tl-nm">${esc(p.author.name)}</span><span class="tl-ag">${ago(p.created)}</span><span class="tr-cm">${ico("chat")}<span class="num">${fmt(p.cmts || 0)}</span></span></span></span>
-    <span class="tr-items">${ents.slice(0, 3).map(e => `<span class="tr-it">${e.pic}<span class="tx"><b>${esc(e.name)}</b>${e.sub ? `<i>${esc(e.sub)}</i>` : ""}</span></span>`).join("")}${more > 0 ? `<span class="tr-more">외 ${more}개 더</span>` : ""}</span>
+    <span class="tr-items"><span class="tr-it">${e0.pic}<span class="tx"><b>${esc(e0.name)}</b>${e0.sub ? `<i>${esc(e0.sub)}</i>` : ""}</span></span><span class="tl-sm"${rest.length ? "" : ` aria-hidden="true"`}>${rest.length ? `<span class="tl-plus" aria-hidden="true">+</span>` : ""}${show.map(x => `<span class="tl-pc" title="${esc(tEntry(x, 30).name)}">${tEntry(x, 30).pic}</span>`).join("")}${left ? `<span class="tl-cnt" aria-label="${left}개 더">+${left}</span>` : ""}</span></span>
     ${fold ? `<span class="tl-pay"><span class="tl-sh ${k2}"><b>${PAY_HEAD[p.type]}</b></span><span class="tr-pay">${payHTML(p)}</span></span><span class="tl-x" role="button" tabindex="0" data-tlx aria-expanded="false" aria-label="${PAY_HEAD[p.type]} 펼치기"><i></i></span>` : ""}
   </button>`;
 }
