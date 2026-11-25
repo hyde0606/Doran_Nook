@@ -1861,6 +1861,32 @@ html.lscB .card.li .meta .tag:last-child{margin-right:0}
 :root[data-theme="dark"]{--cau:#f0c552; --cau-bg:#f0c552}
 .cmts .cmt.au{box-shadow:inset 4px 0 0 var(--cau)}
 .cmts .cmt .ch .cau{flex:none; font-style:normal; font-family:var(--f-display); font-size:11.5px; line-height:18px; padding:0 7px; border-radius:999px; background:var(--cau-bg); color:#3b2a1a; white-space:nowrap}
+/* v48 자랑 사진 크게 보기 (링크님 2026-11-26): 사진을 누르면 화면 가득 크게. 좌우로 밀거나 화살표로 넘김, 두 번 누르거나 + 버튼으로 확대해서 끌어 보기. */
+.sh-photo .dbig.tall{position:relative}
+.sh-photo #sh-img{cursor:zoom-in; touch-action:pan-y; -webkit-user-drag:none; user-select:none}
+.sh-zbtn{position:absolute; right:8px; bottom:8px; width:38px; height:38px; border-radius:50%; border:0; background:rgba(20,14,8,.55); color:#f6ead0; display:grid; place-items:center}
+.sh-zbtn .fi{width:19px; height:19px}
+.pzv{position:fixed; inset:0; z-index:90; background:#0d0a07; display:grid}
+.pzv-strip{display:flex; width:100%; height:100%; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; overscroll-behavior:contain}
+.pzv-strip::-webkit-scrollbar{display:none}
+.pzv-strip.lock{overflow-x:hidden; scroll-snap-type:none}
+.pzv-sl{flex:0 0 100%; height:100%; box-sizing:border-box; scroll-snap-align:center; scroll-snap-stop:always; display:grid; place-items:center; padding:64px 12px 28px; overflow:hidden}
+.pzv-sl img{max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; user-select:none; -webkit-user-drag:none; cursor:zoom-in; touch-action:pan-x pan-y}
+.pzv-sl.zm{display:block; overflow:auto; padding:0; overscroll-behavior:contain}
+.pzv-sl.zm img{max-width:none; max-height:none; border-radius:0; display:block; margin:auto; cursor:zoom-out}
+.pzv-top{position:fixed; top:0; left:0; right:0; z-index:1; display:flex; align-items:center; gap:8px; padding:10px 12px; pointer-events:none}
+.pzv-top > *{pointer-events:auto}
+.pzv-n{margin-right:auto; color:#f6ead0; font-family:var(--f-display); font-size:15px; background:rgba(0,0,0,.5); border-radius:999px; padding:5px 13px}
+.pzv-n:empty{visibility:hidden}
+.pzv-b{width:46px; height:46px; border-radius:50%; border:0; background:rgba(255,246,222,.18); color:#f6ead0; display:grid; place-items:center; flex:none}
+.pzv-b .fi{width:22px; height:22px}
+.pzv-p, .pzv-nx{position:fixed; top:50%; z-index:1; margin-top:-23px}
+.pzv-p{left:10px} .pzv-nx{right:10px}
+.pzv-p .fi{transform:rotate(90deg)} .pzv-nx .fi{transform:rotate(-90deg)}
+.pzv-p[disabled], .pzv-nx[disabled]{opacity:.25}
+.pzv.zoomed .pzv-p, .pzv.zoomed .pzv-nx{display:none}
+@media (min-width:601px){ .pzv-sl{padding:64px 68px 28px} }
+@media (max-width:600px){ .pzv-sl{padding:64px 8px 84px} .pzv-p, .pzv-nx{top:auto; bottom:20px; margin-top:0} .pzv-p{left:calc(50% - 58px)} .pzv-nx{left:calc(50% + 12px); right:auto} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2633,6 +2659,61 @@ function openSheet(html, onClose, opt){
   });
   const f = (matchMedia("(pointer:fine)").matches && ov.querySelector(".bd input[type=search]")) || ov.querySelector(".x"); f && f.focus({preventScroll:true});
   return {el: ov.firstChild, close, ov};
+}
+// v48 사진 크게 보기: imgs [{f,w,h}], start 번째부터. onAt(i) = 보던 사진 번호를 자세히 화면에 돌려줌.
+function openZoom(imgs, start, title, onAt){
+  const layer = $("layer"), n = imgs.length, Z = 2.5;
+  layer.insertAdjacentHTML("beforeend", `<div class="pzv" role="dialog" aria-modal="true" aria-label="${esc(title)} 사진 크게 보기">
+    <div class="pzv-strip">${imgs.map((im, i) => `<div class="pzv-sl"><img src="${esc(imgUrl(im.f))}" alt="${esc(title)} 사진 ${i + 1}" draggable="false"${im.w && im.h ? ` width="${im.w}" height="${im.h}"` : ""}${Math.abs(i - start) > 1 ? ` loading="lazy"` : ""}></div>`).join("")}</div>
+    <div class="pzv-top"><span class="num pzv-n"></span><button class="pzv-b pzv-z" type="button" aria-label="확대" aria-pressed="false">${ico("plus")}</button><button class="pzv-b pzv-x" type="button" aria-label="닫기">${ico("x")}</button></div>
+    ${n > 1 ? `<button class="pzv-b pzv-p" type="button" aria-label="앞 사진">${ico("down")}</button><button class="pzv-b pzv-nx" type="button" aria-label="다음 사진">${ico("down")}</button>` : ""}</div>`);
+  const zv = layer.lastElementChild, strip = zv.querySelector(".pzv-strip"), sls = [...strip.children], zb = zv.querySelector(".pzv-z");
+  let at = Math.max(0, Math.min(start, n - 1)), zoomed = null;
+  const W = () => strip.clientWidth || 1;
+  const mark = () => {
+    zv.querySelector(".pzv-n").textContent = n > 1 ? `${at + 1} / ${n}` : "";
+    const p = zv.querySelector(".pzv-p"), q = zv.querySelector(".pzv-nx"); if(p){ p.disabled = at === 0; q.disabled = at === n - 1; }
+  };
+  const unzoom = () => {
+    if(!zoomed) return; const img = zoomed.querySelector("img"); img.style.width = img.style.height = "";
+    zoomed.classList.remove("zm"); zoomed = null; strip.classList.remove("lock"); zv.classList.remove("zoomed");
+    zb.innerHTML = ico("plus"); zb.setAttribute("aria-label", "확대"); zb.setAttribute("aria-pressed", "false");
+    strip.scrollLeft = at * W();
+  };
+  const zoom = (cx, cy) => {
+    const sl = sls[at], img = sl.querySelector("img"), r = img.getBoundingClientRect(); if(!r.width) return;
+    const fx = cx === undefined ? .5 : Math.min(1, Math.max(0, (cx - r.left) / r.width)), fy = cy === undefined ? .5 : Math.min(1, Math.max(0, (cy - r.top) / r.height));
+    strip.classList.add("lock"); zv.classList.add("zoomed"); sl.classList.add("zm"); zoomed = sl;
+    img.style.width = Math.round(r.width * Z) + "px"; img.style.height = Math.round(r.height * Z) + "px";
+    sl.scrollLeft = fx * r.width * Z - sl.clientWidth / 2; sl.scrollTop = fy * r.height * Z - sl.clientHeight / 2;
+    zb.innerHTML = ico("minus"); zb.setAttribute("aria-label", "확대 풀기"); zb.setAttribute("aria-pressed", "true");
+  };
+  const go = i => { if(i < 0 || i >= n) return; unzoom(); at = i; mark(); strip.scrollTo({left: i * W(), behavior: REDUCED ? "auto" : "smooth"}); onAt && onAt(at); };
+  const close = () => { if(!zv.isConnected) return; zv.remove(); removeEventListener("keydown", key); removeEventListener("resize", fit); onAt && onAt(at); };
+  const key = e => { if(!zv.isConnected) return; if(e.key === "ArrowRight"){ e.preventDefault(); go(at + 1); } else if(e.key === "ArrowLeft"){ e.preventDefault(); go(at - 1); } };
+  const fit = () => { if(!zoomed) strip.scrollLeft = at * W(); };
+  zv._close = close;
+  strip.scrollLeft = at * W(); requestAnimationFrame(() => { strip.scrollLeft = at * W(); });
+  mark();
+  let st = 0;
+  strip.addEventListener("scroll", () => { if(zoomed) return; clearTimeout(st); st = setTimeout(() => { const i = Math.round(strip.scrollLeft / W()); if(i !== at && i >= 0 && i < n){ at = i; mark(); onAt && onAt(at); } }, 60); }, {passive: true});
+  // 두 번 누르기(손가락) / 두 번 클릭(마우스) = 확대·풀기, 사진 밖 빈 곳 한 번 = 닫기
+  let lastT = 0, lastX = 0, lastY = 0, downX = 0, downY = 0; const born = Date.now();
+  zv.addEventListener("pointerdown", e => { downX = e.clientX; downY = e.clientY; });
+  zv.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if(b){ if(b.classList.contains("pzv-x")) close(); else if(b.classList.contains("pzv-p")) go(at - 1); else if(b.classList.contains("pzv-nx")) go(at + 1); else if(b === zb){ zoomed ? unzoom() : zoom(); } return; }
+    if(Date.now() - born < 400 || Math.hypot(e.clientX - downX, e.clientY - downY) > 10) return;   // 여는 누르기의 click, 끌어 넘기거나 끌어 본 것
+    const now = Date.now();
+    if(e.target.tagName === "IMG"){
+      if(now - lastT < 320 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 40){ lastT = 0; zoomed ? unzoom() : zoom(e.clientX, e.clientY); return; }
+      lastT = now; lastX = e.clientX; lastY = e.clientY; return;
+    }
+    if(!zoomed && e.target.classList.contains("pzv-sl")) close();
+  });
+  addEventListener("keydown", key); addEventListener("resize", fit);
+  zv.querySelector(".pzv-x").focus({preventScroll: true});
+  return {close};
 }
 // Escape shuts only the sheet on top
 document.addEventListener("keydown", e => { if(e.key !== "Escape") return; const ov = $("layer").lastElementChild; if(ov && ov._close){ e.preventDefault(); e.stopPropagation(); ov._close(); } });
@@ -5049,7 +5130,7 @@ function openShow(id, x0, opt){
   function picHTML2(){
     if(!x.imgs.length) return x.kind === "dream" ? "" : `<div class="dbig"><svg class="fi" style="width:44px;height:44px;opacity:.5" aria-hidden="true"><use href="#i-image"/></svg></div>`;
     const im = x.imgs[Math.min(at, x.imgs.length - 1)], n = x.imgs.length;
-    return `<div class="sh-photo"><div class="dbig tall"><img id="sh-img" src="${esc(imgUrl(im.f))}" alt="${esc(showTitle(x))} 사진 ${at + 1}"${im.w && im.h ? ` width="${im.w}" height="${im.h}"` : ""}></div>
+    return `<div class="sh-photo"><div class="dbig tall"><img id="sh-img" src="${esc(imgUrl(im.f))}" alt="${esc(showTitle(x))} 사진 ${at + 1}" draggable="false"${im.w && im.h ? ` width="${im.w}" height="${im.h}"` : ""}><button class="sh-zbtn" type="button" data-zoom="1" aria-label="사진 크게 보기">${ico("search")}</button></div>
       ${n > 1 ? `<div class="sh-nav"><button class="pill ghost sm" type="button" data-go="-1" aria-label="앞 사진">${ico("down")}<span>앞</span></button><span class="num">${at + 1} / ${n}</span><button class="pill ghost sm" type="button" data-go="1" aria-label="다음 사진"><span>다음</span>${ico("down")}</button></div>` : ""}</div>`;
   }
   function itemRow(y){
@@ -5091,12 +5172,27 @@ function openShow(id, x0, opt){
     .catch(e => { if(e.message === "no_show"){ SH.drop(id); s.close(); toast("지워진 글이에요"); return; } loadErr = true; drawCmts(); });
   const msg = sel => body.querySelector(sel);
   s.el.addEventListener("input", e => { if(cb.input(e)) return; if(e.target.id === "shc-text") body.querySelector("#shc-cnt").textContent = `${e.target.value.length}/300`; });
+  function picAt(i){
+    const n = x.imgs.length; if(!n) return; at = (i % n + n) % n;
+    const im = x.imgs[at], el = body.querySelector("#sh-img"); if(!el) return;
+    el.src = imgUrl(im.f); el.alt = `${showTitle(x)} 사진 ${at + 1}`; if(im.w && im.h){ el.width = im.w; el.height = im.h; }
+    const c = body.querySelector(".sh-nav .num"); if(c) c.textContent = `${at + 1} / ${n}`;
+  }
+  const zoomOpen = () => { if(x.imgs.length) openZoom(x.imgs, at, showTitle(x), picAt); };
+  let swX = null, swY = 0;
+  s.el.addEventListener("pointerdown", e => { swX = e.target.id === "sh-img" ? e.clientX : null; swY = e.clientY; });
+  s.el.addEventListener("pointerup", e => {
+    if(swX === null) return; const dx = e.clientX - swX, dy = e.clientY - swY; swX = null;
+    if(x.imgs.length > 1 && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3){ picAt(at + (dx < 0 ? 1 : -1)); }
+    else if(Math.abs(dx) < 10 && Math.abs(dy) < 10 && e.target.id === "sh-img" && body.contains(e.target)) zoomOpen();   // 누르기 (밀고 난 다음 click이 안 오는 폰이 있어 pointerup에서 엶)
+  });
   s.el.addEventListener("click", async e => {
     const t = e.target.closest("button"); if(!t || !body.contains(t)) return;
     if(cb.owns(t)) return cb.click(t);
     if(t.dataset.signin) return openSignin(t.dataset.signin);
     if(t.dataset.copy) return copyText(t.dataset.copy);
-    if(t.dataset.go){ at = (at + +t.dataset.go + x.imgs.length) % x.imgs.length; const im = x.imgs[at], el = body.querySelector("#sh-img"); el.src = imgUrl(im.f); el.alt = `${showTitle(x)} 사진 ${at + 1}`; body.querySelector(".sh-nav .num").textContent = `${at + 1} / ${x.imgs.length}`; return; }
+    if(t.dataset.zoom) return zoomOpen();
+    if(t.dataset.go) return picAt(at + +t.dataset.go);
     if(t.dataset.oi){ const it = BY_ID.get(+t.dataset.oi); if(it){ sheetOver = true; openDetail(it, +t.dataset.oc >= 0 && frameCount(it) > 1 ? +t.dataset.oc : undefined); } return; }
     if(t.id === "sh-like"){
       if(!me()) return openSignin("in");
