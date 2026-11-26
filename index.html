@@ -1891,6 +1891,13 @@ html.lscB .card.li .meta .tag:last-child{margin-right:0}
 @media (max-width:600px){ .pzv-sl{padding:64px 8px 84px} .pzv-p, .pzv-nx{top:auto; bottom:20px; margin-top:0} .pzv-p{left:calc(50% - 58px)} .pzv-nx{left:calc(50% + 12px); right:auto} }
 .tabs.fo-multi button{flex:1 1 0; min-width:0}
 @media (max-width:320px){ .tabs.fo-multi button:not([data-fo="all"])[aria-selected="true"]::before{display:none} }
+#btn-lock[aria-pressed="true"]{background:var(--sun); color:var(--soil-deep)}
+#btn-lock.nudge{animation:lockNudge .45s}
+@keyframes lockNudge{20%{transform:rotate(-14deg)} 45%{transform:rotate(11deg)} 70%{transform:rotate(-6deg)} 100%{transform:none}}
+@media (prefers-reduced-motion:reduce){ #btn-lock.nudge{animation:none} }
+@media (max-width:340px){ .row2 .filt.sq{width:32px} }
+.sheet .ph-kind{flex:none; margin:2px 0 12px}
+.sheet .ph-kind button{min-width:0}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1927,6 +1934,7 @@ html.lscB .card.li .meta .tag:last-child{margin-right:0}
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.1"/><path d="M12 7.5V12l3 2.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 9.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0 M3 15.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 11h12v9H6z M8.5 11V8a3.5 3.5 0 0 1 7 0v3" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/></symbol>
+  <symbol id="i-unlock" viewBox="0 0 24 24"><path d="M6 11h12v9H6z M8.5 11V8a3.5 3.5 0 0 1 6.6-1.6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/></symbol>
   <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="16" cy="7" r="2.4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="10" cy="17" r="2.4" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
   <symbol id="i-sofa" viewBox="0 0 24 24"><path d="M5.5 10.5V8a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.5 M3.5 12a1.75 1.75 0 0 1 3.5 0v2h10v-2a1.75 1.75 0 0 1 3.5 0v6h-17z M6 18v2 M18 18v2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/></symbol>
   <symbol id="i-museum" viewBox="0 0 24 24"><path d="M3.5 9L12 4l8.5 5z M6 10v7.5 M10 10v7.5 M14 10v7.5 M18 10v7.5 M3.5 20h17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" stroke-linecap="round"/></symbol>
@@ -1984,6 +1992,7 @@ html.lscB .card.li .meta .tag:last-child{margin-right:0}
       </div>
       <button class="filt sq" id="btn-like" type="button" aria-pressed="false" aria-label="좋아요만 보기" title="좋아요만 보기"><svg class="ic"><use href="#i-heart"/></svg></button>
       <button class="filt sq" id="btn-lsc" type="button" aria-pressed="false" aria-label="목록 모양" title="목록 모양"><svg class="ic"><use href="#i-list"/></svg></button>
+      <button class="filt sq" id="btn-lock" type="button" aria-pressed="false" aria-label="잠금" title="잠금"><svg class="ic"><use href="#i-unlock"/></svg></button>
       <button class="filt" id="btn-filt" type="button" aria-haspopup="dialog" aria-label="필터와 정렬" title="필터와 정렬"><svg class="ic"><use href="#i-sliders"/></svg><span class="lb">필터·정렬</span><span class="badge num" id="filt-badge" hidden>0</span></button>
     </div>
     <div class="meter" title="전체 진행률" role="progressbar" aria-label="전체 진행률" id="p-bar"><i></i></div>
@@ -2140,7 +2149,25 @@ function initials(s){ let o=""; for(const ch of s){ const c=ch.charCodeAt(0); if
 function clean(s){ return s.replace(/[^0-9A-Za-z가-힣ㄱ-ㅎ]/g,"").toLowerCase(); }
 function jamo(s){ let o=""; for(const ch of s){ const c=ch.charCodeAt(0); if(c>=0xAC00&&c<=0xD7A3){ const x=c-0xAC00; o+=String.fromCharCode(0x1100+Math.floor(x/588), 0x1161+Math.floor((x%588)/28)); const t=x%28; if(t) o+=String.fromCharCode(0x11A7+t); } else o+=ch; } return o; }
 ITEMS.forEach(it => { it.k = clean(it.ko); it.e = clean(it.en); it.i = initials(it.ko); it.j = jamo(it.k); });
-const MATCHABLE = ITEMS.filter(it => it.st <= 3 && !it.noKo);
+let MATCHABLE = ITEMS.filter(it => it.st <= 3 && !it.noKo);
+const MATCH_POOL = {item: MATCHABLE, rcp: ITEMS.filter(it => CATS[it.cat] && CATS[it.cat][1] === "rcp" && !it.noKo), react: ITEMS.filter(it => CATS[it.cat] && CATS[it.cat][0] === "리액션" && !it.noKo)};
+const MATCH_KINDS = [["item", "아이템"], ["rcp", "DIY 레시피"], ["react", "리액션"]];
+let matchKind = "item";
+function setMatchKind(k){ if(!MATCH_POOL[k] || k === matchKind) return; matchKind = k; MATCHABLE = MATCH_POOL[k]; bmCache.clear(); }
+// what the photo sheet starts on: the kind of list being looked at
+function viewMatchKind(){
+  const cs = ui.cat === -5 ? ui.cats : [ui.cat]; if(!cs.length || cs.some(c => !(c >= 0) || !CATS[c])) return "item";
+  if(cs.every(c => CATS[c][1] === "rcp")) return "rcp";
+  if(cs.every(c => CATS[c][0] === "리액션")) return "react";
+  return "item";
+}
+// the fixes for K.K. songs, No.N clothes and Latin names look at every item: keep only what is in the chosen kind
+function poolOnly(list){
+  if(matchKind === "item") return list;
+  const ids = new Set(MATCHABLE.map(it => it.id)), byK = new Map(MATCHABLE.map(it => [it.k, it])), out = new Map();
+  list.forEach(r => { const it = ids.has(r.it.id) ? r.it : byK.get(r.it.k); if(!it) return; const prev = out.get(it.id); if(!prev || prev.score < r.score) out.set(it.id, {...r, it}); });
+  return [...out.values()].sort((a, b) => b.score - a.score);
+}
 
 /* ---------- Korean search ----------
    Matches: 초성 (ㅈㄹㅎ), 겹자음 typed by the IME (ㅈㅀ = ㅈㄹㅎ), mixed (정ㄹㅎ), unfinished syllables (정맇, 정리하),
@@ -2211,6 +2238,20 @@ const KS = (() => {
 
 /* ---------- State ---------- */
 const KEY = "acnh-catalog-check-v1";
+let locked = (() => { try{ return localStorage.getItem(KEY + ":lock") === "1"; }catch(e){ return false; } })(), lockHinted = false;
+const LOCK_TABS = ["item", "museum", "villager"];
+function lockApply(){
+  const b = document.getElementById("btn-lock"); if(!b) return;
+  document.documentElement.classList.toggle("locked", locked);
+  b.classList.toggle("tabhide", !LOCK_TABS.includes(ui.tab)); b.setAttribute("aria-pressed", String(locked));
+  b.title = b.ariaLabel = locked ? "잠금 중 (누르면 풀기)" : "잠금 (누르면 잠가요)";
+  b.querySelector("use").setAttribute("href", locked ? "#i-lock" : "#i-unlock");
+}
+// a tap that would change a check while locked: shake the lock, say why once, and show the detail instead
+function lockNudge(){
+  const b = document.getElementById("btn-lock"); if(b){ b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge"); }
+  if(!lockHinted){ lockHinted = true; toast("잠금 중이라 체크되지 않아요"); }
+}
 const LSC_MODES = {item:["", "B"], museum:["", "B"]}, LSC_NAME = {"":"기본 보기", B:"작은 칸 보기", C:"사진 칸 보기"}, LSC_ICO = {"":"list", B:"grid", C:"image"};
 let lsMode = (() => { try{ const o = JSON.parse(localStorage.getItem(KEY + ":lsc") || "{}"); return o && typeof o === "object" ? o : {}; }catch(e){ return {}; } })();
 function lscApply(tab){
@@ -2519,7 +2560,7 @@ function renderHead0(){
     : ui.fo === "season" ? ["설정", "sliders", "시즌 설정"] : ui.fo === "turnip" ? ["지난 기록", "cal", "무트코인 지난 기록"] : ["고치기", "sliders", "할 일 고치기"];
   fl.querySelector(".lb").textContent = flb; fl.querySelector("use").setAttribute("href", "#i-" + fic); fl.title = fl.ariaLabel = ft;
   $("btn-like").classList.toggle("tabhide", todo || island);
-  lscApply(ui.tab);
+  lscApply(ui.tab); lockApply();
   if(island) return renderIslandHead();
   if(todo) return renderTodoHead();
   if(ui.tab === "villager") return renderVillagerHead();
@@ -2578,6 +2619,7 @@ $("grid").addEventListener("click", e => {
   const sc = e.target.closest("[data-show]"); if(sc){ openShow(sc.dataset.show); return; }
   const b = e.target.closest("[data-act]"); if(!b) return;
   const card = b.closest(".card");
+  if(locked && ["tog", "v", "vtog"].includes(b.dataset.act)){ lockNudge(); if(card.dataset.v){ const v = VBY.get(card.dataset.v); if(v) openVillager(v); } else { const it = BY_ID.get(+card.dataset.id); if(it) openDetail(it); } return; }
   if(card.dataset.v){
     const v = VBY.get(card.dataset.v); if(!v) return; const a = b.dataset.act;
     if(a === "vinfo") return openVillager(v);
@@ -3304,6 +3346,7 @@ function openFind(jump){
     const ab = e.target.closest("[data-act]"), card = ab && ab.closest(".sgrid .card");
     if(card){
       const a = ab.dataset.act;
+      if(locked && ["tog", "v", "vtog"].includes(a)){ lockNudge(); sheetOver = true; if(card.dataset.v){ const v = VBY.get(card.dataset.v); if(v) openVillager(v); } else { const it = BY_ID.get(+card.dataset.id); if(it) openDetail(it); } return; }
       if(card.dataset.v){
         const v = VBY.get(card.dataset.v); if(!v) return;
         if(a === "vinfo"){ sheetOver = true; openVillager(v); return; }
@@ -3418,6 +3461,10 @@ function openFilters(){
 $("btn-filt").addEventListener("click", () => ui.tab === "island" ? openIslandShare() : ui.tab === "todo" ? todoFiltClick() : ui.tab === "dream" ? (SRV ? openShowForm() : openDreamForm()) : ui.tab === "trade" ? openTradeForm() : openFind("filt"));
 document.addEventListener("change", e => { if(e.target.id === "f-src"){ ui.src = +e.target.value; ui.limit = 0; saveView(); render(); renderHead(); } });
 
+$("btn-lock").addEventListener("click", () => {
+  locked = !locked; lockHinted = false; try{ localStorage.setItem(KEY + ":lock", locked ? "1" : "0"); }catch(e){}
+  lockApply(); toast(locked ? "잠갔어요" : "잠금을 풀었어요");
+});
 $("btn-lsc").addEventListener("click", () => {
   const L = LSC_MODES[ui.tab]; if(!L) return;
   const m = L.includes(lsMode[ui.tab]) ? lsMode[ui.tab] : "", nx = L[(L.indexOf(m) + 1) % L.length];
@@ -8220,13 +8267,18 @@ async function claudeRead(file, sp){
 
 function openPhoto(){
   const s = openSheet(`<div class="hd"><h3>사진으로 체크</h3>${XBTN}</div>
-    <p class="sub">카탈로그 화면을 찍거나 화면 기록해서 올려요</p>
+    <div class="vtabs ph-kind" id="ph-kind" role="tablist" aria-label="무엇을 체크할까요">${MATCH_KINDS.map(([k, l]) => `<button type="button" role="tab" data-mk="${k}" aria-selected="false">${l}</button>`).join("")}</div>
     <div id="ph-claude"></div>
     <label class="drop" id="ph-drop"><b>사진·영상 고르기</b><input id="ph-file" type="file" accept="image/*,video/*" multiple hidden></label>
     <div id="ph-stat" hidden><p class="sub" id="ph-txt"></p><div class="pbar"><i id="ph-bar"></i></div></div>
     <div id="ph-res"></div>`);
   const el = s.el, stat = el.querySelector("#ph-stat"), txt = el.querySelector("#ph-txt"), bar = el.querySelector("#ph-bar"), res = el.querySelector("#ph-res");
-  let useClaude = false, sp = null;
+  let useClaude = false, sp = null, kind = viewMatchKind(), lastLines = null;
+  const kindEl = el.querySelector("#ph-kind"), paintKind = () => kindEl.querySelectorAll("[data-mk]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mk === kind)));
+  paintKind();
+  kindEl.addEventListener("click", e => { const b = e.target.closest("[data-mk]"); if(!b || !drop.isConnected || stat.hidden === false) return; kind = b.dataset.mk; paintKind();
+    if(lastLines){ setMatchKind(kind); showResults(poolOnly(matchLines(lastLines))); }   // the same photo, matched again as the new kind
+  });
   getSample().then(x => { sp = x; if(!x) return; el.querySelector("#ph-claude").innerHTML = `<label class="toggle"><input type="checkbox" id="ph-use"> Claude로 읽기 (더 정확해요. 로그인한 내 계정의 사용량을 써요)</label>`; el.querySelector("#ph-use").addEventListener("change", e => { useClaude = e.target.checked; }); });
   const drop = el.querySelector("#ph-drop");
   drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("hot"); });
@@ -8239,7 +8291,7 @@ function openPhoto(){
     if(!files.length) return;
     drop.hidden = true; stat.hidden = false; res.innerHTML = "";
     bar.style.transition = "none"; bar.style.width = "0%"; txt.textContent = ""; void bar.offsetWidth; bar.style.transition = "";   // a new run starts from empty, without sliding back
-    const lines = []; ocrCut = 0; ocrColor = [];
+    const lines = []; ocrCut = 0; ocrColor = []; setMatchKind(kind);
     let shown = 0;
     const show = (f, label, note) => { shown = Math.max(shown, Math.min(1, f)); bar.style.width = (shown * 100).toFixed(1) + "%";
       if(label) txt.textContent = `${label} · ${Math.floor(shown * 100)}%${note ? " " + note : ""}`; };
@@ -8280,7 +8332,8 @@ function openPhoto(){
       }
       const t0 = performance.now(), mw = "읽은 글자를 아이템 이름과 맞추는 중";
       show(1 - MATCH, mw); await warmMatch(lines, f => show(1 - MATCH + MATCH * 0.95 * f, mw));
-      const found = matchLines(lines.filter(l => l && l.trim())); ocrT.match += performance.now() - t0;
+      lastLines = lines.filter(l => l && l.trim());
+      const found = poolOnly(matchLines(lastLines)); ocrT.match += performance.now() - t0;
       show(1);
       showResults(found);
     }catch(e){
