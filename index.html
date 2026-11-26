@@ -1889,6 +1889,8 @@ html.lscB .card.li .meta .tag:last-child{margin-right:0}
 .pzv.zoomed .pzv-p, .pzv.zoomed .pzv-nx{display:none}
 @media (min-width:601px){ .pzv-sl{padding:64px 68px 28px} }
 @media (max-width:600px){ .pzv-sl{padding:64px 8px 84px} .pzv-p, .pzv-nx{top:auto; bottom:20px; margin-top:0} .pzv-p{left:calc(50% - 58px)} .pzv-nx{left:calc(50% + 12px); right:auto} }
+.tabs.fo-multi button{flex:1 1 0; min-width:0}
+@media (max-width:320px){ .tabs.fo-multi button:not([data-fo="all"])[aria-selected="true"]::before{display:none} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
