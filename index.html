@@ -54,6 +54,8 @@
   .acbtns .pill{flex-direction:column; gap:3px; padding:8px 2px 7px; font-size:13.5px}
   .acbtns .pill .fi{width:19px; height:19px}
 }
+.tabs.fo-multi button:not([data-fo="all"])[aria-selected="true"]::before{content:""; flex:none; width:.95em; height:.95em; margin-right:-2px; background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='black' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='black' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+@media (max-width:300px){ .tabs.fo-multi button:not([data-fo="all"])[aria-selected="true"]::before{width:.8em; height:.8em; margin-right:-3px} }
 </style>
 <script>window.DN_SERVER = 1;</script>
 </head>
@@ -2255,9 +2257,14 @@ const TAB_FO = {
   island: [["land","땅"], ["water","물"], ["path","길"], ["deco","나무·꽃"], ["build","건물"]]
 };
 const FO_LABEL = {all:"전체", done:"완료", none:"미보유", part:"일부 보유", have:"보유"};
+const FO_MULTI = ["none", "part", "done"];
+const foSet = fo => fo === "have" ? ["part", "done"] : !fo || fo === "all" ? [] : String(fo).split("+");
+const foOk = (t, f) => TAB_FO[t].some(x => x[0] === f) || (t === "item" && typeof f === "string" && f.split("+").length > 1 && f.split("+").every(k => FO_MULTI.includes(k)));
+function foToggle(cur, f){ if(f === "all") return "all"; const on = new Set(foSet(cur)); if(on.has(f)) on.delete(f); else on.add(f); const L = FO_MULTI.filter(k => on.has(k)); return !L.length || L.length === FO_MULTI.length ? "all" : L.join("+"); }
+const foOn = (fo, f) => f === "all" ? fo === "all" : foSet(fo).includes(f);
 const UIKEY = KEY + ":view";
 try{ const v = JSON.parse(localStorage.getItem(UIKEY) || "null"); if(v){
-  if(v.mem) TABS.forEach(t => { const m = v.mem[t]; if(m){ if(Number.isInteger(m.cat)) mem[t].cat = m.cat; if(TAB_FO[t].some(f => f[0] === m.fo)) mem[t].fo = m.fo; mem[t].liked = !!m.liked; if(Array.isArray(m.cats)) mem[t].cats = m.cats.filter(Number.isInteger); } });
+  if(v.mem) TABS.forEach(t => { const m = v.mem[t]; if(m){ if(Number.isInteger(m.cat)) mem[t].cat = m.cat; if(foOk(t, m.fo)) mem[t].fo = m.fo; mem[t].liked = !!m.liked; if(Array.isArray(m.cats)) mem[t].cats = m.cats.filter(Number.isInteger); } });
   else { if(Number.isInteger(v.cat)) mem.item.cat = v.cat; const fo = {no:"none", yes:"done", nopart:"all"}[v.fo] || v.fo; if(FO_LABEL[fo]) mem.item.fo = fo; mem.item.liked = !!v.liked; }
   // a category saved before the museum split moves to its tab
   if(mem.item.cat >= 0 && tabOfCat(mem.item.cat) === "museum"){ mem.museum.cat = mem.item.cat; mem.item.cat = 0; }
@@ -2410,7 +2417,7 @@ function matchesFilters(it){
   if(!passItem(it)) return false;
   if(ui.fo !== "all"){
     const s = ownState(it);
-    if(ui.fo === "have" ? s === "none" : ui.fo==="nopart" ? s==="done" : s !== ui.fo) return false;
+    if(ui.fo === "nopart" ? s === "done" : !foSet(ui.fo).includes(s)) return false;
   }
   return passCatalog(it);
 }
@@ -2473,7 +2480,7 @@ function setTabs(counts){
     el.setAttribute("aria-label", ui.tab === "island" ? "도구" : ui.tab === "dream" ? (SRV ? "종류" : "정렬") : ui.tab === "trade" ? "글 종류" : ui.tab === "villager" ? "주민 상태" : "보유 상태");
     el.innerHTML = TAB_FO[ui.tab].map(([v, l, short]) => `<button type="button" role="tab" data-fo="${v}"${v === "have" ? ` title="일부 보유와 완료를 함께 보여요"` : ""}>${short ? `<span class="mob">${short}</span><span class="desk">${l}</span>` : l}${counts ? `<span class="tn num"></span>` : ""}${ui.tab === "dream" && v !== "new" ? `<span class="cd num" aria-hidden="true"></span>` : ""}</button>`).join("");
   }
-  el.querySelectorAll("button").forEach(b => { const f = b.dataset.fo; b.setAttribute("aria-selected", ui.fo === f); const tn = b.querySelector(".tn"); if(tn && counts) tn.textContent = fmt(counts[f] || 0); });
+  el.classList.toggle("fo-multi", ui.tab === "item"); el.querySelectorAll("button").forEach(b => { const f = b.dataset.fo; b.setAttribute("aria-selected", ui.tab === "item" ? foOn(ui.fo, f) : ui.fo === f); const tn = b.querySelector(".tn"); if(tn && counts) tn.textContent = fmt(counts[f] || 0); });
   paintDreamLock();
 }
 let dreamLockUntil = 0, dreamLockTimer = 0;
@@ -2606,7 +2613,7 @@ $("grid").addEventListener("pointermove", e => { if(lp && Math.hypot(e.clientX-l
 $("grid").addEventListener("contextmenu", e => { const card = e.target.closest(".card"); if(!card) return; e.preventDefault(); if(!lpFired) lpOpen(card); });
 $("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return;
   if(ui.tab === "dream" && b.dataset.fo !== "new" && dreamLeft()){ toast(`처음엔 새로 올라온 꿈번지부터 보여 드려요. ${dreamLeft()}초 뒤에 고를 수 있어요`); return; }
-  ui.fo = b.dataset.fo; ui.limit = 0; saveView(); render(); $("page").scrollTo({top:0}); });
+  ui.fo = ui.tab === "item" ? foToggle(ui.fo, b.dataset.fo) : b.dataset.fo; ui.limit = 0; saveView(); render(); $("page").scrollTo({top:0}); });
 if(false) $("active").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return; const k = b.dataset.k;
   if(k==="fo") ui.fo="all"; else if(k==="src") ui.src=-1; else if(k==="sort") ui.sort="base"; else if(k==="buyable" || k==="new3" || k==="diy" || k==="remake" || k==="liked") ui[k]=false; else ui[k]=true;
@@ -2758,7 +2765,7 @@ const BK = (() => {
       if(t !== ui.tab){ ui.tab = t; Object.assign(ui, {fo: mem[t].fo, liked: mem[t].liked}); if(t === "dream") dreamLock(); }
       if(typeof v.c === "string" && v.c[0] === "m") setCats(v.c.slice(1).split(".").map(Number).filter(Number.isInteger));
       else { ui.cat = Number.isInteger(v.c) ? v.c : mem[t].cat; ui.cats = ui.cat === -5 ? (mem[t].cats || []).slice() : []; if(ui.cat === -5 && ui.cats.length < 2) setCats(ui.cats); }
-      if(t !== "island" && TAB_FO[t].some(f => f[0] === v.f)) ui.fo = v.f;
+      if(t !== "island" && foOk(t, v.f)) ui.fo = v.f;
       ui.limit = st.limit || 0;
       saveView(); renderTotals(); render();
     } finally { restoring = false; }
@@ -3274,9 +3281,10 @@ function openFind(jump){
     if(html === cardHTML && list.length){
       const c = {all:list.length, none:0, part:0, done:0}; list.forEach(it => c[ownState(it)]++); c.have = c.part + c.done;
       const F = T === "museum" ? [["all", "전체", ""], ["none", "미기증", ""], ["have", "기증", "on"]] : [["all", "전체", ""], ["none", "미보유", ""], ["part", `일부<span class="sfo-l"> 보유</span>`, "part"], ["done", "완료", "on"]];
-      if(!F.some(f => f[0] === sfo) || !c[sfo]) sfo = "all";
-      chips = `<div class="sfo" role="radiogroup" aria-label="보유 상태">${F.map(([v, l, d]) => `<button type="button" role="radio" data-sfo="${v}" aria-checked="${sfo === v}">${d || v === "none" ? `<i class="${d}"></i>` : ""}${l} <b class="num">${fmt(c[v])}</b></button>`).join("")}</div>`;
-      if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return sfo === "have" ? st !== "none" : st === sfo; });
+      const multi = T !== "museum", cOf = v => v === "all" ? c.all : foSet(v).reduce((a, k) => a + (c[k] || 0), 0);
+      if(!(F.some(f => f[0] === sfo) || (multi && foOk("item", sfo))) || !cOf(sfo)) sfo = "all";
+      chips = `<div class="sfo" role="radiogroup" aria-label="보유 상태">${F.map(([v, l, d]) => `<button type="button" role="radio" data-sfo="${v}" aria-checked="${multi ? foOn(sfo, v) : sfo === v}">${d || v === "none" ? `<i class="${d}"></i>` : ""}${l} <b class="num">${fmt(c[v])}</b></button>`).join("")}</div>`;
+      if(sfo !== "all") list = list.filter(it => { const st = ownState(it); return multi ? foSet(sfo).includes(st) : sfo === "have" ? st !== "none" : st === sfo; });
     }
     let catHits = "";
     if(T === "item" || T === "museum"){ const cs = T === "museum" ? MUSEUM_CATS : CATS.map((c, i) => i).filter(i => tabOfCat(i) === "item"); const h = searchIn(cs, i => [CATS[i][0]], q).slice(0, 6); if(h.length) catHits = `<div class="cgrid vchit">${h.map(i => catBtn(i)).join("")}</div>`; }
@@ -3287,7 +3295,7 @@ function openFind(jump){
   if(!V) s.ov._reveal = () => { if(inp.value.trim()) paint(); };   // back from a detail opened here: show its new check state
   const redo = (el, h) => { const w = document.createElement("div"); w.innerHTML = h; el.replaceWith(w.firstChild); };
   s.el.addEventListener("click", e => {
-    const sf = e.target.closest("[data-sfo]"); if(sf){ sfo = sf.dataset.sfo; paint(); return; }
+    const sf = e.target.closest("[data-sfo]"); if(sf){ sfo = T === "museum" ? sf.dataset.sfo : foToggle(sfo, sf.dataset.sfo); paint(); return; }
     const d = e.target.closest("[data-dream]"); if(d){ sheetOver = true; openDream(d.dataset.dream); return; }
     const tr = e.target.closest("[data-trade]"); if(tr){ sheetOver = true; openTrade(tr.dataset.trade); return; }
     const sw = e.target.closest("[data-show]"); if(sw){ sheetOver = true; openShow(sw.dataset.show); return; }
